@@ -1,5 +1,10 @@
 2000-07-31  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1023)
 
+	* lib/DBD/File.pm (STORE): Changed croak to die.
+	  Guido Flohr <guido@imperia.westend.com>	  
+
+2000-07-31  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1023)
+
 	* Minor fix in the docs, thanks to Andreas Grupp,
 	  grupp@elektronikschule.de.
 	* Minor compatibility fixes in the test suite for

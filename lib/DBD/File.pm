@@ -195,7 +195,7 @@ sub STORE ($$$) {
     my ($dbh, $attrib, $value) = @_;
     if ($attrib eq 'AutoCommit') {
 	return 1 if $value; # is already set
-	croak("Can't disable AutoCommit");
+	die("Can't disable AutoCommit");
     } elsif ($attrib eq (lc $attrib)) {
 	# Driver private attributes are lower cased
 	$dbh->{$attrib} = $value;
