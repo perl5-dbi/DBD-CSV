@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1021';
+$VERSION = '0.1022';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -269,6 +269,10 @@ sub type_info_all ($) {
 		my $user = eval { getpwuid((stat(_))[4]) };
 		push(@tables, [undef, $user, $file, "TABLE", undef]);
 	    }
+	}
+	if (!closedir($dirh)) {
+	    DBI::set_err($dbh, 1, "Cannot close directory $dir");
+	    return undef;
 	}
 
 	my $dbh2 = $dbh->{'csv_sponge_driver'};

@@ -1,3 +1,8 @@
+2001-05-04  Jochen Wiedmann  <joe@ispsoft.de> (0.1026)
+
+	* lib/DBD/File.pm (table_info): Added closedir().
+	  Alex Hornby <alex@anvil.co.uk>
+
 2000-12-22  Jochen Wiedmann  <joe@ispsoft.de> (0.1025)
 
 	* lib/DBD/CSV.pm (fetch_row): Now cleaning $! before
