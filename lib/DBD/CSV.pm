@@ -2,15 +2,14 @@
 #
 #   DBD::CSV - A DBI driver for CSV and similar structured files
 #
-#   This module is Copyright (C) 1998 by
+#   This module is currently maintained by
 #
-#       Jochen Wiedmann
-#       Am Eisteich 9
-#       72555 Metzingen
-#       Germany
+#       Jeff Zucker
+#       <jeff@vpservices.com>
 #
-#       Email: joe@ispsoft.de
-#       Phone: +49 7123 14887
+#   The original author is Jochen Wiedmann.
+#
+#   Copyright (C) 1998 by Jochen Wiedmann
 #
 #   All rights reserved.
 #
@@ -34,7 +33,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1030';
+$VERSION = '0.2001';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -333,6 +332,14 @@ Note that you almost definitely need root or administrator permissions.
 If you don't have them, read the ExtUtils::MakeMaker man page for details
 on installing in your own directories. L<ExtUtils::MakeMaker>.
 
+=head2
+
+  The level of SQL support available depends on the version of
+  SQL::Statement installed.  Any version will support *basic*
+  CREATE, INSERT, DELETE, UPDATE, and SELECT statements.  Only
+  versions of SQL::Statement 1.0 and above support additional
+  features such as table joins, string functions, etc.  See the
+  documentation of the latest version of SQL::Statement for details.
 
 =head2 Creating a database handle
 
@@ -757,12 +764,6 @@ modules:
 
 =over 4
 
-=item Joins
-
-The current version of the module works with single table SELECTs
-only, although the basic design of the SQL::Statement module allows
-joins and the like.
-
 =item Table name mapping
 
 Currently it is not possible to use files with names like C<names.csv>.
@@ -797,22 +798,20 @@ operating systems, as they are for single users anyways).
 
 =head1 AUTHOR AND COPYRIGHT
 
-This module is Copyright (C) 1998 by
+This module is currently maintained by
 
-    Jochen Wiedmann
-    Am Eisteich 9
-    72555 Metzingen
-    Germany
+      Jeff Zucker
+      <jeff@vpservices.com>
 
-    Email: joe@ispsoft.de
-    Phone: +49 7123 14887
+The original author is Jochen Wiedmann.
+
+Copyright (C) 1998 by Jochen Wiedmann
 
 All rights reserved.
 
 You may distribute this module under the terms of either the GNU
 General Public License or the Artistic License, as specified in
 the Perl README file.
-
 
 =head1 SEE ALSO
 

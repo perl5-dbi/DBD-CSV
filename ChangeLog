@@ -1,3 +1,13 @@
+2002-01-21  Jeff Zucker <jeff@vpservices.com> (0.2001)
+
+	* adjusted docs to show Jeff as the new maintainer.
+
+	* added docs for extended SQL features (joins, etc.)
+	  available with SQL::Statement 1.0 and above.
+
+	* adjusted tests blobs.t, chopblanks.t, and ak-dbd.t
+	  to work with all versions of SQL::Statement.
+
 2002-12-20  Jochen Wiedmann  <joe@ispsoft.de> (0.1030)
 
         * lib/DBD/File.pm: Locking is now suppressed under

@@ -88,6 +88,15 @@ DESCRIPTION
     ExtUtils::MakeMaker man page for details on installing in your
     own directories. the ExtUtils::MakeMaker manpage.
 
+  Supported SQL
+
+    The level of SQL support available depends on the version of 
+    SQL::Statement installed.  Any version will support *basic*
+    CREATE, INSERT, DELETE, UPDATE, and SELECT statements.  Only
+    versions of SQL::Statement 1.0 and above support additional
+    features such as table joins, string functions, etc.  See the
+    documentation of the latest version of SQL::Statement for details.
+
   Creating a database handle
 
     Creating a database handle usually implies connecting to a
@@ -102,12 +111,6 @@ DESCRIPTION
 
         $dbh = DBI->connect("DBI:CSV:");
         $dbh = DBI->connect("DBI:CSV:f_dir=.");
-
-    (I was told, that VMS requires
-
-        $dbh = DBI->connect("DBI:CSV:f_dir=");
-
-    for whatever reasons.)
 
     You may set other attributes in the DSN string, separated by
     semicolons.
@@ -474,11 +477,6 @@ TODO
     These are merely restrictions of the DBD::File or SQL::Statement
     modules:
 
-    Joins
-        The current version of the module works with single table
-        SELECTs only, although the basic design of the
-        SQL::Statement module allows joins and the like.
-
     Table name mapping
         Currently it is not possible to use files with names like
         `names.csv'. Instead you have to use soft links or rename
@@ -501,15 +499,12 @@ KNOWN BUGS
             systems, as they are for single users anyways).
 
 AUTHOR AND COPYRIGHT
-    This module is Copyright (C) 1998 by
 
-        Jochen Wiedmann
-        Am Eisteich 9
-        72555 Metzingen
-        Germany
+    This module is currently maintained by Jeff Zucker <jeff@vpservices.com>.
 
-        Email: joe@ispsoft.de
-        Phone: +49 7123 14887
+    The original module was written by Jochen Wiedmann.
+
+    This module is Copyright (C) 1998 by and Jochen Wiedmann
 
     All rights reserved.
 

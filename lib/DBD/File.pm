@@ -3,21 +3,20 @@
 #   DBD::File - A base class for implementing DBI drivers that
 #               act on plain files
 #
-#   This module is Copyright (C) 1998 by
+#  This module is currently maintained by
 #
-#       Jochen Wiedmann
-#       Am Eisteich 9
-#       72555 Metzingen
-#       Germany
+#      Jeff Zucker
+#      <jeff@vpservices.com>
 #
-#       Email: joe@ispsoft.de
-#       Phone: +49 7123 14887
+#  The original author is Jochen Wiedmann.
 #
-#   All rights reserved.
+#  Copyright (C) 1998 by Jochen Wiedmann
 #
-#   You may distribute this module under the terms of either the GNU
-#   General Public License or the Artistic License, as specified in
-#   the Perl README file.
+#  All rights reserved.
+#
+#  You may distribute this module under the terms of either the GNU
+#  General Public License or the Artistic License, as specified in
+#  the Perl README file.
 #
 
 require 5.004;
@@ -705,22 +704,20 @@ MacOS and Windows 95, as there's a single user anyways).
 
 =head1 AUTHOR AND COPYRIGHT
 
-This module is Copyright (C) 1998 by
+This module is currently maintained by
 
-    Jochen Wiedmann
-    Am Eisteich 9
-    72555 Metzingen
-    Germany
+      Jeff Zucker
+      <jeff@vpservices.com>
 
-    Email: joe@ispsoft.de
-    Phone: +49 7123 14887
+The original author is Jochen Wiedmann.
+
+Copyright (C) 1998 by Jochen Wiedmann
 
 All rights reserved.
 
 You may distribute this module under the terms of either the GNU
 General Public License or the Artistic License, as specified in
 the Perl README file.
-
 
 =head1 SEE ALSO
 

@@ -34,7 +34,7 @@ my %opts =
 
 if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
   $opts{'ABSTRACT_FROM'} = 'lib/DBD/CSV.pm';
-  $opts{'AUTHOR'} = 'Jochen Wiedmann (joe@ispsoft.de)';
+  $opts{'AUTHOR'} = 'Jeff Zucker (jeff@vpservices.com)';
   $opts{'PREREQ_PM'} =
     { 'DBI' => '1.00',
       'Text::CSV_XS' => '0.16',
@@ -47,11 +47,11 @@ ExtUtils::MakeMaker::WriteMakefile(%opts);
 
 package MY;
 
-sub postamble {
-    "\npm_to_blib: README\n" .
-    "\nREADME: lib/DBD/CSV.pm" .
-    "\n\tperldoc -t lib/DBD/CSV.pm >README\n\n"
-}
+#sub postamble {
+#    "\npm_to_blib: README\n" .
+#    "\nREADME: lib/DBD/CSV.pm" .
+#    "\n\tperldoc -t lib/DBD/CSV.pm >README\n\n"
+#}
 
 sub libscan {
     my($self, $path) = @_;
