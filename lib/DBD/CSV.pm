@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1029';
+$VERSION = '0.1030';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -348,6 +348,12 @@ are equivalent:
 
     $dbh = DBI->connect("DBI:CSV:");
     $dbh = DBI->connect("DBI:CSV:f_dir=.");
+
+(I was told, that VMS requires
+
+    $dbh = DBI->connect("DBI:CSV:f_dir=");
+
+for whatever reasons.)
 
 You may set other attributes in the DSN string, separated by semicolons.
 

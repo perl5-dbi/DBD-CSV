@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1022';
+$VERSION = '0.1023';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -440,6 +440,10 @@ sub finish ($) { 1; }
 
 package DBD::File::Statement;
 
+my $locking = $^O ne 'MacOS'  &&
+              ($^O ne 'MSWin32' || !Win32::IsWin95())  &&
+              $^O ne 'VMS';
+
 @DBD::File::Statement::ISA = qw(SQL::Statement);
 
 my $open_table_re =
@@ -474,7 +478,7 @@ sub open_table ($$$$$) {
 	}
     }
     binmode($fh);
-    if ($^O ne 'MacOS' && ($^O ne 'MSWin32' || !Win32::IsWin95())) {
+    if ($locking) {
 	if ($lockMode) {
 	    if (!flock($fh, 2)) {
 		die " Cannot obtain exclusive lock on $file: $!";
