@@ -1,3 +1,8 @@
+2001-11-28  Jochen Wiedmann  <joe@ispsoft.de> (0.1029)
+
+	* lib/DBD/CSV.pm (fetch_row): A numeric value
+	  must be assigned to $!.
+
 2001-11-20  Jochen Wiedmann  <joe@ispsoft.de> (0.1028)
 
 	* lib/DBD/CSV.pm (fetch_row): Changed "undef $!"
