@@ -1,6 +1,6 @@
 #   Hej, Emacs, give us -*- perl mode here!
 #
-#   $Id: lib.pl 1.1 Tue, 30 Sep 1997 01:28:08 +0200 joe $
+#   $Id: lib.pl,v 1.2 1998/12/30 10:41:45 joe Exp $
 #
 #   lib.pl is the file where database specific things should live,
 #   whereever possible. For example, you define certain constants
@@ -9,7 +9,8 @@
 
 require 5.003;
 use strict;
-use vars qw($mdriver $dbdriver $childPid $test_dsn $test_user $test_password);
+use vars qw($mdriver $dbdriver $childPid $test_dsn $test_user $test_password
+            $haveFileSpec);
 
 
 #
@@ -25,8 +26,11 @@ $dbdriver = $mdriver; # $dbdriver is usually just the same as $mdriver.
 #
 #   DSN being used; do not edit this, edit "$dbdriver.dbtest" instead
 #
+$haveFileSpec = eval { require File::Spec };
+my $table_dir = $haveFileSpec ?
+    File::Spec->catdir(File::Spec->curdir(), 'output') : 'output';
 $test_dsn      = $ENV{'DBI_DSN'}
-    ||  "DBI:$dbdriver:f_dir=output";
+    ||  "DBI:$dbdriver:f_dir=$table_dir";
 $test_user     = $ENV{'DBI_USER'}  ||  "";
 $test_password = $ENV{'DBI_PASS'}  ||  "";
 

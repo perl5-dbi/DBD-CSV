@@ -1,3 +1,20 @@
+1999-02-11  Jochen Wiedmann  <joe@ispsoft.de> (0.1019)
+
+	* Makefile.PL (CheckModule): Now requires Text::CSV_XS 0.16, due
+	  to an imcompatible change.
+
+1998-12-30  Jochen Wiedmann  <joe@ispsoft.de> (0.1018)
+
+	* t/lib.pl: Fixed a bug in the test suite. (File::Spec wasn't
+	  loaded)
+
+1998-10-26  Jochen Wiedmann  <joe@ispsoft.de> (0.1017)
+
+      * lib/DBD/CSV.pm: Fixed some examples in the docs. (Brian
+        Millett, bpm@ec-group.com)
+      * Now using File::Spec, if available, for Mac portability.
+	(Chris Nandor, pudge@pobox.com)
+
 1998-10-20  Jochen Wiedmann  <joe@ispsoft.de> (0.1016)
 
 	* lib/Bundle/DBD/CSV.pm: Added lib/Bundle/DBD/CSV.pm

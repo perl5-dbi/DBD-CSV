@@ -19,7 +19,7 @@ SYNOPSIS
 
         # Same example, this time reading "info.csv" as a table:
         $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
-        $dbh->{'tables'}->{'info'} = { 'file' => 'csv'};
+        $dbh->{'csv_tables'}->{'info'} = { 'file' => 'csv'};
         $sth = $dbh->prepare("SELECT * FROM info");
 
         # Read /etc/passwd as a CSV file.    
@@ -53,7 +53,7 @@ DESCRIPTION
 
       ftp://ftp.funet.fi/pub/languages/perl/CPAN/modules/by-module
 
-    DBI the DBI (Database independent interface for Perl), version 0.93 or a
+    DBI the DBI (Database independent interface for Perl), version 1.00 or a
         later release
 
     SQL::Statement
@@ -351,7 +351,7 @@ DESCRIPTION
         my $dbh = DBI->connect("DBI:CSV:f_dir=/etc:csv_eol=\n;"
                                . "csv_sep_char=:;csv_quote_char=;"
                                . "csv_escape_char=");
-        $dbh->{'tables'}->{'passwd'} = {
+        $dbh->{'csv_tables'}->{'passwd'} = {
             'col_names' => ["login", "password", "uid", "gid", "realname",
                             "directory", "shell"]
         };
@@ -362,7 +362,7 @@ DESCRIPTION
 
         require DBI;
         my $dbh = DBI->connect("DBI:CSV:");
-        $dbh->{'tables'}->{'passwd'} = {
+        $dbh->{'csv_tables'}->{'passwd'} = {
             'eol' => "\n",
             'sep_char' => ":",
             'quote_char' => undef,
@@ -467,6 +467,12 @@ TODO
         programmer: For example MS Access doesn't export column names by
         default.
 
+KNOWN BUGS
+    *       The module is using flock() internally. However, this function is
+            not available on platforms. Using flock() is disabled on MacOS:
+            There's no locking at all (perhaps not so important on MacOS, as
+            there's a single user anyways).
+
 AUTHOR AND COPYRIGHT
     This module is Copyright (C) 1998 by
 
@@ -487,4 +493,8 @@ AUTHOR AND COPYRIGHT
 SEE ALSO
     the DBI(3) manpage, the Text::CSV_XS(3) manpage, the SQL::Statement(3)
     manpage
+
+    A mailing list for supporting the DBD::CSV driver is available at
+
+      http://mail.healthquiz.com/mailman/listinfo/dbd-csv
 

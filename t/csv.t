@@ -8,7 +8,8 @@ use lib "t";
 require "lib.pl";
 
 
-use vars qw($dbdriver $test_dsn $test_user $test_password $state);
+use vars qw($dbdriver $test_dsn $test_user $test_password $state
+            $haveFileSpec);
 
 
 if ($dbdriver ne 'CSV') {
@@ -45,12 +46,16 @@ while (Testing()) {
 	$dbh->{f_dir} = $dir;
 	print "Trying to create file $table in directory $dir.\n";
     }
-    Test($state or (($table = FindNewTable($dbh))
-		    and  !(-f "$dir/$table")))
+    Test($state
+	 or (($table = FindNewTable($dbh))
+	  and  !(-f ($haveFileSpec ?
+		     File::Spec->catfile($dir, $table) : "$dir/$table"))))
 	or print("Cannot determine a legal table name: Error ",
 		 $dbh->errstr);
-    Test($state or (($tableb = FindNewTable($dbh))
-		    and  !(-f "$dir/$tableb")))
+    Test($state
+	 or (($tableb = FindNewTable($dbh))
+	     and  !(-f ($haveFileSpec ?
+			File::Spec->catfile($dir, $tableb) : "$dir/$tableb"))))
 	or print("Cannot determine a legal table name: Error ",
 		 $dbh->errstr);
     Test($state or ($table ne $tableb))
@@ -63,9 +68,14 @@ while (Testing()) {
 		    and $dbh->do($cquery)))
 	or print("Cannot create table $table in directory $dir: ",
 		 $dbh->errstr);
-    Test($state or (-f "$dir/$table"))
+    Test($state
+	 or (-f ($haveFileSpec ?
+		 File::Spec->catfile($dir, $table) : "$dir/$table")))
 	or print("No such file in directory $dir: $table");
-    Test($state or ($dbh->do("DROP TABLE $table")  and  !(-f "$dir/$table")))
+    Test($state
+	 or ($dbh->do("DROP TABLE $table")
+	     and  !(-f ($haveFileSpec ?
+			File::Spec->catfile($dir, $table) : "$dir/$table"))))
 	or print("Cannot drop table $table in directory $dir: ",
 		 $dbh->errstr());
     Test($state or $dbh->disconnect());
@@ -79,8 +89,10 @@ while (Testing()) {
     Test($state or ($dbh = DBI->connect($dsn)))
 	or print "Cannot connect to DSN $dsn: $DBI::errstr\n";
     my $tablec;
-    Test($state or (($tablec = FindNewTable($dbh))
-		    and  !(-f "$dir/$tablec")))
+    Test($state
+	 or (($tablec = FindNewTable($dbh))
+	     and  !(-f ($haveFileSpec ?
+			File::Spec->catfile($dir, $tablec) : "$dir/$tablec"))))
 	or print("Cannot determine a legal table name: Error ",
 		 $dbh->errstr);
     if (!$state) {
@@ -109,7 +121,10 @@ while (Testing()) {
 		    $ref->[0] eq "2" and $ref->[1] eq "Jochen;"))
 	or printf("Expected 2,Jochen;, got %s,%s\n", ($ref->[0] || "undef"),
 		  ($ref->[1] || "undef"));
-    Test($state or ($dbh->do("DROP TABLE $tablec")  and  !(-f "$dir/$tablec")))
+    Test($state
+	 or ($dbh->do("DROP TABLE $tablec")
+	     and  !(-f ($haveFileSpec ?
+			File::Spec->catfile($dir, $table) : "$dir/$tablec"))))
 	or print("Cannot drop table $tablec in directory $dir: ",
 		 $dbh->errstr());
     Test($state or $dbh->disconnect());
@@ -120,15 +135,22 @@ while (Testing()) {
     $dsn = "DBI:CSV:";
     Test($state or ($dbh = DBI->connect($dsn)));
     if (!$state) {
-	$dbh->{csv_tables}->{$table}->{file} = "$dir/$tableb";
+	$dbh->{csv_tables}->{$table}->{file} =
+	    $haveFileSpec ? File::Spec->catfile($dir, $tableb)
+		: "$dir/$tableb";
 	print "Trying to create file $tableb in directory $dir.\n";
     }
     Test($state or $dbh->do($cquery))
 	or print("Cannot create table $table in directory $dir: ",
 		 $dbh->errstr);
-    Test($state or (-f "$dir/$tableb"))
+    Test($state
+	 or (-f ($haveFileSpec ? File::Spec->catfile($dir, $tableb)
+		 : "$dir/$tableb")))
 	or print("No such file in directory $dir: $tableb");
-    Test($state or ($dbh->do("DROP TABLE $table")  and  !(-f "$dir/$tableb")))
+    Test($state
+	 or ($dbh->do("DROP TABLE $table")
+	     and  !(-f ($haveFileSpec ?
+			File::Spec->catfile($dir, $table) : "$dir/$tableb"))))
 	or print("Cannot drop table $table in directory $dir: ",
 		 $dbh->errstr());
 

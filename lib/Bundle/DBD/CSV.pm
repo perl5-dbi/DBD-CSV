@@ -2,7 +2,7 @@
 
 package Bundle::DBD::CSV;
 
-$VERSION = '0.01';
+$VERSION = '0.1016';
 
 1;
 
@@ -23,6 +23,8 @@ DBI 1.02
 Text::CSV_XS 0.14
 
 SQL::Statement 0.1006
+
+DBD::CSV
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,14 @@ require DBI;
 require Benchmark;
 
 
-if (! -d "output"  &&  ! mkdir "output", 0755) {
+my $haveFileSpec = eval { require File::Spec };
+my $table_dir;
+if ($haveFileSpec) {
+    $table_dir = File::Spec->catdir(File::Spec->curdir(), 'output');
+} else {
+    $table_dir = "output";
+}
+if (! -d $table_dir  &&  ! mkdir $table_dir, 0755) {
     die "Cannot create 'output' directory: $!";
 }
 
@@ -46,14 +53,16 @@ my($dbh);
 TimeMe("Testing connect/disconnect speed ...",
        "%d connections in %.1f cpu+sys seconds (%d per sec)",
        sub {
-	   $dbh = DBI->connect("DBI:CSV:f_dir=output", undef, undef,
+	   $dbh = DBI->connect("DBI:CSV:f_dir=$table_dir", undef, undef,
 			       { 'RaiseError' => 1 });
 	   $dbh->disconnect();
        },
     2000);
 
-unlink "output/bench";
-$dbh = DBI->connect("DBI:CSV:f_dir=output", undef, undef,
+unlink $haveFileSpec ?
+    File::Spec->catfile($table_dir, 'bench') : "output/bench";
+
+$dbh = DBI->connect("DBI:CSV:f_dir=$table_dir", undef, undef,
                     { 'RaiseError' => 1 });
 TimeMe("Testing CREATE/DROP TABLE speed ...",
        "%d files in %.1f cpu+sys seconds (%d per sec)",

@@ -28,7 +28,7 @@ require DynaLoader;
 require DBI;
 require SQL::Statement;
 require SQL::Eval;
-
+my $haveFileSpec = eval { require File::Spec };
 
 package DBD::File;
 
@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1004';
+$VERSION = '0.1005';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -93,7 +93,7 @@ sub connect ($$;$$$) {
 
     if ($this) {
 	my($var, $val);
-	$this->{f_dir} = '.';
+	$this->{f_dir} = $haveFileSpec ? File::Spec->curdir() : '.';
 	while (length($dbname)) {
 	    if ($dbname =~ s/^((?:[^\\;]|\\.)*?);//s) {
 		$var = $1;
@@ -116,7 +116,7 @@ sub data_sources ($;$) {
     my($drh, $attr) = @_;
     $attr ||= $DBD::File::dr::data_sources_attr;
     my($dir) = exists($attr->{'f_dir'}) ?
-	$attr->{'f_dir'} : '.';
+	$attr->{'f_dir'} : $haveFileSpec ? File::Spec->curdir() : '.';
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
         DBI::set_err($drh, 1, "Cannot open directory $dir");
@@ -129,8 +129,12 @@ sub data_sources ($;$) {
 	$driver = 'File';
     }
     while (defined($file = readdir($dirh))) {
-	if ($file ne '.'  &&  $file ne '..'  &&  -d "$dir/$file") {
-	    push(@dsns, "DBI:$driver:f_dir=$dir/$file");
+	my $d = $haveFileSpec ?
+	    File::Spec->catdir($dir, $file) : "$dir/$file";
+	if ($file ne ($haveFileSpec ? File::Spec->curdir() : '.')
+	    and  $file ne ($haveFileSpec ? File::Spec->updir() : '..')
+	    and  -d $d) {
+	    push(@dsns, "DBI:$driver:f_dir=$d");
 	}
     }
     @dsns;
@@ -450,11 +454,20 @@ package DBD::File::Statement;
 
 @DBD::File::Statement::ISA = qw(SQL::Statement);
 
+my $open_table_re =
+    $haveFileSpec ?
+    sprintf('(?:%s|%s¦%s)',
+	    quotemeta(File::Spec->curdir()),
+	    quotemeta(File::Spec->updir()),
+	    quotemeta(File::Spec->rootdir()))
+    : '(?:\.?\.)?\/';
 sub open_table ($$$$$) {
     my($self, $data, $table, $createMode, $lockMode) = @_;
     my $file = $table;
-    if ($file !~ /^(\.?\.)?\//) {
-	$file = $data->{Database}->{'f_dir'} . "/$table";
+    if ($file !~ /^$open_table_re/o) {
+	$file = $haveFileSpec ?
+	    File::Spec->catfile($data->{Database}->{'f_dir'}, $table)
+		: $data->{Database}->{'f_dir'} . "/$table";
     }
     my $fh;
     if ($createMode) {
@@ -473,13 +486,15 @@ sub open_table ($$$$$) {
 	}
     }
     binmode($fh);
-    if ($lockMode) {
-	if (!flock($fh, 2)) {
-	    die " Cannot obtain exclusive lock on $file: $!";
-	}
-    } else {
-	if (!flock($fh, 1)) {
-	    die "Cannot obtain shared lock on $file: $!";
+    if ($^O ne 'MacOS') {
+	if ($lockMode) {
+	    if (!flock($fh, 2)) {
+		die " Cannot obtain exclusive lock on $file: $!";
+	    }
+	} else {
+	    if (!flock($fh, 1)) {
+		die "Cannot obtain shared lock on $file: $!";
+	    }
 	}
     }
     my $columns = {};
@@ -683,6 +698,20 @@ Instead you have to use soft links or rename files. As an alternative
 one might use, for example a dbh attribute 'table_map'. It might be a
 hash ref, the keys being the table names and the values being the file
 names.
+
+=back
+
+
+=head1 KNOWN BUGS
+
+=over 8
+
+=item *
+
+The module is using flock() internally. However, this function is not
+available on platforms. Using flock() is disabled on MacOS: There's
+no locking at all (perhaps not so important on MacOS, as there's a
+single user anyways).
 
 =back
 

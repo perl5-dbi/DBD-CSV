@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1016';
+$VERSION = '0.1019';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -44,26 +44,26 @@ $drh = undef;		# holds driver handle once initialised
 
 package DBD::CSV::dr; # ====== DRIVER ======
 
-use Text::CSV_XS qw(IV PV NV);
+use Text::CSV_XS();
 
 use vars qw(@ISA @CSV_TYPES);
 
 @CSV_TYPES = (
-    IV(), # SQL_TINYINT
-    IV(), # SQL_BIGINT
-    PV(), # SQL_LONGVARBINARY
-    PV(), # SQL_VARBINARY
-    PV(), # SQL_BINARY
-    PV(), # SQL_LONGVARCHAR
-    PV(), # SQL_ALL_TYPES
-    PV(), # SQL_CHAR
-    NV(), # SQL_NUMERIC
-    NV(), # SQL_DECIMAL
-    IV(), # SQL_INTEGER
-    IV(), # SQL_SMALLINT
-    NV(), # SQL_FLOAT
-    NV(), # SQL_REAL
-    NV(), # SQL_DOUBLE
+    Text::CSV_XS::IV(), # SQL_TINYINT
+    Text::CSV_XS::IV(), # SQL_BIGINT
+    Text::CSV_XS::PV(), # SQL_LONGVARBINARY
+    Text::CSV_XS::PV(), # SQL_VARBINARY
+    Text::CSV_XS::PV(), # SQL_BINARY
+    Text::CSV_XS::PV(), # SQL_LONGVARCHAR
+    Text::CSV_XS::PV(), # SQL_ALL_TYPES
+    Text::CSV_XS::PV(), # SQL_CHAR
+    Text::CSV_XS::NV(), # SQL_NUMERIC
+    Text::CSV_XS::NV(), # SQL_DECIMAL
+    Text::CSV_XS::IV(), # SQL_INTEGER
+    Text::CSV_XS::IV(), # SQL_SMALLINT
+    Text::CSV_XS::NV(), # SQL_FLOAT
+    Text::CSV_XS::NV(), # SQL_REAL
+    Text::CSV_XS::NV(), # SQL_DOUBLE
 );
 
 @DBD::CSV::dr::ISA = qw(DBD::File::dr);
@@ -137,9 +137,9 @@ sub open_table ($$$$$) {
 	    my $t = [];
 	    foreach (@{$types}) {
 		if ($_) {
-		    $_ = $DBD::CSV::CSV_TYPES[$_+6]  ||  PV();
+		    $_ = $DBD::CSV::CSV_TYPES[$_+6]  ||  Text::CSV_XS::PV();
 		} else {
-		    $_ = PV();
+		    $_ = Text::CSV_XS::PV();
 		}
 		push(@$t, $_);
 	    }
@@ -195,6 +195,7 @@ sub fetch_row ($$) {
 	$fields = delete($self->{cached_row});
     } else {
 	my $csv = $self->{csv_csv};
+	local $/ = $csv->{'eol'};
 	$fields = $csv->getline($self->{'fh'});
 	if (!$fields) {
 	    if ($!) {
@@ -253,7 +254,7 @@ DBD::CSV - DBI driver for CSV files
 
     # Same example, this time reading "info.csv" as a table:
     $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
-    $dbh->{'tables'}->{'info'} = { 'file' => 'csv'};
+    $dbh->{'csv_tables'}->{'info'} = { 'file' => 'csv'};
     $sth = $dbh->prepare("SELECT * FROM info");
 
 
@@ -296,7 +297,7 @@ available from any CPAN mirror, for example
 
 =item DBI
 
-the DBI (Database independent interface for Perl), version 0.93 or
+the DBI (Database independent interface for Perl), version 1.00 or
 a later release
 
 =item SQL::Statement
@@ -637,7 +638,7 @@ There simplest way is:
     my $dbh = DBI->connect("DBI:CSV:f_dir=/etc:csv_eol=\n;"
                            . "csv_sep_char=:;csv_quote_char=;"
                            . "csv_escape_char=");
-    $dbh->{'tables'}->{'passwd'} = {
+    $dbh->{'csv_tables'}->{'passwd'} = {
         'col_names' => ["login", "password", "uid", "gid", "realname",
                         "directory", "shell"]
     };
@@ -648,7 +649,7 @@ overwrite them on a per table base:
 
     require DBI;
     my $dbh = DBI->connect("DBI:CSV:");
-    $dbh->{'tables'}->{'passwd'} = {
+    $dbh->{'csv_tables'}->{'passwd'} = {
         'eol' => "\n",
         'sep_char' => ":",
         'quote_char' => undef,
@@ -769,6 +770,20 @@ example MS Access doesn't export column names by default.
 =back
 
 
+=head1 KNOWN BUGS
+
+=over 8
+
+=item *
+
+The module is using flock() internally. However, this function is not
+available on platforms. Using flock() is disabled on MacOS: There's
+no locking at all (perhaps not so important on MacOS, as there's a
+single user anyways).
+
+=back
+
+
 =head1 AUTHOR AND COPYRIGHT
 
 This module is Copyright (C) 1998 by
@@ -792,5 +807,8 @@ the Perl README file.
 
 L<DBI(3)>, L<Text::CSV_XS(3)>, L<SQL::Statement(3)>
 
+A mailing list for supporting the DBD::CSV driver is available at
+
+  http://mail.healthquiz.com/mailman/listinfo/dbd-csv
 
 =cut
