@@ -1,3 +1,9 @@
+1998-10-20  Jochen Wiedmann  <joe@ispsoft.de> (0.1016)
+
+	* lib/Bundle/DBD/CSV.pm: Added lib/Bundle/DBD/CSV.pm
+	* lib/DBD/File.pm: Added $dbh->table_info(). Added
+	  $dbh->type_info_all(). Added $dbh->quote($str, $type).
+
 1998-09-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1015)
 
 	* lib/DBD/CSV.pm: Fixed bug in the docs, the "undef" argument

@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1002';
+$VERSION = '0.1004';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -206,25 +206,114 @@ sub DESTROY ($) {
     undef;
 }
 
-sub list_tables ($) {
-    my($dbh) = @_;
-    my($dir) = $dbh->{f_dir};
-    my($dirh) = Symbol::gensym();
-    if (!opendir($dirh, $dir)) {
-        DBI::set_err($dbh, 1, "Cannot open directory $dir");
-	return undef;
-    }
-    my($file, @tables, %names);
-    while (defined($file = readdir($dirh))) {
-	if ($file ne '.'  &&  $file ne '..'  &&  -f "$dir/$file") {
-	    push(@tables, $file);
+sub type_info_all ($) {
+    [
+     {   TYPE_NAME         => 0,
+	 DATA_TYPE         => 1,
+	 PRECISION         => 2,
+	 LITERAL_PREFIX    => 3,
+	 LITERAL_SUFFIX    => 4,
+	 CREATE_PARAMS     => 5,
+	 NULLABLE          => 6,
+	 CASE_SENSITIVE    => 7,
+	 SEARCHABLE        => 8,
+	 UNSIGNED_ATTRIBUTE=> 9,
+	 MONEY             => 10,
+	 AUTO_INCREMENT    => 11,
+	 LOCAL_TYPE_NAME   => 12,
+	 MINIMUM_SCALE     => 13,
+	 MAXIMUM_SCALE     => 14,
+     },
+     [ 'VARCHAR', DBI::SQL_VARCHAR(),
+       undef, "'","'", undef,0, 1,1,0,0,0,undef,1,999999
+       ],
+     [ 'CHAR', DBI::SQL_CHAR(),
+       undef, "'","'", undef,0, 1,1,0,0,0,undef,1,999999
+       ],
+     [ 'INTEGER', DBI::SQL_INTEGER(),
+       undef,  "", "", undef,0, 0,1,0,0,0,undef,0,  0
+       ],
+     [ 'REAL', DBI::SQL_REAL(),
+       undef,  "", "", undef,0, 0,1,0,0,0,undef,0,  0
+       ],
+     [ 'BLOB', DBI::SQL_LONGVARBINARY(),
+       undef, "'","'", undef,0, 1,1,0,0,0,undef,1,999999
+       ],
+     [ 'BLOB', DBI::SQL_LONGVARBINARY(),
+       undef, "'","'", undef,0, 1,1,0,0,0,undef,1,999999
+       ],
+     [ 'TEXT', DBI::SQL_LONGVARCHAR(),
+       undef, "'","'", undef,0, 1,1,0,0,0,undef,1,999999
+       ]
+     ]     
+}
+
+
+{
+    my $names = ['TABLE_QUALIFIER', 'TABLE_OWNER', 'TABLE_NAME',
+                 'TABLE_TYPE', 'REMARKS'];
+
+    sub table_info ($) {
+	my($dbh) = @_;
+	my($dir) = $dbh->{f_dir};
+	my($dirh) = Symbol::gensym();
+	if (!opendir($dirh, $dir)) {
+	    DBI::set_err($dbh, 1, "Cannot open directory $dir");
+	    return undef;
 	}
+	my($file, @tables, %names);
+	while (defined($file = readdir($dirh))) {
+	    if ($file ne '.'  &&  $file ne '..'  &&  -f "$dir/$file") {
+		my $user = eval { getpwuid((stat(_))[4]) };
+		push(@tables, [undef, $user, $file, "TABLE", undef]);
+	    }
+	}
+
+	my $dbh2 = $dbh->{'csv_sponge_driver'};
+	if (!$dbh2) {
+	    $dbh2 = $dbh->{'csv_sponge_driver'} = DBI->connect("DBI:Sponge:");
+	    if (!$dbh2) {
+	        DBI::set_err($dbh, 1, $DBI::errstr);
+		return undef;
+	    }
+	}
+
+	# Temporary kludge: DBD::Sponge dies if @tables is empty. :-(
+	return undef if !@tables;
+
+	my $sth = $dbh2->prepare("TABLE_INFO", { 'rows' => \@tables,
+						 'NAMES' => $names });
+	if (!$sth) {
+	    DBI::set_err($dbh, 1, $dbh2->errstr());
+	}
+	$sth;
+    }
+}
+sub list_tables ($) {
+    my $dbh = shift;
+    my($sth, @tables);
+    if (!($sth = $dbh->table_info())) {
+	return ();
+    }
+    while (my $ref = $sth->fetchrow_arrayref()) {
+	push(@tables, $ref->[2]);
     }
     @tables;
 }
 
-sub quote ($$) {
-    my($self, $str) = @_;
+sub quote ($$;$) {
+    my($self, $str, $type) = @_;
+    if (defined($type)  &&
+	($type == DBI::SQL_NUMERIC()   ||
+	 $type == DBI::SQL_DECIMAL()   ||
+	 $type == DBI::SQL_INTEGER()   ||
+	 $type == DBI::SQL_SMALLINT()  ||
+	 $type == DBI::SQL_FLOAT()     ||
+	 $type == DBI::SQL_REAL()      ||
+	 $type == DBI::SQL_DOUBLE()    ||
+	 $type == DBI::TINYINT())) {
+	return $str;
+    }
     if (!defined($str)) { return "NULL" }
     $str =~ s/\\/\\\\/sg;
     $str =~ s/\0/\\0/sg;

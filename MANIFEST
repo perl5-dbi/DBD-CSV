@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
 lib/DBD/File.pm
 t/00base.t
