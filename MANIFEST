@@ -1,10 +1,11 @@
 ChangeLog
-CSV.h
-CSV.pm
-CSV.xs
 MANIFEST
 Makefile.PL
 README
+DBD-File/Makefile.PL
+DBD-File/File.pm
+DBD-File/File.xs
+CSV.pm
 t/00base.t
 t/10dsnlist.t
 t/20createdrop.t
@@ -22,6 +23,7 @@ t/CSV.dbtest
 t/CSV.mtest
 t/README
 t/ak-dbd.t
+t/csv.t
 t/dbdadmin.t
 t/lib.pl
 t/mSQL.dbtest

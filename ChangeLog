@@ -1,3 +1,9 @@
+1998-06-11  Jochen Wiedmann  <joe@ispsoft.de>   (0.1010)
+
+	* Added DBD::File, DBD::CSV is derived from it.
+
+	* CSV.pm (open_table): Added $dbh->{tables}->{$table}->{file}.
+
 1998-05-21  Jochen Wiedmann  <joe@ispsoft.de>   (0.1002)
 
 	* CSV.pm: Now using the misc.files_as_tables feature

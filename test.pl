@@ -46,13 +46,13 @@ my($dbh);
 TimeMe("Testing connect/disconnect speed ...",
        "%d connections in %.1f cpu+sys seconds (%d per sec)",
        sub {
-	   $dbh = DBI->connect("DBI:CSV:directory=output", undef, undef,
+	   $dbh = DBI->connect("DBI:CSV:f_dir=output", undef, undef,
 			       { 'RaiseError' => 1 });
 	   $dbh->disconnect();
        },
     2000);
 
-$dbh = DBI->connect("DBI:CSV:directory=output", undef, undef,
+$dbh = DBI->connect("DBI:CSV:f_dir=output", undef, undef,
                     { 'RaiseError' => 1 });
 TimeMe("Testing CREATE/DROP TABLE speed ...",
        "%d files in %.1f cpu+sys seconds (%d per sec)",

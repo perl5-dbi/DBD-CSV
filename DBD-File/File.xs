@@ -29,7 +29,7 @@ struct imp_sth_st {
 
 DBISTATE_DECLARE;
 
-MODULE = DBD::CSV	PACKAGE = DBD::CSV
+MODULE = DBD::File	PACKAGE = DBD::File
 
 PROTOTYPES: ENABLE
 
@@ -76,7 +76,7 @@ SetWarning(self, errstr, err)
     }
 
 
-MODULE = DBD::CSV	PACKAGE = DBD::CSV::st
+MODULE = DBD::File	PACKAGE = DBD::File::st
 
 
 AV*
@@ -96,6 +96,6 @@ BOOT:
     items = 0;  /* avoid 'unused variable' warning */
     DBISTATE_INIT;
     /* XXX this interface will change: */
-    DBI_IMP_SIZE("DBD::CSV::dr::imp_data_size", sizeof(imp_drh_t));
-    DBI_IMP_SIZE("DBD::CSV::db::imp_data_size", sizeof(imp_dbh_t));
-    DBI_IMP_SIZE("DBD::CSV::st::imp_data_size", sizeof(imp_sth_t));
+    DBI_IMP_SIZE("DBD::File::dr::imp_data_size", sizeof(imp_drh_t));
+    DBI_IMP_SIZE("DBD::File::db::imp_data_size", sizeof(imp_dbh_t));
+    DBI_IMP_SIZE("DBD::File::st::imp_data_size", sizeof(imp_sth_t));
