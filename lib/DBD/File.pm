@@ -95,16 +95,15 @@ sub connect ($$;$$$) {
 	my($var, $val);
 	$this->{f_dir} = '.';
 	while (length($dbname)) {
-	    if ($dbname =~ /^(.*?);(.*)/) {
+	    if ($dbname =~ s/^((?:[^\\;]|\\.)*?);//s) {
 		$var = $1;
-		$dbname = $2;
 	    } else {
 		$var = $dbname;
 		$dbname = '';
 	    }
-	    if ($var =~ /^(.+?)=(.*)/) {
+	    if ($var =~ /^(.+?)=(.*)/s) {
 		$var = $1;
-		$val = $2;
+		($val = $2) =~ tr/\\//d;
 		$this->{$var} = $val;
 	    }
 	}
@@ -274,6 +273,7 @@ sub execute {
     my $result = eval { $stmt->execute($sth, $params); };
     if ($@) {
         DBI::set_err($sth, 1, $@);
+	return undef;
     }
     if ($stmt->{'NUM_OF_FIELDS'}  &&  !$sth->FETCH('NUM_OF_FIELDS')) {
 	$sth->STORE('NUM_OF_FIELDS', $stmt->{'NUM_OF_FIELDS'});

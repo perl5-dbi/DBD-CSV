@@ -1,3 +1,11 @@
+1998-09-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1015)
+
+	* lib/DBD/CSV.pm: Fixed bug in the docs, the "undef" argument
+	  was missing in conjunction with parameters,
+	  Honza Pazdziora <adelton@fi.muni.cz>.
+	* lib/DBD/CSV.pm: Added csv_eol, csv_sep_char, csv_quote_char
+	  and csv_escape_char to DSN.
+
 1998-08-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1014)
 
 	* Makefile.PL: Added AUTHOR, ABSTRACT_FROM and PREREQ_PM.

@@ -91,7 +91,7 @@ my %opts =
      'VERSION_FROM' => 'lib/DBD/CSV.pm',
      'dist'         => { 'SUFFIX'       => ".gz",
 			 'DIST_DEFAULT' => 'all tardist',
-			 'COMPRESS'     => "gzip -9f" }
+			 'COMPRESS'     => "gzip -9vf" }
      );
 
 if ($ExtUtils::MakeMaker::VERSION >= 5.43) {

@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1014';
+$VERSION = '0.1015';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -75,9 +75,7 @@ sub connect ($$;$$$) {
     my($drh, $dbname, $user, $auth, $attr) = @_;
 
     my $this = $drh->DBD::File::dr::connect($dbname, $user, $auth, $attr);
-    if (!exists($this->{csv_tables})) {
-	$this->{csv_tables} = {};
-    }
+    $this->{'csv_tables'} ||= {};
 
     $this;
 }
@@ -108,20 +106,30 @@ sub open_table ($$$$$) {
     if (!exists($tables->{$table})) {
 	$tables->{$table} = {};
     }
-    my $meta = $tables->{$table};
-    my $csv = $meta->{csv_csv} || $dbh->{csv_csv};
+    my $meta = $tables->{$table} || {};
+    my $csv = $meta->{csv} || $dbh->{csv_csv};
     if (!$csv) {
-	my $class = $meta->{csv_class}  ||  $dbh->{'csv_class'};
-	if (!$class) {
-	    $class = 'Text::CSV_XS';
-	}
-	$csv = $meta->{csv_csv} = $class->new({ binary => 1,
-						eol => "\015\012" });
-    }				     
+	my $class = $meta->{class}  ||  $dbh->{'csv_class'}  ||
+	    'Text::CSV_XS';
+	my %opts = ( 'binary' => 1 );
+	$opts{'eol'} = $meta->{'eol'} || $dbh->{'csv_eol'} || "\015\012";
+	$opts{'sep_char'} =
+	    exists($meta->{'sep_char'}) ? $meta->{'sep_char'} :
+		exists($dbh->{'csv_sep_char'}) ? $dbh->{'csv_sep_char'} : ",";
+	$opts{'quote_char'} =
+	    exists($meta->{'quote_char'}) ? $meta->{'quote_char'} :
+		exists($dbh->{'csv_quote_char'}) ? $dbh->{'csv_quote_char'} :
+		    '"';
+	$opts{'escape_char'} =
+	    exists($meta->{'escape_char'}) ? $meta->{'escape_char'} :
+		exists($dbh->{'csv_escape_char'}) ? $dbh->{'csv_escape_char'} :
+		    '"';
+	$csv = $meta->{csv} = $class->new(\%opts);
+    }
     my $file = $meta->{file}  ||  $table;
     my $tbl = $self->SUPER::open_table($data, $file, $createMode, $lockMode);
     if ($tbl) {
-	$tbl->{csv_csv} = $csv;
+	$tbl->{'csv_csv'} = $csv;
 	my $types = $meta->{types};
 	if ($types) {
 	    # The 'types' array contains DBI types, but we need types
@@ -236,6 +244,20 @@ DBD::CSV - DBI driver for CSV files
     $sth->finish();
     $dbh->disconnect();
 
+
+    # Read a CSV file with ";" as the separator, as exported by
+    # MS Excel. Note we need to escape the ";", otherwise it
+    # would be treated as an attribute separator.
+    $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
+    $sth = $dbh->prepare("SELECT * FROM info");
+
+    # Same example, this time reading "info.csv" as a table:
+    $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
+    $dbh->{'tables'}->{'info'} = { 'file' => 'csv'};
+    $sth = $dbh->prepare("SELECT * FROM info");
+
+
+    # Read /etc/passwd as a CSV file.    
 
 =head1 WARNING
 
@@ -366,12 +388,16 @@ string must be escaped, even if it doesn't contain binary data.
 
 Next an example using parameters:
 
-    $dbh->do("INSERT INTO $table VALUES (?, ?)",
+    $dbh->do("INSERT INTO $table VALUES (?, ?)", undef,
 	     2, "It's a string!");
 
 Note that you don't need to use the quote method here, this is done
 automatically for you. This version is particularly well designed for
 loops. Whenever performance is an issue, I recommend using this method.
+
+You might wonder about the undef. Don't wonder, just take it as it
+is. :-) It's an attribute argument that I have never ever used and
+will be parsed to the prepare method as a second argument.
 
 
 To retrieve data, you can use the following:
@@ -531,12 +557,31 @@ This attribute is used for setting the directory where CSV files are
 opened. Usually you set it in the dbh, it defaults to the current
 directory ("."). However, it is overwritable in the statement handles.
 
+=item csv_eol
+
+=item csv_sep_char
+
+=item csv_quote_char
+
+=item csv_escape_char
+
 =item csv_class
 
 =item csv_csv
 
-Used as a default for the respective attributes of I<csv_tables>,
-see below.
+The attributes I<csv_eol>, I<csv_sep_char>, I<csv_quote_char> and
+I<csv_escape_char> are corresponding to the respective attributes of the
+Text::CSV_XS object. You want to set these attributes, if you have unusual
+CSV files like /etc/passwd or MS Excel generated CSV files with a semicolon
+as separator. Defaults are "\015\012", ';', '"' and '"', respectively.
+
+The attributes are used to create an instance of the class I<csv_class>,
+by default Text::CSV_XS. Altrenatively you may pass an instance as
+I<csv_csv>, the latter takes precedence. Note that the I<binary>
+attribute *must* be set to a true value in that case.
+
+Additionally you may overwrite these attributes on a per-table base in
+the I<csv_tables> attribute.
 
 =item csv_tables
 
@@ -552,20 +597,21 @@ The tables file name; defaults to
 
     $dbh->{f_dir} . "/$table
 
-=item csv_class
+=item eol
 
-The class to use for accessing the file, by default "Text::CSV_XS".
-This attribute (like any other attribute of prefix I<csv_>, see
-I<csv_csv> below) is inherited from the dbh, if not explicitly
-specified.
+=item sep_char
 
-=item csv_csv
+=item quote_char
 
-The csv object, an instance of I<csv_class>. You need to supply such
-an object for overwriting attributes like C<$csv->{eol}>,
-C<$csv->{quote_char}> and the like. See L<Text::CSV_XS(3)> for
-details. Note that by default binary mode is used for creating the
-csv object. You must not change this!
+=item escape_char
+
+=item class
+
+=item csv
+
+These correspond to the attributes I<csv_eol>, I<csv_sep_char>,
+I<csv_quote_char>, I<csv_escape_char>, I<csv_class> and I<csv_csv>.
+The difference is that they work on a per-table base.
 
 =item col_names
 
@@ -582,22 +628,36 @@ C<col0>, C<col1>, ...
 
 =back
 
+=back
+
 Example: Suggest you want to use C</etc/passwd> as a CSV file. :-)
-You can read it like this:
+There simplest way is:
 
     require DBI;
-    my $dbh = DBI->connect("DBI:CSV:f_dir=/etc");
-    my $dbh->{csv_tables}->{passwd} = {
-        csv_csv => Text::CSV_XS->new({ binary => 1,
-                                       eol => "\012",
-                                       quote_char => undef,
-                                       escape_char => undef,
-                                       sep_char => ':'}),
-        file => '/etc/passwd',
-        col_names => ["login", "password", "uid", "gid", "realname",
-                      "directory", "shell"]
+    my $dbh = DBI->connect("DBI:CSV:f_dir=/etc:csv_eol=\n;"
+                           . "csv_sep_char=:;csv_quote_char=;"
+                           . "csv_escape_char=");
+    $dbh->{'tables'}->{'passwd'} = {
+        'col_names' => ["login", "password", "uid", "gid", "realname",
+                        "directory", "shell"]
     };
-    $dbh->do("UPDATE passwd SET login = 'joe' WHERE login = 'wiedmann'");
+    $sth = $dbh->prepare("SELECT * FROM passwd");
+
+Another possibility where you leave all the defaults as they are and
+overwrite them on a per table base:
+
+    require DBI;
+    my $dbh = DBI->connect("DBI:CSV:");
+    $dbh->{'tables'}->{'passwd'} = {
+        'eol' => "\n",
+        'sep_char' => ":",
+        'quote_char' => undef,
+        'escape_char' => undef,
+        'file' => '/etc/passwd',
+        'col_names' => ["login", "password", "uid", "gid", "realname",
+                        "directory", "shell"]
+    };
+    $sth = $dbh->prepare("SELECT * FROM passwd");
 
 
 =head2 Driver private methods

@@ -85,4 +85,47 @@ while (Testing()) {
     Test($state or ($dbh->do("DROP TABLE $table")  and  !(-f "$dir/$tableb")))
 	or print("Cannot drop table $table in directory $dir: ",
 		 $dbh->errstr());
+
+    #
+    #   Try to read a semicolon separated file.
+    #
+    Test($state or $dbh->disconnect());
+
+    my $dsn = "DBI:CSV:f_dir=$dir;csv_eol=\015\012;csv_sep_char=\\;;";
+    Test($state or ($dbh = DBI->connect($dsn)))
+	or print "Cannot connect to DSN $dsn: $DBI::errstr\n";
+    Test($state or (($table = FindNewTable($dbh))
+		    and  !(-f "$dir/$table")))
+	or print("Cannot determine a legal table name: Error ",
+		 $dbh->errstr);
+    if (!$state) {
+	print "Trying to create file $table in directory $dir.\n";
+    }
+    Test($state or
+	 $dbh->do("CREATE TABLE $table (id INTEGER, name CHAR(64))"))
+	or print("Cannot create table $table: ", $dbh->errstr(), "\n");
+    Test($state or
+	 $dbh->do("INSERT INTO $table VALUES (1, ?)", undef, "joe"))
+	or print("Cannot insert data into $table: ", $dbh->errstr(), "\n");
+    Test($state or
+	 $dbh->do("INSERT INTO $table VALUES (2, ?)", undef, "Jochen;"))
+	or print("Cannot insert data into $table: ", $dbh->errstr(), "\n");
+    my($sth, $ref);
+    Test($state or
+	 ($sth = $dbh->prepare("SELECT * FROM $table")))
+	or print("Cannot prepare: ", $dbh->errstr(), "\n");
+    Test($state or $sth->execute())
+	or print("Cannot execute: ", $sth->errstr(), "\n");
+    Test($state or (($ref = $sth->fetchrow_arrayref()) and
+		    $ref->[0] eq "1" and $ref->[1] eq "joe"))
+	or printf("Expected 1,joe, got %s,%s\n", ($ref->[0] || "undef"),
+		  ($ref->[1] || "undef"));
+    Test($state or (($ref = $sth->fetchrow_arrayref()) and
+		    $ref->[0] eq "2" and $ref->[1] eq "Jochen;"))
+	or printf("Expected 2,Jochen;, got %s,%s\n", ($ref->[0] || "undef"),
+		  ($ref->[1] || "undef"));
+    Test($state or ($dbh->do("DROP TABLE $table")  and  !(-f "$dir/$tableb")))
+	or print("Cannot drop table $table in directory $dir: ",
+		 $dbh->errstr());
 }
+

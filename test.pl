@@ -52,6 +52,7 @@ TimeMe("Testing connect/disconnect speed ...",
        },
     2000);
 
+unlink "output/bench";
 $dbh = DBI->connect("DBI:CSV:f_dir=output", undef, undef,
                     { 'RaiseError' => 1 });
 TimeMe("Testing CREATE/DROP TABLE speed ...",
