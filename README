@@ -1,0 +1,407 @@
+NAME
+    DBD::CSV - DBI driver for CSV files
+
+SYNOPSIS
+        use DBI;
+        $dbh = DBI->connect("DBI:CSV:directory=/home/joe/csvdb")
+            or die "Cannot connect: " . $DBI::errstr;
+        $sth = DBI->prepare("CREATE TABLE a (id INTEGER, name CHAR(10))")
+            or die "Cannot prepare: " . $dbh->errstr();
+        $sth->execute() or die "Cannot execute: " . $sth->errstr();
+        $sth->finish();
+        $dbh->disconnect();
+
+DESCRIPTION
+    The DBD::CSV module is yet another driver for the DBI (Database
+    independent interface for Perl). This one is based on the SQL
+    "engine" SQL::Statement and implements access to so-called CSV
+    files (Comma separated values). Such files are mostly used for
+    exporting MS Acess and MS Excel data.
+
+    See the DBI(3) manpage for details on DBI and the
+    SQL::Statement(3) manpage for details on SQL::Statement.
+
+  Prerequisites
+
+    The only system dependent feature that DBD::CSV uses, is the
+    flock() function. Thus the module should run (in theory) on any
+    system with a working flock(), in particular on all Unix
+    machines, on Windows 95 and NT.
+
+    Unlike other DBI drivers, you don't need an external SQL engine
+    or a running server. All you need are the following Perl
+    modules, available from any CPAN mirror, for example
+
+      ftp://ftp.funet.fi/pub/languages/perl/CPAN/modules/by-module
+
+    DBI the DBI (Database independent interface for Perl), version 0.93
+        or a later release
+
+    Text::CSV_XS
+        this module is used for writing rows to or reading rows from
+        CSV files. Note that you need version 0.10, the C version
+        and not the old Perl- only version.
+
+  Installation
+
+    Installing this module (and the prerequisites from above) is
+    quite simple. You just fetch the archive, extract it with
+
+        gzip -cd DBD-CSV-0.1000.tar.gz | tar xf -
+
+    (this is for Unix users, Windows users would prefer WinZip or
+    something similar) and then enter the following:
+
+        cd DBD-CSV-0.1000
+        make
+        make test
+
+    If any tests fail, let me know. Otherwise go on with
+
+        make install
+
+    Note that you almost definitely need root or administrator
+    permissions. If you don't have them, read the
+    ExtUtils::MakeMaker man page for details on installing in your
+    own directories. the ExtUtils::MakeMaker manpage.
+
+  Creating a database handle
+
+    Creating a database handle usually implies connecting to a
+    database server. Thus this command reads
+
+        use DBI;
+        my($dbh) = DBI->connect("DBI:CSV:directory=$dir");
+
+    The directory tells the driver where it should create or open
+    tables (aka CSV files). It defaults to the current directory,
+    thus the following are equivalent:
+
+        $dbh = DBI->connect("DBI:CSV:");
+        $dbh = DBI->connect("DBI:CSV:directory=.");
+
+    You may set other attributes in the DSN string, separated by
+    semicolons.
+
+  Creating and dropping tables
+
+    You can create and drop tables with commands like the following:
+
+        $dbh->do("CREATE TABLE $table (id INTEGER, name CHAR(64))");
+        $dbh->do("DROP TABLE $table");
+
+    The table is created as an empty file, then a first row with
+    column names will be written into the file. Note that currently
+    only the column names will be stored and no other data. Thus all
+    other information including column type (INTEGER or CHAR(x), for
+    example), column attributes (NOT NULL, PRIMARY KEY, ...) will
+    silently be discarded. This may change in a later release.
+
+    A drop just removes the file without any warning.
+
+    See the DBI(3) manpage for more details.
+
+    Table names cannot be arbitrary, due to restrictions of the SQL
+    syntax. In other words, a table name must be a valid SQL
+    identifier: The first character is alphabetic, followed by an
+    arbitrary number of alphanumeric characters. In particular, you
+    cannot use table names like `names.csv' or something similar.
+    Instead you must either rename the table or use a softlink from
+    `names.csv' to `names'.
+
+    A more complex mapping between table and file names will
+    probably be introduced in the future. For example I can imagine
+    a hash ref of table and file names, available as a dbh
+    attribute.
+
+  Inserting, fetching and modifying data
+
+    The following examples insert some data in in a table and fetch
+    it back: First all data in the string:
+
+        $dbh->do("INSERT INTO $table VALUES (1, "
+                 . $dbh->quote("foobar") . ")");
+
+    Note the use of the quote method for escaping the word 'foobar'.
+    Any string must be escaped, even if they don't contain binary
+    data.
+
+    Next an example using parameters:
+
+        $dbh->do("INSERT INTO $table VALUES (?, ?)",
+                 2, "It's a string!");
+
+    Note that you don't need to use the quote method here, this is
+    done automatically for you. This version is particularly well
+    designed for loops. Whenever performance is an issue, I
+    recommend using this method. See the section on "Data
+    restrictions" below for possible problems.
+
+    To retrieve data, you can use the following:
+
+        my($query) = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
+        my($sth) = $dbh->prepare($query);
+        $sth->execute();
+        while (my($row) = $sth->fetchrow_hashref) {
+            print("Found result row: id = ", $row->{'id'},
+                  ", name = ", $row->{'name'});
+        }
+        $sth->finish();
+
+    Again, column binding works: The same example again.
+
+        my($query) = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
+        my($sth) = $dbh->prepare($query);
+        $sth->execute();
+        my($id, $name);
+        $sth->bind_columns(undef, \$id, \$name);
+        while ($sth->fetch) {
+            print("Found result row: id = $id, name = $name\n");
+        }
+        $sth->finish();
+
+    Of course you can even use input parameters. Here's the same
+    example for the third time:
+
+        my($query) = "SELECT * FROM $table WHERE id = ?";
+        my($sth) = $dbh->prepare($query);
+        $sth->bind_columns(undef, \$id, \$name);
+        for (my($i) = 1;  $i <= 2;   $i++) {
+            $sth->execute($id);
+            if ($sth->fetch) {
+                print("Found result row: id = $id, name = $name\n");
+            }
+            $sth->finish();
+        }
+
+    See the DBI(3) manpage for details on these methods. See the
+    section on "Data restrictions" below for possible problems. See
+    the SQL::Statement(3) manpage for details on the WHERE clause.
+
+    Data rows are modified with the UPDATE statement:
+
+        $dbh->do("UPDATE $table SET id = 3 WHERE id = 1");
+
+    Likewise you use the DELETE statement for removing rows:
+
+        $dbh->do("DELETE FROM $table WHERE id > 1");
+
+  Data restrictions
+
+    When inserting and fetching data, you will sometimes be
+    surprised: DBD::CSV doesn't correctly handle data types, in
+    particular NULL's. If you insert integers, it might happen, that
+    fetch returns a string. Of course, a string containing the
+    integer, so that's perhaps not a real problem. But the following
+    will never work:
+
+        $dbh->do("INSERT INTO $table (id, name) VALUES (?, ?)",
+                 undef, "foo bar");
+        $sth = $dbh->prepare("SELECT * FROM $table WHERE id IS NULL");
+        $sth->execute();
+        my($id, $name);
+        $sth->bind_columns(undef, \$id, \$name);
+        while ($sth->fetch) {
+            printf("Found result row: id = %s, name = %s\n",
+                  defined($id) ? $id : "NULL",
+                  defined($name) ? $name : "NULL");
+        }
+        $sth->finish();
+
+    The row we have just inserted, will never be returned! The
+    reason is obvious, if you examine the CSV file: The
+    corresponding row looks like
+
+        "","foo bar"
+
+    In other words, not a NULL is stored, but an empty string. CSV
+    files don't have a concept of NULL values. Surprisingly the
+    above example works, if you insert a NULL value for the name!
+    Again, you find the explanation by examining the CSV file:
+
+        ""
+
+    In other words, DBD::CSV has "emulated" a NULL value by writing
+    a row with less columns. Of course this works only if the
+    rightmost column is NULL, the two rightmost columns are NULL,
+    ..., but the leftmost column will never be NULL!
+
+    See the section on "Creating and dropping tables" above for
+    table name restrictions.
+
+  Error handling
+
+    In the above examples we have never cared for return codes. Of
+    course this cannot be recommended. Instead we should have
+    written (for example)
+
+        my($query) = "SELECT * FROM $table WHERE id = ?";
+        my($sth) = $dbh->prepare($query)
+            or die "prepare: " . $dbh->errstr();
+        $sth->bind_columns(undef, \$id, \$name)
+            or die "bind_columns: " . $dbh->errstr();
+        for (my($i) = 1;  $i <= 2;   $i++) {
+            $sth->execute($id)
+                or die "execute: " . $dbh->errstr();
+            if ($sth->fetch) {
+                print("Found result row: id = $id, name = $name\n");
+            }
+        }
+        $sth->finish($id)
+            or die "finish: " . $dbh->errstr();
+
+    Obviously this is tedious. Fortunately we have DBI's
+    *RaiseError* attribute:
+
+        $dbh->{'RaiseError'} = 1;
+        $@ = '';
+        eval {
+            my($query) = "SELECT * FROM $table WHERE id = ?";
+            my($sth) = $dbh->prepare($query);
+            $sth->bind_columns(undef, \$id, \$name);
+            for (my($i) = 1;  $i <= 2;   $i++) {
+                $sth->execute($id);
+                if ($sth->fetch) {
+                    print("Found result row: id = $id, name = $name\n");
+                }
+            }
+            $sth->finish($id);
+        };
+        if ($@) { die "SQL database error: $@"; }
+
+    This is not only shorter, it even works when using DBI methods
+    within subroutines.
+
+  Metadata
+
+    The following attributes are handled by DBI itself and not by
+    DBD::CSV, thus they all work like expected:
+
+        Active
+        ActiveKids
+        CachedKids
+        CompatMode             (Not used)
+        InactiveDestroy
+        Kids
+        PrintError
+        RaiseError
+        Warn                   (Not used)
+
+    The following DBI attributes are handled by DBD::CSV:
+
+    AutoCommit
+        Always on
+
+    ChopBlanks
+        Works
+
+    NUM_OF_FIELDS
+        Valid after `$sth-'execute>
+
+    NUM_OF_PARAMS
+        Valid after `$sth-'prepare>
+
+    NAME
+        Valid after `$sth-'execute>; undef for Non-Select
+        statements.
+
+    NULLABLE
+        Not really working, always returns an array ref of one's, as
+        DBD::CSV doesn't verify input data. Valid after `$sth-
+        'execute>; undef for Non-Select statements.
+
+        See the section on "Data restrictions" above for details.
+
+    These attributes and methods are not supported:
+
+        bind_param_inout
+        CursorName
+        LongReadLen
+        LongTruncOk
+
+    Additional to the DBI attributes, you can use the following:
+
+    directory
+        This attribute is used for setting the directory where CSV
+        files are opened. Usually you set it in the dbh, it defaults
+        to the current directory ("."). However, it is overwritable
+        in the statement handles.
+
+    eol
+    quote_char
+    escape_char
+    sep_char
+        These are corresponding to the same attributes of the
+        Text::CSV_XS object.
+
+        You need access to the DBD::CSV_XS object, if you want to
+        work with non-default CSV files. For example, the following
+        will advice the DBD::CSV_XS file to use semicolons as field
+        separators:
+
+            $dbh->{'sep_char'} = ';';
+
+        Note that DBD::CSV will put the Text::CSV_XS object into
+        binary mode, so that you can safely work with arbitrary
+        data. You must not change this!
+
+  Driver private methods
+
+    data_sources
+        The `data_sources' method returns a list of subdirectories
+        of the current directory in the form
+        "DBI:CSV:directory=$dirname". Unfortunately the current
+        version of DBI doesn't accept attributes of the data_sources
+        method. Thus the method reads a global variable
+
+            $DBD::CSV::dr::data_sources_attr
+
+        if you want to read the subdirectories of another directory.
+        Example:
+
+            my($drh) = DBI->install_driver("CSV");
+            $DBD::CSV::dr::data_sources_attr = "/usr/local/csv_data";
+            my(@list) = $drh->data_sources();
+
+    list_tables
+        This method returns a list of file names inside $dbh-
+        >{'directory'}. Example:
+
+            my($dbh) = DBI->connect("DBI:CSV:directory=/usr/local/csv_data");
+            my(@list) = $dbh->func('list_tables');
+
+        Note that the list includes all files contained in the
+        directory, even those that have non-valid table names, from
+        the view of SQL. See the section on "Creating and dropping
+        tables" above.
+
+TODO
+    Joins
+        The current version of the module works with single table
+        SELECT's only, although the basic design of the
+        SQL::Statement module allows joins and the likes.
+
+    Table name mapping
+        Currently it is not possible to use files with names like
+        `names.csv'. Instead you have to use soft links or rename
+        files. As an alternative one might use, for example a dbh
+        attribute 'table_map'. It might be a hash ref, the keys
+        being the table names and the values being the file names.
+
+AUTHOR AND COPYRIGHT
+    This module is Copyright (C) 1998 by Jochen Wiedmann Am Eisteich
+    9 72555 Metzingen Germany
+
+        Email: joe@ispsoft.de
+        Phone: +49 7123 14887
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU
+    General Public License or the Artistic License, as specified in
+    the Perl README file.
+
+SEE ALSO
+    the DBI(3) manpage, the Text::CSV_XS(3) manpage, the
+    SQL::Statement(3) manpage
+

@@ -1,0 +1,8 @@
+# Hej, Emacs, give us -*- perl -*- mode here!
+#
+#   $Id: pNET.dbtest 1.1 Tue, 30 Sep 1997 01:28:08 +0200 joe $
+#
+# database specific definitions for a 'mysql' database
+
+
+die "Misconfiguration: DBD::pNET cannot be configured as database driver";
