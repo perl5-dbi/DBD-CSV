@@ -1,3 +1,9 @@
+1999-03-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1020)
+
+	* lib/DBD/File.pm (FETCH): Simplified handling of $sth->{'NAME'}
+	  due to a change in SQL::Statement 0.1011. (Teun Burgers,
+	  Teun Burgers <burgers@ecn.nl>)
+
 1999-02-11  Jochen Wiedmann  <joe@ispsoft.de> (0.1019)
 
 	* Makefile.PL (CheckModule): Now requires Text::CSV_XS 0.16, due

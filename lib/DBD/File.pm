@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1005';
+$VERSION = '0.1020';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -249,7 +249,7 @@ sub type_info_all ($) {
      [ 'TEXT', DBI::SQL_LONGVARCHAR(),
        undef, "'","'", undef,0, 1,1,0,0,0,undef,1,999999
        ]
-     ]     
+     ]
 }
 
 
@@ -395,22 +395,8 @@ sub fetch ($) {
 
 sub FETCH ($$) {
     my ($sth, $attrib) = @_;
-    if ($attrib eq 'TYPE') {
-	# Workaround for a bug in DBI 0.93
-	return undef;
-    }
-    if ($attrib eq 'NAME') {
-	my($meta) = $sth->FETCH('f_stmt')->{'NAME'};
-	if (!$meta) {
-	    return undef;
-	}
-	my($names) = [];
-	my($col);
-	foreach $col (@$meta) {
-	    push(@$names, $col->[0]->name());
-	}
-	return $names;
-    }
+    return undef if ($attrib eq 'TYPE'); # Workaround for a bug in DBI 0.93
+    return $sth->FETCH('f_stmt')->{'NAME'} if ($attrib eq 'NAME');
     if ($attrib eq 'NULLABLE') {
 	my($meta) = $sth->FETCH('f_stmt')->{'NAME'}; # Intentional !
 	if (!$meta) {

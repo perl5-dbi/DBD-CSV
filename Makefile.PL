@@ -36,7 +36,7 @@ sub CheckModule ($$;$) {
 my $ok = 1;
 $ok &&= CheckModule('DBI', '1.00');
 $ok &&= CheckModule('Text::CSV_XS', '0.16');
-$ok &&= CheckModule('SQL::Statement', '0.1006');
+$ok &&= CheckModule('SQL::Statement', '0.1011');
 
 if (!$ok) {
     print("\n",
