@@ -1,3 +1,14 @@
+1999-10-07  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1022)
+
+	* lib/DBD/File.pm (connect): In the DSN, \ was removed in
+	  all cases. It is now possible to use \\ for a DSN
+	  containing a backslash, for example f_dir=C:\\tmp.
+	  Suggested by Giuliano Cioffi <g.cioffi@piemme.it>.
+	* lib/DBD/CSV.pm: Lots os minor POD patches, thanks to
+          Adam Di Carlo <adam@onshore.com>.
+	* lib/DBD/CSV.pm: More POD patches, thanks to
+          Timothy F Armbruster <tfarmbruster@notes.west.raytheon.com>.
+
 1999-05-10  Jochen Wiedmann  <joe@ispsoft.de> (0.1021)
 
 	* lib/DBD/CSV.pm (push_row): Fixed typo in docs where DBI:File:

@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1021';
+$VERSION = '0.1022';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -257,12 +257,10 @@ DBD::CSV - DBI driver for CSV files
     $sth = $dbh->prepare("SELECT * FROM info");
 
 
-    # Read /etc/passwd as a CSV file.    
-
 =head1 WARNING
 
 THIS IS ALPHA SOFTWARE. It is *only* 'Alpha' because the interface (API)
-is not finalised. The Alpha status does not reflect code quality or
+is not finalized. The Alpha status does not reflect code quality or
 stability.
 
 
@@ -272,7 +270,7 @@ The DBD::CSV module is yet another driver for the DBI (Database independent
 interface for Perl). This one is based on the SQL "engine" SQL::Statement
 and the abstract DBI driver DBD::File and implements access to
 so-called CSV files (Comma separated values). Such files are mostly used for
-exporting MS Acess and MS Excel data.
+exporting MS Access and MS Excel data.
 
 See L<DBI(3)> for details on DBI, L<SQL::Statement(3)> for details on
 SQL::Statement and L<DBD::File(3)> for details on the base class
@@ -281,10 +279,11 @@ DBD::File.
 
 =head2 Prerequisites
 
-The only system dependent feature that DBD::File uses, is the flock()
+The only system dependent feature that DBD::File uses, is the C<flock()>
 function. Thus the module should run (in theory) on any system with
-a working flock(), in particular on all Unix machines, on Windows 95
-and NT.
+a working C<flock()>, in particular on all Unix machines and on Windows
+NT. Under Windows 95 and MacOS the use of C<flock()> is disabled, thus
+the module should still be usable,
 
 Unlike other DBI drivers, you don't need an external SQL engine
 or a running server. All you need are the following Perl modules,
@@ -342,9 +341,9 @@ Thus this command reads
     use DBI;
     my $dbh = DBI->connect("DBI:CSV:f_dir=$dir");
 
-The directory tells the driver where it should create or open tables (aka
-files). It defaults to the current directory, thus the following are
-equivalent:
+The directory tells the driver where it should create or open tables
+(a.k.a. files). It defaults to the current directory, thus the following
+are equivalent:
 
     $dbh = DBI->connect("DBI:CSV:");
     $dbh = DBI->connect("DBI:CSV:f_dir=.");
@@ -369,7 +368,7 @@ A drop just removes the file without any warning.
 See L<DBI(3)> for more details.
 
 Table names cannot be arbitrary, due to restrictions of the SQL syntax.
-I recommend table names to be valid SQL identifiers: The first
+I recommend that table names are valid SQL identifiers: The first
 character is alphabetic, followed by an arbitrary number of alphanumeric
 characters. If you want to use other files, the file names must start
 with '/', './' or '../' and they must not contain white space.
@@ -395,7 +394,7 @@ Note that you don't need to use the quote method here, this is done
 automatically for you. This version is particularly well designed for
 loops. Whenever performance is an issue, I recommend using this method.
 
-You might wonder about the undef. Don't wonder, just take it as it
+You might wonder about the C<undef>. Don't wonder, just take it as it
 is. :-) It's an attribute argument that I have never ever used and
 will be parsed to the prepare method as a second argument.
 
@@ -405,7 +404,7 @@ To retrieve data, you can use the following:
     my($query) = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
     my($sth) = $dbh->prepare($query);
     $sth->execute();
-    while (my($row) = $sth->fetchrow_hashref) {
+    while (my $row = $sth->fetchrow_hashref) {
         print("Found result row: id = ", $row->{'id'},
               ", name = ", $row->{'name'});
     }
@@ -451,8 +450,8 @@ Likewise you use the DELETE statement for removing rows:
 
 =head2 Error handling
 
-In the above examples we have never cared for return codes. Of course
-this cannot be recommended. Instead we should have written (for example)
+In the above examples we have never cared about return codes. Of course,
+this cannot be recommended. Instead we should have written (for example):
 
     my($query) = "SELECT * FROM $table WHERE id = ?";
     my($sth) = $dbh->prepare($query)
@@ -495,7 +494,7 @@ subroutines.
 =head2 Metadata
 
 The following attributes are handled by DBI itself and not by DBD::File,
-thus they all work like expected:
+thus they all work as expected:
 
     Active
     ActiveKids
@@ -521,21 +520,21 @@ Works
 
 =item NUM_OF_FIELDS
 
-Valid after C<$sth->execute>
+Valid after C<$sth-E<gt>execute>
 
 =item NUM_OF_PARAMS
 
-Valid after C<$sth->prepare>
+Valid after C<$sth-E<gt>prepare>
 
 =item NAME
 
-Valid after C<$sth->execute>; undef for Non-Select statements.
+Valid after C<$sth-E<gt>execute>; undef for Non-Select statements.
 
 =item NULLABLE
 
-Not really working, always returns an array ref of one's, as DBD::CSV
-doesn't verify input data. Valid after C<$sth->execute>; undef for
-Non-Select statements.
+Not really working. Always returns an array ref of one's, as DBD::CSV
+doesn't verify input data. Valid after C<$sth-E<gt>execute>; undef for
+non-Select statements.
 
 =back
 
@@ -546,7 +545,7 @@ These attributes and methods are not supported:
     LongReadLen
     LongTruncOk
 
-Additional to the DBI attributes, you can use the following dbh
+In addition to the DBI attributes, you can use the following dbh
 attributes:
 
 =over 8
@@ -571,21 +570,21 @@ directory ("."). However, it is overwritable in the statement handles.
 
 The attributes I<csv_eol>, I<csv_sep_char>, I<csv_quote_char> and
 I<csv_escape_char> are corresponding to the respective attributes of the
-Text::CSV_XS object. You want to set these attributes, if you have unusual
-CSV files like /etc/passwd or MS Excel generated CSV files with a semicolon
+Text::CSV_XS object. You want to set these attributes if you have unusual
+CSV files like F</etc/passwd> or MS Excel generated CSV files with a semicolon
 as separator. Defaults are "\015\012", ';', '"' and '"', respectively.
 
 The attributes are used to create an instance of the class I<csv_class>,
-by default Text::CSV_XS. Altrenatively you may pass an instance as
+by default Text::CSV_XS. Alternatively you may pass an instance as
 I<csv_csv>, the latter takes precedence. Note that the I<binary>
-attribute *must* be set to a true value in that case.
+attribute I<must> be set to a true value in that case.
 
 Additionally you may overwrite these attributes on a per-table base in
 the I<csv_tables> attribute.
 
 =item csv_tables
 
-This hash ref is used for storing table dependent meta data. For any
+This hash ref is used for storing table dependent metadata. For any
 table it contains an element with the table name as key and another
 hash ref with the following attributes:
 
@@ -595,7 +594,7 @@ hash ref with the following attributes:
 
 The tables file name; defaults to
 
-    $dbh->{f_dir} . "/$table
+    "$dbh->{f_dir}/$table"
 
 =item eol
 
@@ -630,11 +629,11 @@ C<col0>, C<col1>, ...
 
 =back
 
-Example: Suggest you want to use C</etc/passwd> as a CSV file. :-)
+Example: Suggest you want to use F</etc/passwd> as a CSV file. :-)
 There simplest way is:
 
     require DBI;
-    my $dbh = DBI->connect("DBI:CSV:f_dir=/etc:csv_eol=\n;"
+    my $dbh = DBI->connect("DBI:CSV:f_dir=/etc;csv_eol=\n;"
                            . "csv_sep_char=:;csv_quote_char=;"
                            . "csv_escape_char=");
     $dbh->{'csv_tables'}->{'passwd'} = {
@@ -669,17 +668,12 @@ These methods are inherited from DBD::File:
 =item data_sources
 
 The C<data_sources> method returns a list of subdirectories of the current
-directory in the form "DBI:CSV:directory=$dirname". Unfortunately the
-current version of DBI doesn't accept attributes of the data_sources
-method. Thus the method reads a global variable
+directory in the form "DBI:CSV:directory=$dirname". 
 
-    $DBD::CSV::dr::data_sources_attr
-
-if you want to read the subdirectories of another directory. Example:
+If you want to read the subdirectories of another directory, use
 
     my($drh) = DBI->install_driver("CSV");
-    $DBD::CSV::dr::data_sources_attr = "/usr/local/csv_data";
-    my(@list) = $drh->data_sources();
+    my(@list) = $drh->data_sources('f_dir' => '/usr/local/csv_data' );
 
 =item list_tables
 
@@ -699,7 +693,7 @@ L<Creating and dropping tables> above.
 =head2 Data restrictions
 
 When inserting and fetching data, you will sometimes be surprised: DBD::CSV
-doesn't correctly handle data types, in particular NULL's. If you insert
+doesn't correctly handle data types, in particular NULLs. If you insert
 integers, it might happen, that fetch returns a string. Of course, a string
 containing the integer, so that's perhaps not a real problem. But the
 following will never work:
@@ -740,6 +734,17 @@ See L<Creating and dropping tables> above for table name restrictions.
 
 =head1 TODO
 
+Extensions of DBD::CSV:
+
+=over 4
+
+=item CSV file scanner
+
+Write a simple CSV file scanner that reads a CSV file and attempts
+to guess sep_char, quote_char, escape_char and eol automatically.
+
+=back
+
 These are merely restrictions of the DBD::File or SQL::Statement
 modules:
 
@@ -747,9 +752,9 @@ modules:
 
 =item Joins
 
-The current version of the module works with single table SELECT's
+The current version of the module works with single table SELECTs
 only, although the basic design of the SQL::Statement module allows
-joins and the likes.
+joins and the like.
 
 =item Table name mapping
 
@@ -776,9 +781,9 @@ example MS Access doesn't export column names by default.
 =item *
 
 The module is using flock() internally. However, this function is not
-available on platforms. Using flock() is disabled on MacOS: There's
-no locking at all (perhaps not so important on MacOS, as there's a
-single user anyways).
+available on platforms. Using flock() is disabled on MacOS and Windows
+95: There's no locking at all (perhaps not so important on these
+operating systems, as they are for single users anyways).
 
 =back
 
@@ -799,16 +804,16 @@ All rights reserved.
 
 You may distribute this module under the terms of either the GNU
 General Public License or the Artistic License, as specified in
-the Perl README file. 
+the Perl README file.
 
 
 =head1 SEE ALSO
 
 L<DBI(3)>, L<Text::CSV_XS(3)>, L<SQL::Statement(3)>
 
-A mailing list for supporting the DBD::CSV driver is available at
+For help on the use of DBD::CSV, see the DBI users mailing list:
 
-  http://mail.healthquiz.com/mailman/listinfo/dbd-csv
+  http://www.isc.org/dbi-lists.html
 
 For general information on DBI see
 

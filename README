@@ -22,11 +22,9 @@ SYNOPSIS
         $dbh->{'csv_tables'}->{'info'} = { 'file' => 'csv'};
         $sth = $dbh->prepare("SELECT * FROM info");
 
-        # Read /etc/passwd as a CSV file.    
-
 WARNING
     THIS IS ALPHA SOFTWARE. It is *only* 'Alpha' because the interface (API)
-    is not finalised. The Alpha status does not reflect code quality or
+    is not finalized. The Alpha status does not reflect code quality or
     stability.
 
 DESCRIPTION
@@ -34,7 +32,7 @@ DESCRIPTION
     independent interface for Perl). This one is based on the SQL "engine"
     SQL::Statement and the abstract DBI driver DBD::File and implements
     access to so-called CSV files (Comma separated values). Such files are
-    mostly used for exporting MS Acess and MS Excel data.
+    mostly used for exporting MS Access and MS Excel data.
 
     See the DBI(3) manpage for details on DBI, the SQL::Statement(3) manpage
     for details on SQL::Statement and the DBD::File(3) manpage for details
@@ -42,10 +40,11 @@ DESCRIPTION
 
   Prerequisites
 
-    The only system dependent feature that DBD::File uses, is the flock()
+    The only system dependent feature that DBD::File uses, is the `flock()'
     function. Thus the module should run (in theory) on any system with a
-    working flock(), in particular on all Unix machines, on Windows 95 and
-    NT.
+    working `flock()', in particular on all Unix machines and on Windows NT.
+    Under Windows 95 and MacOS the use of `flock()' is disabled, thus the
+    module should still be usable,
 
     Unlike other DBI drivers, you don't need an external SQL engine or a
     running server. All you need are the following Perl modules, available
@@ -96,7 +95,7 @@ DESCRIPTION
         my $dbh = DBI->connect("DBI:CSV:f_dir=$dir");
 
     The directory tells the driver where it should create or open tables
-    (aka files). It defaults to the current directory, thus the following
+    (a.k.a. files). It defaults to the current directory, thus the following
     are equivalent:
 
         $dbh = DBI->connect("DBI:CSV:");
@@ -121,8 +120,8 @@ DESCRIPTION
     See the DBI(3) manpage for more details.
 
     Table names cannot be arbitrary, due to restrictions of the SQL syntax.
-    I recommend table names to be valid SQL identifiers: The first character
-    is alphabetic, followed by an arbitrary number of alphanumeric
+    I recommend that table names are valid SQL identifiers: The first
+    character is alphabetic, followed by an arbitrary number of alphanumeric
     characters. If you want to use other files, the file names must start
     with '/', './' or '../' and they must not contain white space.
 
@@ -146,7 +145,7 @@ DESCRIPTION
     automatically for you. This version is particularly well designed for
     loops. Whenever performance is an issue, I recommend using this method.
 
-    You might wonder about the undef. Don't wonder, just take it as it is.
+    You might wonder about the `undef'. Don't wonder, just take it as it is.
     :-) It's an attribute argument that I have never ever used and will be
     parsed to the prepare method as a second argument.
 
@@ -155,7 +154,7 @@ DESCRIPTION
         my($query) = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
         my($sth) = $dbh->prepare($query);
         $sth->execute();
-        while (my($row) = $sth->fetchrow_hashref) {
+        while (my $row = $sth->fetchrow_hashref) {
             print("Found result row: id = ", $row->{'id'},
                   ", name = ", $row->{'name'});
         }
@@ -200,8 +199,9 @@ DESCRIPTION
 
   Error handling
 
-    In the above examples we have never cared for return codes. Of course
-    this cannot be recommended. Instead we should have written (for example)
+    In the above examples we have never cared about return codes. Of course,
+    this cannot be recommended. Instead we should have written (for
+    example):
 
         my($query) = "SELECT * FROM $table WHERE id = ?";
         my($sth) = $dbh->prepare($query)
@@ -243,7 +243,7 @@ DESCRIPTION
   Metadata
 
     The following attributes are handled by DBI itself and not by DBD::File,
-    thus they all work like expected:
+    thus they all work as expected:
 
         Active
         ActiveKids
@@ -264,18 +264,18 @@ DESCRIPTION
         Works
 
     NUM_OF_FIELDS
-        Valid after `$sth-'execute>
+        Valid after `$sth->execute'
 
     NUM_OF_PARAMS
-        Valid after `$sth-'prepare>
+        Valid after `$sth->prepare'
 
     NAME
-        Valid after `$sth-'execute>; undef for Non-Select statements.
+        Valid after `$sth->execute'; undef for Non-Select statements.
 
     NULLABLE
-        Not really working, always returns an array ref of one's, as
-        DBD::CSV doesn't verify input data. Valid after `$sth-'execute>;
-        undef for Non-Select statements.
+        Not really working. Always returns an array ref of one's, as
+        DBD::CSV doesn't verify input data. Valid after `$sth->execute';
+        undef for non-Select statements.
 
     These attributes and methods are not supported:
 
@@ -284,7 +284,7 @@ DESCRIPTION
         LongReadLen
         LongTruncOk
 
-    Additional to the DBI attributes, you can use the following dbh
+    In addition to the DBI attributes, you can use the following dbh
     attributes:
 
     f_dir   This attribute is used for setting the directory where CSV files are
@@ -299,13 +299,13 @@ DESCRIPTION
     csv_class
     csv_csv The attributes *csv_eol*, *csv_sep_char*, *csv_quote_char* and
             *csv_escape_char* are corresponding to the respective attributes
-            of the Text::CSV_XS object. You want to set these attributes, if
+            of the Text::CSV_XS object. You want to set these attributes if
             you have unusual CSV files like /etc/passwd or MS Excel
             generated CSV files with a semicolon as separator. Defaults are
             "\015\012", ';', '"' and '"', respectively.
 
             The attributes are used to create an instance of the class
-            *csv_class*, by default Text::CSV_XS. Altrenatively you may pass
+            *csv_class*, by default Text::CSV_XS. Alternatively you may pass
             an instance as *csv_csv*, the latter takes precedence. Note that
             the *binary* attribute *must* be set to a true value in that
             case.
@@ -314,13 +314,13 @@ DESCRIPTION
             base in the *csv_tables* attribute.
 
     csv_tables
-            This hash ref is used for storing table dependent meta data. For
+            This hash ref is used for storing table dependent metadata. For
             any table it contains an element with the table name as key and
             another hash ref with the following attributes:
 
     file                The tables file name; defaults to
 
-                            $dbh->{f_dir} . "/$table
+                            "$dbh->{f_dir}/$table"
 
     eol
     sep_char
@@ -344,11 +344,11 @@ DESCRIPTION
                         columns and create column names like `col0', `col1',
                         ...
 
-    Example: Suggest you want to use `/etc/passwd' as a CSV file. :-) There
+    Example: Suggest you want to use /etc/passwd as a CSV file. :-) There
     simplest way is:
 
         require DBI;
-        my $dbh = DBI->connect("DBI:CSV:f_dir=/etc:csv_eol=\n;"
+        my $dbh = DBI->connect("DBI:CSV:f_dir=/etc;csv_eol=\n;"
                                . "csv_sep_char=:;csv_quote_char=;"
                                . "csv_escape_char=");
         $dbh->{'csv_tables'}->{'passwd'} = {
@@ -380,17 +380,11 @@ DESCRIPTION
     data_sources
         The `data_sources' method returns a list of subdirectories of the
         current directory in the form "DBI:CSV:directory=$dirname".
-        Unfortunately the current version of DBI doesn't accept attributes
-        of the data_sources method. Thus the method reads a global variable
 
-            $DBD::CSV::dr::data_sources_attr
-
-        if you want to read the subdirectories of another directory.
-        Example:
+        If you want to read the subdirectories of another directory, use
 
             my($drh) = DBI->install_driver("CSV");
-            $DBD::CSV::dr::data_sources_attr = "/usr/local/csv_data";
-            my(@list) = $drh->data_sources();
+            my(@list) = $drh->data_sources('f_dir' => '/usr/local/csv_data' );
 
     list_tables
         This method returns a list of file names inside $dbh->{'directory'}.
@@ -406,7 +400,7 @@ DESCRIPTION
   Data restrictions
 
     When inserting and fetching data, you will sometimes be surprised:
-    DBD::CSV doesn't correctly handle data types, in particular NULL's. If
+    DBD::CSV doesn't correctly handle data types, in particular NULLs. If
     you insert integers, it might happen, that fetch returns a string. Of
     course, a string containing the integer, so that's perhaps not a real
     problem. But the following will never work:
@@ -445,13 +439,19 @@ DESCRIPTION
     restrictions.
 
 TODO
+    Extensions of DBD::CSV:
+
+    CSV file scanner
+        Write a simple CSV file scanner that reads a CSV file and attempts
+        to guess sep_char, quote_char, escape_char and eol automatically.
+
     These are merely restrictions of the DBD::File or SQL::Statement
     modules:
 
     Joins
-        The current version of the module works with single table SELECT's
+        The current version of the module works with single table SELECTs
         only, although the basic design of the SQL::Statement module allows
-        joins and the likes.
+        joins and the like.
 
     Table name mapping
         Currently it is not possible to use files with names like
@@ -469,9 +469,10 @@ TODO
 
 KNOWN BUGS
     *       The module is using flock() internally. However, this function is
-            not available on platforms. Using flock() is disabled on MacOS:
-            There's no locking at all (perhaps not so important on MacOS, as
-            there's a single user anyways).
+            not available on platforms. Using flock() is disabled on MacOS
+            and Windows 95: There's no locking at all (perhaps not so
+            important on these operating systems, as they are for single
+            users anyways).
 
 AUTHOR AND COPYRIGHT
     This module is Copyright (C) 1998 by
@@ -494,9 +495,9 @@ SEE ALSO
     the DBI(3) manpage, the Text::CSV_XS(3) manpage, the SQL::Statement(3)
     manpage
 
-    A mailing list for supporting the DBD::CSV driver is available at
+    For help on the use of DBD::CSV, see the DBI users mailing list:
 
-      http://mail.healthquiz.com/mailman/listinfo/dbd-csv
+      http://www.isc.org/dbi-lists.html
 
     For general information on DBI see
 

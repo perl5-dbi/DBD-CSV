@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 #
-#   $Id: 40nulls.t,v 1.2 1998/12/30 10:41:43 joe Exp $
+#   $Id: 40nulls.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
 #
 #   This is a test for correctly handling NULL values.
 #

@@ -79,7 +79,6 @@ sub driver ($;$) {
 package DBD::File::dr; # ====== DRIVER ======
 
 $DBD::File::dr::imp_data_size = 0;
-$DBD::File::dr::data_sources_attr = undef;
 
 sub connect ($$;$$$) {
     my($drh, $dbname, $user, $auth, $attr)= @_;
@@ -103,7 +102,7 @@ sub connect ($$;$$$) {
 	    }
 	    if ($var =~ /^(.+?)=(.*)/s) {
 		$var = $1;
-		($val = $2) =~ tr/\\//d;
+		($val = $2) =~ s/\\(.)/$1/g;
 		$this->{$var} = $val;
 	    }
 	}
@@ -114,8 +113,7 @@ sub connect ($$;$$$) {
 
 sub data_sources ($;$) {
     my($drh, $attr) = @_;
-    $attr ||= $DBD::File::dr::data_sources_attr;
-    my($dir) = exists($attr->{'f_dir'}) ?
+    my($dir) = ($attr and exists($attr->{'f_dir'})) ?
 	$attr->{'f_dir'} : $haveFileSpec ? File::Spec->curdir() : '.';
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
@@ -640,17 +638,12 @@ directory ("."). However, it is overwritable in the statement handles.
 =item data_sources
 
 The C<data_sources> method returns a list of subdirectories of the current
-directory in the form "DBI:CSV:directory=$dirname". Unfortunately the
-current version of DBI doesn't accept attributes of the data_sources
-method. Thus the method reads a global variable
+directory in the form "DBI:CSV:f_dir=$dirname".
 
-    $DBD::CSV::dr::data_sources_attr
-
-if you want to read the subdirectories of another directory. Example:
+If you want to read the subdirectories of another directory, use
 
     my($drh) = DBI->install_driver("CSV");
-    $DBD::CSV::dr::data_sources_attr = "/usr/local/csv_data";
-    my(@list) = $drh->data_sources();
+    my(@list) = $drh->data_sources('f_dir' => '/usr/local/csv_data' );
 
 =item list_tables
 

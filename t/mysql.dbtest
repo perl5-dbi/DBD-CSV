@@ -1,6 +1,6 @@
 # Hej, Emacs, give us -*- perl -*- mode here!
 #
-#   $Id: mysql.dbtest,v 1.2 1998/12/30 10:41:46 joe Exp $
+#   $Id: mysql.dbtest,v 1.1.1.1 1999/06/13 12:59:36 joe Exp $
 #
 # database specific definitions for a 'mysql' database
 
