@@ -102,17 +102,11 @@ DESCRIPTION
     See the DBI(3) manpage for more details.
 
     Table names cannot be arbitrary, due to restrictions of the SQL
-    syntax. In other words, a table name must be a valid SQL
-    identifier: The first character is alphabetic, followed by an
-    arbitrary number of alphanumeric characters. In particular, you
-    cannot use table names like `names.csv' or something similar.
-    Instead you must either rename the table or use a softlink from
-    `names.csv' to `names'.
-
-    A more complex mapping between table and file names will
-    probably be introduced in the future. For example I can imagine
-    a hash ref of table and file names, available as a dbh
-    attribute.
+    syntax. I recommend table names to be valid SQL identifiers: The
+    first character is alphabetic, followed by an arbitrary number
+    of alphanumeric characters. If you want to use other files, the
+    file names must start with '/', './' or '../' and they must not
+    contain white space.
 
   Inserting, fetching and modifying data
 
@@ -389,8 +383,12 @@ TODO
         being the table names and the values being the file names.
 
 AUTHOR AND COPYRIGHT
-    This module is Copyright (C) 1998 by Jochen Wiedmann Am Eisteich
-    9 72555 Metzingen Germany
+    This module is Copyright (C) 1998 by
+
+        Jochen Wiedmann
+        Am Eisteich 9
+        72555 Metzingen
+        Germany
 
         Email: joe@ispsoft.de
         Phone: +49 7123 14887

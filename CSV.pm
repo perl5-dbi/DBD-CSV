@@ -17,7 +17,7 @@ use vars qw(@ISA $VERSION $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1001';
+$VERSION = '0.1002';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -571,15 +571,10 @@ A drop just removes the file without any warning.
 See L<DBI(3)> for more details.
 
 Table names cannot be arbitrary, due to restrictions of the SQL syntax.
-In other words, a table name must be a valid SQL identifier: The first
+I recommend table names to be valid SQL identifiers: The first
 character is alphabetic, followed by an arbitrary number of alphanumeric
-characters. In particular, you cannot use table names like C<names.csv>
-or something similar. Instead you must either rename the table or use
-a softlink from C<names.csv> to C<names>.
-
-A more complex mapping between table and file names will probably be
-introduced in the future. For example I can imagine a hash ref of
-table and file names, available as a dbh attribute.
+characters. If you want to use other files, the file names must start
+with '/', './' or '../' and they must not contain white space.
 
 
 =head2 Inserting, fetching and modifying data
@@ -885,7 +880,7 @@ names.
 =head1 AUTHOR AND COPYRIGHT
 
 This module is Copyright (C) 1998 by
- 
+
     Jochen Wiedmann
     Am Eisteich 9
     72555 Metzingen

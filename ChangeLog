@@ -1,3 +1,8 @@
+1998-05-21  Jochen Wiedmann  <joe@ispsoft.de>   (0.1002)
+
+	* CSV.pm: Now using the misc.files_as_tables feature
+	  of SQL::Statement
+
 1998-05-05  Jochen Wiedmann  <joe@ispsoft.de>	(0.1000)
 
 	* Initial version
