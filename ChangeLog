@@ -1,3 +1,9 @@
+1998-08-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1013)
+
+	* lib/DBD/File.pm (drop): $self->{'fh'} is now closed before
+	  unlinking it. This makes DROP TABLE work under Win32 and
+	  other Non-Unixes.
+
 1998-08-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1012)
 
 	* lib/DBD/File.pm (open_table): Added binmode.

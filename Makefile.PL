@@ -19,24 +19,24 @@ if ($@) {
     print "ok\n";
 }
 
-print "Checking for Text::CSV_XS, 0.12 or later ... ";
+print "Checking for Text::CSV_XS, 0.14 or later ... ";
 $@ = '';
-eval "use Text::CSV_XS 0.12 ();";
+eval "use Text::CSV_XS 0.14 ();";
 if ($@) {
     $ok = 0;
-    print("\nYou don't have installed the Text::CSV_XS module, version 0.10",
+    print("\nYou don't have installed the Text::CSV_XS module, version 0.14",
           " or later.\n");
 } else {
     print "ok\n";
 }
 
-print "Checking for SQL::Statement, 0.1003 or later ... ";
+print "Checking for SQL::Statement, 0.1005 or later ... ";
 $@ = '';
-eval "use SQL::Statement 0.1003 ();";
+eval "use SQL::Statement 0.1005 ();";
 if ($@) {
     $ok = 0;
     print("\nYou don't have installed the SQL::Statement module, version",
-	  " 0.1003 or later.\n");
+	  " 0.1005 or later.\n");
 } else {
     print "ok\n";
 }

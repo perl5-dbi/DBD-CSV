@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1001';
+$VERSION = '0.1002';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -415,6 +415,9 @@ package DBD::File::Table;
 
 sub drop ($) {
     my($self) = @_;
+    # We have to close the file before unlinking it: Some OS'es will
+    # refuse the unlink otherwise.
+    $self->{'fh'}->close();
     unlink($self->{'file'});
     return 1;
 }
