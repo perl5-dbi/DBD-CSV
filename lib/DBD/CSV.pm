@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1020';
+$VERSION = '0.1021';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -198,9 +198,8 @@ sub fetch_row ($$) {
 	local $/ = $csv->{'eol'};
 	$fields = $csv->getline($self->{'fh'});
 	if (!$fields) {
-	    if ($!) {
-		die "Error while reading file " . $self->{'file'} . ": $!";
-	    }
+	    die "Error while reading file " . $self->{'file'} . ": $!" if $!;
+	    return undef;
 	}
     }
     $self->{row} = (@$fields ? $fields : undef);
@@ -341,14 +340,14 @@ Creating a database handle usually implies connecting to a database server.
 Thus this command reads
 
     use DBI;
-    my $dbh = DBI->connect("DBI:File:f_dir=$dir");
+    my $dbh = DBI->connect("DBI:CSV:f_dir=$dir");
 
 The directory tells the driver where it should create or open tables (aka
 files). It defaults to the current directory, thus the following are
 equivalent:
 
-    $dbh = DBI->connect("DBI:File:");
-    $dbh = DBI->connect("DBI:File:f_dir=.");
+    $dbh = DBI->connect("DBI:CSV:");
+    $dbh = DBI->connect("DBI:CSV:f_dir=.");
 
 You may set other attributes in the DSN string, separated by semicolons.
 
@@ -810,5 +809,9 @@ L<DBI(3)>, L<Text::CSV_XS(3)>, L<SQL::Statement(3)>
 A mailing list for supporting the DBD::CSV driver is available at
 
   http://mail.healthquiz.com/mailman/listinfo/dbd-csv
+
+For general information on DBI see
+
+  http://www.symbolstone.org/technology/perl/DBI
 
 =cut

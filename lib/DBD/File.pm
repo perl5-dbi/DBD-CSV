@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1020';
+$VERSION = '0.1021';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -472,7 +472,7 @@ sub open_table ($$$$$) {
 	}
     }
     binmode($fh);
-    if ($^O ne 'MacOS') {
+    if ($^O ne 'MacOS' && ($^O ne 'MSWin32' || !Win32::IsWin95())) {
 	if ($lockMode) {
 	    if (!flock($fh, 2)) {
 		die " Cannot obtain exclusive lock on $file: $!";
@@ -695,9 +695,9 @@ names.
 =item *
 
 The module is using flock() internally. However, this function is not
-available on platforms. Using flock() is disabled on MacOS: There's
-no locking at all (perhaps not so important on MacOS, as there's a
-single user anyways).
+available on all platforms. Using flock() is disabled on MacOS and
+Windows 95: There's no locking at all (perhaps not so important on
+MacOS and Windows 95, as there's a single user anyways).
 
 =back
 
@@ -718,7 +718,7 @@ All rights reserved.
 
 You may distribute this module under the terms of either the GNU
 General Public License or the Artistic License, as specified in
-the Perl README file. 
+the Perl README file.
 
 
 =head1 SEE ALSO

@@ -1,3 +1,12 @@
+1999-05-10  Jochen Wiedmann  <joe@ispsoft.de> (0.1021)
+
+	* lib/DBD/CSV.pm (push_row): Fixed typo in docs where DBI:File:
+	  was used instead of DBI:CSV: (Mitra <mitra@earth.path.net>)
+	* lib/DBD/CSV.pm (fetch_row): An undef result from $csv->getline()
+	  was sometimes handled incorrectly. Thanks to Syed Muhammad Nayeem
+	  <smnayeem@dhaka.agni.com>.
+	* lib/DBD/File.pm: Removed use of flock under Win95.
+
 1999-03-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1020)
 
 	* lib/DBD/File.pm (FETCH): Simplified handling of $sth->{'NAME'}

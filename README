@@ -93,14 +93,14 @@ DESCRIPTION
     server. Thus this command reads
 
         use DBI;
-        my $dbh = DBI->connect("DBI:File:f_dir=$dir");
+        my $dbh = DBI->connect("DBI:CSV:f_dir=$dir");
 
     The directory tells the driver where it should create or open tables
     (aka files). It defaults to the current directory, thus the following
     are equivalent:
 
-        $dbh = DBI->connect("DBI:File:");
-        $dbh = DBI->connect("DBI:File:f_dir=.");
+        $dbh = DBI->connect("DBI:CSV:");
+        $dbh = DBI->connect("DBI:CSV:f_dir=.");
 
     You may set other attributes in the DSN string, separated by semicolons.
 
@@ -497,4 +497,8 @@ SEE ALSO
     A mailing list for supporting the DBD::CSV driver is available at
 
       http://mail.healthquiz.com/mailman/listinfo/dbd-csv
+
+    For general information on DBI see
+
+      http://www.symbolstone.org/technology/perl/DBI
 
