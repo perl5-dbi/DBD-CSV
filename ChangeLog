@@ -1,16 +1,26 @@
-2000-07-31  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1023)
+2000-12-22  Jochen Wiedmann  <joe@ispsoft.de> (0.1025)
+
+	* lib/DBD/CSV.pm (fetch_row): Now cleaning $! before
+	  calling $csv->getline(). Seems to return false errors
+	  otherwise in some cases. Jeremy Wadsack
+	  <jwadsack@wadsack-allen.com>
+	* Made Makefile.PL CPAN conformant.
+	* Removed unnecessary stuff in Makefile.PL which verified
+	  the DBI installation.
+
+2000-07-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1023)
 
 	* lib/DBD/File.pm (STORE): Changed croak to die.
 	  Guido Flohr <guido@imperia.westend.com>	  
 
-2000-07-31  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1023)
+2000-07-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1023)
 
 	* Minor fix in the docs, thanks to Andreas Grupp,
 	  grupp@elektronikschule.de.
 	* Minor compatibility fixes in the test suite for
 	  Perl 5.6.
 
-1999-10-07  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1022)
+1999-10-07  Jochen Wiedmann  <joe@ispsoft.de> (0.1022)
 
 	* lib/DBD/File.pm (connect): In the DSN, \ was removed in
 	  all cases. It is now possible to use \\ for a DSN

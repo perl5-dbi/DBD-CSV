@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1024';
+$VERSION = '0.1025';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -194,6 +194,7 @@ sub fetch_row ($$) {
     if (exists($self->{cached_row})) {
 	$fields = delete($self->{cached_row});
     } else {
+	undef $!;
 	my $csv = $self->{csv_csv};
 	local $/ = $csv->{'eol'};
 	$fields = $csv->getline($self->{'fh'});
