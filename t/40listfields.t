@@ -83,7 +83,6 @@ while (Testing()) {
     if (!$state && $verbose) {
 	printf("Number of fields: %s\n", defined($res) ? $res : "undef");
     }
-
     Test($state or ($ref = $cursor->{'NAME'})  &&  @$ref == @table_def
 	            &&  (lc $$ref[0]) eq $table_def[0][0]
 		    &&  (lc $$ref[1]) eq $table_def[1][0])

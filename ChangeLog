@@ -1,4 +1,11 @@
-2004-04-18  Jeff Zucker <jeff@vpservices.com> (0.21)
+2005-04-01  Jeff Zucker <jzuckerATcpan.org> (0.22)
+
+	* removed DESTROY and disconnect - use DBD File's instead
+
+	* added ignore_missing_table flag to avoid warnings with
+	  DROP TABLE IF EXISTS
+	
+2004-04-18  Jeff Zucker <jzuckerATcpan.org> (0.21)
 
 	* added support for $dbh->{Active}, should now work 
 	  well with Class::DBI and other caching systems
@@ -9,7 +16,7 @@
 	* removed DBD::File from the distribution - it's now
 	  distributed with DBI 1.42 and higher
 	
-2002-03-01  Jeff Zucker <jeff@vpservices.com> (0.2002)
+2002-03-01  Jeff Zucker <jzuckerATcpan.org> (0.2002)
 
 	* added parser-caching for speedier operation,
 	  see File.pm prepare()
@@ -18,7 +25,7 @@
 	  prototypes to make it perl 5.8 compatible
 
 
-2002-01-21  Jeff Zucker <jeff@vpservices.com> (0.2001)
+2002-01-21  Jeff Zucker <jzuckerATcpan.org> (0.2001)
 
 	* adjusted docs to show Jeff as the new maintainer.
 

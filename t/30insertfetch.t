@@ -55,6 +55,8 @@ while (Testing()) {
     #
     Test($state or $table = FindNewTable($dbh), 'FindNewTable')
 	or DbiError($dbh->err, $dbh->errstr);
+    $table ||= 'tmp';
+    eval {$dbh->do("DROP TABLE $table")};
 
     #
     #   Create a new table; EDIT THIS!
@@ -66,7 +68,6 @@ while (Testing()) {
 					   ["txt",  "CHAR",    64, 0]) and
 		    $dbh->do($def)), 'create', $def)
 	or DbiError($dbh->err, $dbh->errstr);
-
 
     #
     #   Insert a row into the test table.......
@@ -91,7 +92,7 @@ while (Testing()) {
     Test($state or (defined($row = $cursor->fetchrow_arrayref)  &&
 		    !($cursor->errstr)), 'fetch select')
 	or DbiError($cursor->err, $cursor->errstr);
-    
+
     Test($state or ($row->[0] == 1 &&
                     $row->[1] eq 'Alligator Descartes' &&    
                     $row->[2] == 1111 &&    

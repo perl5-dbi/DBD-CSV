@@ -33,7 +33,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.21'; # jumped from 0.2002 to shorten version number
+$VERSION = '0.22';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -96,17 +96,6 @@ sub csv_cache_sql_parser_object {
     return $parser;
 }
 
-sub DESTROY {
-    my $dbh = shift;
-    $dbh->STORE('Active',0);
-    undef;
-}
-sub disconnect {
-    my $dbh = shift;
-    $dbh->STORE('Active',0);
-    1;
-}
-
 package DBD::CSV::st; # ====== STATEMENT ======
 
 $DBD::CSV::st::imp_data_size = 0;
@@ -164,7 +153,7 @@ sub open_table ($$$$$) {
 	    }
 	    $tbl->{types} = $t;
 	}
-	if (!$createMode and !$self->{ignore_missing_table}) {
+	if (!$createMode and !$self->{ignore_missing_table} and $self->command ne 'DROP') {
 	    my($array, $skipRows);
 	    if (exists($meta->{skip_rows})) {
 		$skipRows = $meta->{skip_rows};
@@ -275,13 +264,6 @@ DBD::CSV - DBI driver for CSV files
     $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
     $dbh->{'csv_tables'}->{'info'} = { 'file' => 'info.csv'};
     $sth = $dbh->prepare("SELECT * FROM info");
-
-
-=head1 WARNING
-
-THIS IS ALPHA SOFTWARE. It is *only* 'Alpha' because the interface (API)
-is not finalized. The Alpha status does not reflect code quality or
-stability.
 
 
 =head1 DESCRIPTION

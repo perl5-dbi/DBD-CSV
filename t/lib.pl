@@ -259,7 +259,7 @@ sub DbiError ($$) {
 	}
 	$table = $testtable;
 	$testtable++;
-	$table;
+	return $table;
     }
 }
 

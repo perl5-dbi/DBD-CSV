@@ -34,3 +34,4 @@ t/mysql.mtest
 t/pNET.dbtest
 t/pNET.mtest
 t/skeleton.test
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBD-CSV
+version:      0.22
+version_from: lib/DBD/CSV.pm
+installdirs:  site
+requires:
+    DBD::File:                     0.30
+    DBI:                           1.00
+    SQL::Statement:                0.1011
+    Text::CSV_XS:                  0.16
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

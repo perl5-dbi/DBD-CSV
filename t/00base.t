@@ -10,7 +10,9 @@
 #
 #   Include lib.pl
 #
-
+use lib '/home/jeff/data/module/SQL-Statement/SQL-Statement-1.12/lib';
+use SQL::Statement;
+warn  $SQL::Statement::VERSION;
 
 $mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl") {
