@@ -3,10 +3,33 @@
 require 5.004;
 use strict;
 
-
-require DBI;
 require Benchmark;
 
+my $v;
+eval {
+    require DBI;
+    $v->{DBI}= $DBI::VERSION;
+    require SQL::Statement;
+    $v->{SQL}= $SQL::Statement::VERSION;
+    require Text::CSV_XS;
+    $v->{CSV}= $Text::CSV_XS::VERSION;
+    require DBD::CSV;
+    $v->{DBD}= $DBD::CSV::VERSION;
+};
+if ($@) {
+    print "\n\nYOU ARE MISSING REQUIRED MODULES:\n\n";
+    print "   DBI\n" unless $v->{DBI};
+    print "   SQL::Statement\n" unless $v->{SQL};
+    print "   Text_CSV\n" unless $v->{CSV};
+    exit;
+}
+print  "USING:\n";
+printf " %-20s %s\n",'OS', $^O;
+printf " %-20s %s\n",'Perl', $];
+printf " %-20s %s\n",'DBD::CSV', $v->{DBD};
+printf " %-20s %s\n",'DBI', $v->{DBI};
+printf " %-20s %s\n",'SQL::Statement', $v->{SQL};
+printf " %-20s %s\n",'Text::CSV_XS', $v->{CSV};
 
 my $haveFileSpec = eval { require File::Spec };
 my $table_dir;
@@ -50,6 +73,7 @@ TimeMe("Testing empty loop speed ...",
 
 
 my($dbh);
+my($sth);
 TimeMe("Testing connect/disconnect speed ...",
        "%d connections in %.1f cpu+sys seconds (%d per sec)",
        sub {
@@ -79,35 +103,33 @@ $dbh->do("CREATE TABLE bench (id INTEGER, name CHAR(40),"
     . " zip CHAR(10), city CHAR(40), email CHAR(40))");
 my(@vals) = (0 .. 499);
 my($num);
+$sth = $dbh->prepare("INSERT INTO bench VALUES (?,?,?,?,?,?,?,?,?)");
 TimeMe("Testing INSERT speed ...",
        "%d rows in %.1f cpu+sys seconds (%d per sec)",
        sub {
 	   ($num) = splice(@vals, int(rand(@vals)), 1);
-	   $dbh->do("INSERT INTO bench VALUES (?, 'Wiedmann', 'Jochen',"
-		    . " 'Am Eisteich 9', '72555', 'Metzingen',"
-		    . " 'joe\@ispsoft.de')", undef, $num);
+	   $sth->execute($num, 'Wiedmann', 'Jochen','Am Eisteich 9',
+                          '72555','Metzingen','joe\@ispsoft.de', undef, $num);
        },
     500);
 
-my($sth);
+$sth = $dbh->prepare("SELECT * FROM bench WHERE id = ?");
 TimeMe("Testing SELECT speed ...",
        "%d single rows in %.1f cpu+sys seconds (%.1f per sec)",
        sub {
 	   $num = int(rand(500));
-	   $sth = $dbh->prepare("SELECT * FROM bench WHERE id = $num");
-	   $sth->execute();
+	   $sth->execute($num);
 	   $sth->fetch() or die "Expected result for id = $num";
        },
     100);
 
 
+$sth = $dbh->prepare("SELECT * FROM bench WHERE id >=? AND id < ?");
 TimeMe("Testing SELECT speed (multiple rows) ...",
        "%d times 100 rows in %.1f cpu+sys seconds (%.1f per sec)",
        sub {
 	   $num = int(rand(400));
-	   $sth = $dbh->prepare("SELECT * FROM bench WHERE id >= $num"
-				. " AND id < " . ($num+100));
-	   $sth->execute();
+	   $sth->execute($num,$num+100);
 	   ($sth->rows() == 100)
 	       or die "Expected 100 rows for id = $num, got " . $sth->rows();
 	   while ($sth->fetch()) {

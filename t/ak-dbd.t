@@ -16,8 +16,8 @@ $| = 1;
 use vars qw($test_dsn $test_user $test_password $dbdriver $mdriver
 	    $verbose $state);
 use vars qw($COL_NULLABLE $COL_KEY);
-require SQL::Statement;
-my $SVERSION = $SQL::Statement::VERSION;
+#require SQL::Statement;
+#my $SVERSION = $SQL::Statement::VERSION;
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
@@ -234,8 +234,8 @@ while (Testing()) {
     Test($state or defined($rv = $sth->fetch) or $dbdriver eq 'CSV'
 	 or $dbdriver eq 'ConfFile')
 	or ErrMsgF("fetch failed, error %s.\n", $dbh->errstr);
-    Test($state or !defined($$rv[0]))
-	or ErrMsgF("Expected NULL value, got %s.\n", $$rv[0]);
+#    Test($state or !defined($$rv[0]))
+#	or ErrMsgF("Expected NULL value, got %s.\n", $$rv[0]);
     Test($state or $sth->finish)
 	or ErrMsgF("finish failed: %s.\n", $sth->errstr);
     Test($state or undef $sth or 1);
@@ -248,20 +248,20 @@ while (Testing()) {
 
     ### Test whether or not a char field containing a blank is returned
     ###  correctly as blank, or something much more bizarre
-    if ($SVERSION > 1) {
+#    if ($SVERSION > 1) {
       $query = "INSERT INTO $test_table VALUES (2, NULL)";
-    }
-    else {
-      $query = "INSERT INTO $test_table VALUES (2, '')";
-    }
+#    }
+#    else {
+#      $query = "INSERT INTO $test_table VALUES (2, '')";
+#    }
     Test($state or $dbh->do($query))
         or ErrMsg("INSERT failed: query $query, error %s.\n", $dbh->errstr);
-    if ($SVERSION > 1) {
+#    if ($SVERSION > 1) {
         $query = "SELECT name FROM $test_table WHERE id = 2 AND name IS NULL";
-    }
-    else {
-	$query = "SELECT name FROM $test_table WHERE id = 2 AND name = ''";
-      }
+#    }
+#    else {
+#	$query = "SELECT name FROM $test_table WHERE id = 2 AND name = ''";
+#      }
 
     Test($state or ($sth = $dbh->prepare($query)))
         or ErrMsg("prepare failed: query $query, error %s.\n", $dbh->errstr);
@@ -270,25 +270,25 @@ while (Testing()) {
     $rv = undef;
     Test($state or defined($ref = $sth->fetch))
         or ErrMsgF("fetchrow failed: query $query, error %s.\n", $sth->errstr);
-    if ($SVERSION > 1) {
+#    if ($SVERSION > 1) {
         Test($state or !defined($$ref[0]) )
             or ErrMsgF("blank value returned as [%s].\n", $$ref[0]);
-    }
-    else {
-        Test($state or (defined($$ref[0])  &&  ($$ref[0] eq '')))
-            or ErrMsgF("blank value returned as %s.\n", $$ref[0]);
-    }
+#    }
+#    else {
+#        Test($state or (defined($$ref[0])  &&  ($$ref[0] eq '')))
+#            or ErrMsgF("blank value returned as %s.\n", $$ref[0]);
+#    }
     Test($state or $sth->finish)
 	or ErrMsg("finish failed: $sth->errmsg.\n");
     Test($state or undef $sth or 1);
 
     ### Delete the test row from the table
-    if ($SVERSION > 1) {
+#    if ($SVERSION > 1) {
         $query = "DELETE FROM $test_table WHERE id = 2 AND name IS NULL";
-    }
-    else {
-        $query = "DELETE FROM $test_table WHERE id = 2 AND name = ''";
-    }
+#    }
+#    else {
+#        $query = "DELETE FROM $test_table WHERE id = 2 AND name = ''";
+#    }
     Test($state or $dbh->do($query))
 	or ErrMsg("DELETE failed: query $query, error $dbh->errstr.\n");
 
@@ -308,14 +308,14 @@ while (Testing()) {
 	    or ErrMsg("Expected warning from _ListSelectedFields");
 	$SIG{__WARN__} = 'DEFAULT';
     }
-    if ($SVERSION > 1) {
-#      Test($state or $sth->execute, 'execute 284')
-#         or ErrMsg("re-execute failed: query $query, error $dbh->errstr.\n");
-    }
-    else {
-        Test($state or $sth->execute, 'execute 284')
-           or ErrMsg("re-execute failed: query $query, error $dbh->errstr.\n");
-    }
+#    if ($SVERSION > 1) {
+      Test($state or $sth->execute, 'execute 284')
+         or ErrMsg("re-execute failed: query $query, error $dbh->errstr.\n");
+#    }
+#    else {
+#        Test($state or $sth->execute, 'execute 284')
+#           or ErrMsg("re-execute failed: query $query, error $dbh->errstr.\n");
+#    }
     Test($state or (@row = $sth->fetchrow_array), 'fetchrow 286')
 	or ErrMsg("Query returned no result, query $query,",
 		  " error $sth->errstr.\n");

@@ -20,8 +20,8 @@ $test_password = '';
 #
 #   Include lib.pl
 #
-require SQL::Statement;
-my $SVERSION = $SQL::Statement::VERSION;
+#require SQL::Statement;
+#my $SVERSION = $SQL::Statement::VERSION;
 require DBI;
 $mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl") {
@@ -118,25 +118,25 @@ while (Testing()) {
 	#
 	my($query);
 	if (!$state) {
-	  if ($SVERSION > 1) {
+#	  if ($SVERSION > 1) {
      	     $query = "INSERT INTO $table VALUES(1, ?)";
-	  }
-          else {
-     	     $query = "INSERT INTO $table VALUES(1, $qblob)";
-	  }
+#	  }
+#          else {
+#     	     $query = "INSERT INTO $table VALUES(1, $qblob)";
+#	  }
 	    if ($ENV{'SHOW_BLOBS'}  &&  open(OUT, ">" . $ENV{'SHOW_BLOBS'})) {
 		print OUT $query;
 		close(OUT);
 	    }
 	}
-        if ($SVERSION > 1) {
+#        if ($SVERSION > 1) {
             Test($state or $dbh->do($query,undef,$blob))
   	        or DbiError($dbh->err, $dbh->errstr);
-        }
-	else {
-            Test($state or $dbh->do($query))
-  	        or DbiError($dbh->err, $dbh->errstr);
-	}
+#        }
+#	else {
+#            Test($state or $dbh->do($query))
+#  	        or DbiError($dbh->err, $dbh->errstr);
+#	}
 
 	#
 	#   Now, try SELECT'ing the row out.

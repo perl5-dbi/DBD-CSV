@@ -35,7 +35,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1023';
+$VERSION = '0.2001'; # FIRST JZ CHANGES (cached parser)
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -160,7 +160,21 @@ sub prepare ($$;@) {
 	$@ = '';
 	my $class = $sth->FETCH('ImplementorClass');
 	$class =~ s/::st$/::Statement/;
-	my($stmt) = eval { $class->new($statement) };
+###jz
+#         my($stmt) = eval { $class->new($statement) };
+#=pod
+	my($stmt);
+        my $sversion = $SQL::Statement::VERSION;
+	if ($SQL::Statement::VERSION > 1) {
+            my $parser = $dbh->{csv_sql_parser_object};
+            $parser ||= $dbh->func('csv_cache_sql_parser_object');
+	    $stmt = eval { $class->new($statement,$parser) };
+        }
+        else {
+	    $stmt = eval { $class->new($statement) };
+	}
+#=cut
+###jzend
 	if ($@) {
 	    DBI::set_err($dbh, 1, $@);
 	    undef $sth;

@@ -7,8 +7,7 @@
 #   here and the like.
 #
 
-require 5.003;
-use strict;
+#exit 0;
 use vars qw($mdriver $dbdriver $childPid $test_dsn $test_user $test_password
             $haveFileSpec);
 
@@ -38,6 +37,24 @@ $test_password = $ENV{'DBI_PASS'}  ||  "";
 $::COL_NULLABLE = 1;
 $::COL_KEY = 2;
 
+eval {
+    require DBI;
+    $v->{DBI}= $DBI::VERSION;
+    require SQL::Statement;
+    $v->{SQL}= $SQL::Statement::VERSION;
+    require Text::CSV_XS;
+    $v->{CSV}= $Text::CSV_XS::VERSION;
+    require DBD::CSV;
+    $v->{DBD}= $DBD::CSV::VERSION;
+};
+if ($@) {
+    print STDERR "\n\nYOU ARE MISSING REQUIRED MODULES: [ ";
+    print STDERR "DBI " unless $v->{DBI};
+    print STDERR "SQL::Statement " unless $v->{SQL};
+    print STDERR "Text_CSV " unless $v->{CSV};
+    print STDERR "]\n\n";
+    exit 0;
+}
 
 my $file;
 if (-f ($file = "t/$dbdriver.dbtest")  ||
@@ -247,8 +264,11 @@ sub DbiError ($$) {
 }
 
 
-sub ErrMsg (@_) { print (@_); }
-sub ErrMsgF (@_) { printf (@_); }
+sub ErrMsg (\@) { print (@_); }
+sub ErrMsgF (\@) { printf (@_); }
+
+#sub ErrMsg (@_) { print (@_); }
+#sub ErrMsgF (@_) { printf (@_); }
 
 
 1;

@@ -15,8 +15,8 @@ use vars qw($COL_NULLABLE $COL_KEY);
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
-use SQL::Statement;
-my $SVERSION = $SQL::Statement::VERSION;
+#use SQL::Statement;
+#my $SVERSION = $SQL::Statement::VERSION;
 
 #
 #   Include lib.pl
@@ -82,16 +82,16 @@ while (Testing()) {
     #   and here's the right place for inserting new tests:
     #
     my @rows;
-    if ($SVERSION > 1) {
+#    if ($SVERSION > 1) {
         @rows = ([1, 'NULL'],
 	 	 [2, ' '],
 		 [3, ' a b c ']);
-    }
-    else {
-        @rows = ([1, ''],
-	 	 [2, ' '],
-		 [3, ' a b c ']);
-    }
+#    }
+#    else {
+#        @rows = ([1, ''],
+#	 	 [2, ' '],
+#		 [3, ' a b c ']);
+#    }
     my $ref;
     foreach $ref (@rows) {
 	my ($id, $name) = @$ref;

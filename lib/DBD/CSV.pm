@@ -33,7 +33,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.2001';
+$VERSION = '0.2002';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -85,6 +85,21 @@ package DBD::CSV::db; # ====== DATABASE ======
 $DBD::CSV::db::imp_data_size = 0;
 
 @DBD::CSV::db::ISA = qw(DBD::File::db);
+
+sub csv_cache_sql_parser_object {
+    my $dbh = shift;
+    my $parser = {
+            dialect    => 'CSV',
+            RaiseError => $dbh->FETCH('RaiseError'),
+            PrintError => $dbh->FETCH('PrintError'),
+        };
+    my $sql_flags  = $dbh->FETCH('csv_sql') || {};
+    %$parser = (%$parser,%$sql_flags);
+    $parser = SQL::Parser->new($parser->{dialect},$parser);
+    $dbh->{csv_sql_parser_object} = $parser;
+    return $parser;
+}
+
 
 
 package DBD::CSV::st; # ====== STATEMENT ======
