@@ -1,3 +1,8 @@
+1998-08-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1014)
+
+	* Makefile.PL: Added AUTHOR, ABSTRACT_FROM and PREREQ_PM.
+	* Makefile.PL: Fixed error handling by using DBI::set_err.
+
 1998-08-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1013)
 
 	* lib/DBD/File.pm (drop): $self->{'fh'} is now closed before

@@ -120,7 +120,7 @@ sub data_sources ($;$) {
 	$attr->{'f_dir'} : '.';
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
-	$drh->STORE('errstr', "Cannot open directory $dir");
+        DBI::set_err($drh, 1, "Cannot open directory $dir");
 	return undef;
     }
     my($file, @dsns, %names, $driver);
@@ -162,7 +162,7 @@ sub prepare ($$;@) {
 	$class =~ s/::st$/::Statement/;
 	my($stmt) = eval { $class->new($statement) };
 	if ($@) {
-	    $dbh->STORE('errstr', $@);
+	    DBI::set_err($dbh, 1, $@);
 	    undef $sth;
 	} else {
 	    $sth->STORE('f_stmt', $stmt);
@@ -212,7 +212,7 @@ sub list_tables ($) {
     my($dir) = $dbh->{f_dir};
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
-	$dbh->STORE('errstr', "Cannot open directory $dir");
+        DBI::set_err($dbh, 1, "Cannot open directory $dir");
 	return undef;
     }
     my($file, @tables, %names);
@@ -273,7 +273,7 @@ sub execute {
     my $stmt = $sth->{'f_stmt'};
     my $result = eval { $stmt->execute($sth, $params); };
     if ($@) {
-	$sth->STORE('errstr', $@);
+        DBI::set_err($sth, 1, $@);
     }
     if ($stmt->{'NUM_OF_FIELDS'}  &&  !$sth->FETCH('NUM_OF_FIELDS')) {
 	$sth->STORE('NUM_OF_FIELDS', $stmt->{'NUM_OF_FIELDS'});
@@ -285,8 +285,8 @@ sub fetch ($) {
     my $sth = shift;
     my $data = $sth->{f_stmt}->{data};
     if (!$data  ||  ref($data) ne 'ARRAY') {
-	$sth->STORE('errstr', "Attempt to fetch row from a Non-SELECT"
-		    . " statement");
+	DBI::set_err($sth, 1,
+		     "Attempt to fetch row from a Non-SELECT statement");
 	return undef;
     }
     my $dav = shift @$data;

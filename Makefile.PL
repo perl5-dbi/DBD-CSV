@@ -7,39 +7,36 @@ use vars qw($DBI_INC_DIR);
 require ExtUtils::MakeMaker;
 
 
-my($ok) = 1;
-print "Checking for DBI, 1.00 or later ... ";
-$@ = '';
-eval "use DBI 1.00 (); require DBI::DBD;";
-if ($@) {
-    $ok = 0;
-    print("\nYou don't have installed the DBI module, version 1.00 or",
-	  "later.\n");
-} else {
+my %prereq;
+sub CheckModule ($$;$) {
+    my($module, $version, $package) = @_;
+    $package ||= $module;
+    $prereq{$module} = $version || 0;
+    if ($version) {
+	print "Checking for $package, $version or later ... ";
+	eval "use $module $version";
+	if ($@) {
+	    print("\nYou don't have installed the $package package,",
+		  " version $version or later.\n");
+	    return 0;
+	}
+    } else {
+	print "Checking for $package ... ";
+	eval "use $module";
+	if ($@) {
+	    print("\nYou don't have installed the $package package.\n");
+	    return 0;
+	}
+    }
     print "ok\n";
+    return 1;
 }
 
-print "Checking for Text::CSV_XS, 0.14 or later ... ";
-$@ = '';
-eval "use Text::CSV_XS 0.14 ();";
-if ($@) {
-    $ok = 0;
-    print("\nYou don't have installed the Text::CSV_XS module, version 0.14",
-          " or later.\n");
-} else {
-    print "ok\n";
-}
 
-print "Checking for SQL::Statement, 0.1005 or later ... ";
-$@ = '';
-eval "use SQL::Statement 0.1005 ();";
-if ($@) {
-    $ok = 0;
-    print("\nYou don't have installed the SQL::Statement module, version",
-	  " 0.1005 or later.\n");
-} else {
-    print "ok\n";
-}
+my $ok = 1;
+$ok &&= CheckModule('DBI', '1.00');
+$ok &&= CheckModule('Text::CSV_XS', '0.14');
+$ok &&= CheckModule('SQL::Statement', '0.1006');
 
 if (!$ok) {
     print("\n",
@@ -48,8 +45,8 @@ if (!$ok) {
 	  "\n");
 }
 
-
-my($dir);
+my $dir;
+eval { require DBI::DBD };
 foreach $dir (@INC) {
     if (-f "$dir/auto/DBI/DBIXS.h") {
 	$DBI_INC_DIR = "-I$dir/auto/DBI";
@@ -89,13 +86,21 @@ END_OF_WARNING
 };
 
 
-ExtUtils::MakeMaker::WriteMakefile(
-    'NAME' => 'DBD::CSV',
-    'VERSION_FROM' => 'lib/DBD/CSV.pm',
+my %opts =
+    ('NAME' => 'DBD::CSV',
+     'VERSION_FROM' => 'lib/DBD/CSV.pm',
      'dist'         => { 'SUFFIX'       => ".gz",
 			 'DIST_DEFAULT' => 'all tardist',
-			 'COMPRESS'     => "gzip -9f" },
-);
+			 'COMPRESS'     => "gzip -9f" }
+     );
+
+if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
+    $opts{'ABSTRACT_FROM'} = 'lib/DBD/CSV.pm';
+    $opts{'AUTHOR'} = 'Jochen Wiedmann (joe@ispsoft.de)';
+    $opts{'PREREQ_PM'} = \%prereq;
+}
+
+ExtUtils::MakeMaker::WriteMakefile(%opts);
 
 
 package MY;
