@@ -1,3 +1,10 @@
+2000-07-31  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1023)
+
+	* Minor fix in the docs, thanks to Andreas Grupp,
+	  grupp@elektronikschule.de.
+	* Minor compatibility fixes in the test suite for
+	  Perl 5.6.
+
 1999-10-07  Jochen Wiedmann  <joe@gate.ispsoft.de> (0.1022)
 
 	* lib/DBD/File.pm (connect): In the DSN, \ was removed in

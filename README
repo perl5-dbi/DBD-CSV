@@ -19,7 +19,7 @@ SYNOPSIS
 
         # Same example, this time reading "info.csv" as a table:
         $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
-        $dbh->{'csv_tables'}->{'info'} = { 'file' => 'csv'};
+        $dbh->{'csv_tables'}->{'info'} = { 'file' => 'info.csv'};
         $sth = $dbh->prepare("SELECT * FROM info");
 
 WARNING
@@ -287,8 +287,8 @@ DESCRIPTION
     In addition to the DBI attributes, you can use the following dbh
     attributes:
 
-    f_dir   This attribute is used for setting the directory where CSV files are
-            opened. Usually you set it in the dbh, it defaults to the
+    f_dir   This attribute is used for setting the directory where CSV files
+            are opened. Usually you set it in the dbh, it defaults to the
             current directory ("."). However, it is overwritable in the
             statement handles.
 
@@ -318,26 +318,27 @@ DESCRIPTION
             any table it contains an element with the table name as key and
             another hash ref with the following attributes:
 
-    file                The tables file name; defaults to
+            file        The tables file name; defaults to
 
                             "$dbh->{f_dir}/$table"
 
-    eol
-    sep_char
-    quote_char
-    escape_char
-    class
-    csv                 These correspond to the attributes *csv_eol*,
+            eol
+            sep_char
+            quote_char
+            escape_char
+            class
+            csv         These correspond to the attributes *csv_eol*,
                         *csv_sep_char*, *csv_quote_char*, *csv_escape_char*,
                         *csv_class* and *csv_csv*. The difference is that
                         they work on a per-table base.
 
-    col_names
-    skip_first_row      By default DBD::CSV assumes that column names are stored
-                        in the first row of the CSV file. If this is not the
-                        case, you can supply an array ref of table names
-                        with the *col_names* attribute. In that case the
-                        attribute *skip_first_row* will be set to FALSE.
+            col_names
+            skip_first_row
+                        By default DBD::CSV assumes that column names are
+                        stored in the first row of the CSV file. If this is
+                        not the case, you can supply an array ref of table
+                        names with the *col_names* attribute. In that case
+                        the attribute *skip_first_row* will be set to FALSE.
 
                         If you supply an empty array ref, the driver will
                         read the first row for you, count the number of
@@ -395,7 +396,8 @@ DESCRIPTION
 
         Note that the list includes all files contained in the directory,
         even those that have non-valid table names, from the view of SQL.
-        See the section on "Creating and dropping tables" above.
+        See the Creating and dropping tables entry elsewhere in this
+        document above.
 
   Data restrictions
 
@@ -435,8 +437,8 @@ DESCRIPTION
     NULL, the two rightmost columns are NULL, ..., but the leftmost column
     will never be NULL!
 
-    See the section on "Creating and dropping tables" above for table name
-    restrictions.
+    See the Creating and dropping tables entry elsewhere in this document
+    above for table name restrictions.
 
 TODO
     Extensions of DBD::CSV:
@@ -468,9 +470,9 @@ TODO
         default.
 
 KNOWN BUGS
-    *       The module is using flock() internally. However, this function is
-            not available on platforms. Using flock() is disabled on MacOS
-            and Windows 95: There's no locking at all (perhaps not so
+    *       The module is using flock() internally. However, this function
+            is not available on platforms. Using flock() is disabled on
+            MacOS and Windows 95: There's no locking at all (perhaps not so
             important on these operating systems, as they are for single
             users anyways).
 

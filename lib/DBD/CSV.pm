@@ -34,7 +34,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.1022';
+$VERSION = '0.1023';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -253,7 +253,7 @@ DBD::CSV - DBI driver for CSV files
 
     # Same example, this time reading "info.csv" as a table:
     $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
-    $dbh->{'csv_tables'}->{'info'} = { 'file' => 'csv'};
+    $dbh->{'csv_tables'}->{'info'} = { 'file' => 'info.csv'};
     $sth = $dbh->prepare("SELECT * FROM info");
 
 
