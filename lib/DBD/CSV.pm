@@ -33,18 +33,16 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.2002';
+$VERSION = '0.21'; # jumped from 0.2002 to shorten version number
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
 $sqlstate = "";         # holds error state  for DBI::state
 $drh = undef;		# holds driver handle once initialised
 
-
 package DBD::CSV::dr; # ====== DRIVER ======
 
 use Text::CSV_XS();
-
 use vars qw(@ISA @CSV_TYPES);
 
 @CSV_TYPES = (
@@ -72,13 +70,11 @@ $DBD::CSV::dr::data_sources_attr = undef;
 
 sub connect ($$;$$$) {
     my($drh, $dbname, $user, $auth, $attr) = @_;
-
-    my $this = $drh->DBD::File::dr::connect($dbname, $user, $auth, $attr);
-    $this->{'csv_tables'} ||= {};
-
-    $this;
+    my $dbh = $drh->DBD::File::dr::connect($dbname, $user, $auth, $attr);
+    $dbh->{'csv_tables'} ||= {};
+    $dbh->{Active} = 1;
+    $dbh;
 }
-
 
 package DBD::CSV::db; # ====== DATABASE ======
 
@@ -100,7 +96,16 @@ sub csv_cache_sql_parser_object {
     return $parser;
 }
 
-
+sub DESTROY {
+    my $dbh = shift;
+    $dbh->STORE('Active',0);
+    undef;
+}
+sub disconnect {
+    my $dbh = shift;
+    $dbh->STORE('Active',0);
+    1;
+}
 
 package DBD::CSV::st; # ====== STATEMENT ======
 
@@ -159,7 +164,7 @@ sub open_table ($$$$$) {
 	    }
 	    $tbl->{types} = $t;
 	}
-	if (!$createMode) {
+	if (!$createMode and !$self->{ignore_missing_table}) {
 	    my($array, $skipRows);
 	    if (exists($meta->{skip_rows})) {
 		$skipRows = $meta->{skip_rows};
@@ -697,7 +702,7 @@ These methods are inherited from DBD::File:
 =item data_sources
 
 The C<data_sources> method returns a list of subdirectories of the current
-directory in the form "DBI:CSV:directory=$dirname". 
+directory in the form "DBI:CSV:directory=$dirname".
 
 If you want to read the subdirectories of another directory, use
 

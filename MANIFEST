@@ -5,7 +5,6 @@ Makefile.PL
 README
 lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
-lib/DBD/File.pm
 t/00base.t
 t/10dsnlist.t
 t/20createdrop.t
@@ -35,4 +34,3 @@ t/mysql.mtest
 t/pNET.dbtest
 t/pNET.mtest
 t/skeleton.test
-test.pl

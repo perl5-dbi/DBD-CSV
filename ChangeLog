@@ -1,3 +1,14 @@
+2004-04-18  Jeff Zucker <jeff@vpservices.com> (0.21)
+
+	* added support for $dbh->{Active}, should now work 
+	  well with Class::DBI and other caching systems
+
+	* added support for DROP TABLE IF EXISTS - doesn't
+	  complain if table is already dropped
+
+	* removed DBD::File from the distribution - it's now
+	  distributed with DBI 1.42 and higher
+	
 2002-03-01  Jeff Zucker <jeff@vpservices.com> (0.2002)
 
 	* added parser-caching for speedier operation,

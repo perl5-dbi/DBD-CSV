@@ -38,7 +38,8 @@ if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
   $opts{'PREREQ_PM'} =
     { 'DBI' => '1.00',
       'Text::CSV_XS' => '0.16',
-      'SQL::Statement' => '0.1011'
+      'SQL::Statement' => '0.1011',
+      'DBD::File'      => '0.30',
     };
 }
 
