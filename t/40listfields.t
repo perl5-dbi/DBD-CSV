@@ -95,7 +95,7 @@ while (Testing()) {
 	}
     }
 
-    Test($state  or  ($dbdriver eq 'CSV')
+    Test($state  or  ($dbdriver eq 'CSV') or ($dbdriver eq 'ConfFile')
 	 or ($ref = $cursor->{'NULLABLE'})  &&  @$ref == @table_def
 	     &&  !($$ref[0] xor ($table_def[0][3] & $COL_NULLABLE))
 	     &&  !($$ref[1] xor ($table_def[1][3] & $COL_NULLABLE)))

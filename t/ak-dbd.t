@@ -146,11 +146,13 @@ while (Testing()) {
     }
 
     ### Insert a row into the test table.......
+    print "Inserting a row...\n";
     Test($state or ($dbh->do("INSERT INTO $test_table VALUES(1,"
 			     . " 'Alligator Descartes')")))
          or ErrMsg("INSERT failed: $dbh->errstr.\n");
 
     ### ...and delete it........
+    print "Deleting a row...\n";
     Test($state or $dbh->do("DELETE FROM $test_table WHERE id = 1"))
          or ErrMsg("Cannot delete row: $dbh->errstr.\n");
     Test($state or ($sth = $dbh->prepare("SELECT * FROM $test_table"
@@ -160,7 +162,7 @@ while (Testing()) {
     # This should fail with error message: We "forgot" execute.
     my($pe) = $sth->{'PrintError'};
     $sth->{'PrintError'} = 0;
-    Test($state or !$sth->fetchrow)
+    Test($state or !eval { $sth->fetchrow() })
          or ErrMsg("Missing error report from fetchrow.\n");
     $sth->{'PrintError'} = $pe;
 
@@ -227,7 +229,8 @@ while (Testing()) {
 	or ErrMsgF("Cannot execute, query = $query, error %s.\n",
 		   $dbh->errstr);
     my $rv;
-    Test($state or defined($rv = $sth->fetch) or $dbdriver eq 'CSV')
+    Test($state or defined($rv = $sth->fetch) or $dbdriver eq 'CSV'
+	 or $dbdriver eq 'ConfFile')
 	or ErrMsgF("fetch failed, error %s.\n", $dbh->errstr);
     Test($state or !defined($$rv[0]))
 	or ErrMsgF("Expected NULL value, got %s.\n", $$rv[0]);
@@ -281,9 +284,9 @@ while (Testing()) {
 	    or ErrMsg("Expected warning from _ListSelectedFields");
 	$SIG{__WARN__} = 'DEFAULT';
     }
-    Test($state or $sth->execute)
+    Test($state or $sth->execute, 'execute 284')
 	or ErrMsg("re-execute failed: query $query, error $dbh->errstr.\n");
-    Test($state or (@row = $sth->fetchrow))
+    Test($state or (@row = $sth->fetchrow_array), 'fetchrow 286')
 	or ErrMsg("Query returned no result, query $query,",
 		  " error $sth->errstr.\n");
     Test($state or $sth->finish)

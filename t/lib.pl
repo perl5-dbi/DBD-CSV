@@ -60,6 +60,11 @@ if (-f ($file = "t/$mdriver.mtest")  ||
 }
 
 
+open (STDERR, ">&STDOUT") || die "Cannot redirect stderr" ;  
+select (STDERR) ; $| = 1 ;
+select (STDOUT) ; $| = 1 ;
+
+
 #
 #   The Testing() function builds the frame of the test; it can be called
 #   in many ways, see below.
@@ -149,17 +154,20 @@ if (-f ($file = "t/$mdriver.mtest")  ||
 #
     sub Test ($;$$) {
 	my($result, $error, $diag) = @_;
-	++$::numTests;
+       
+        ++$::numTests;
 	if ($count == 2) {
 	    if (defined($diag)) {
 	        printf("$diag%s", (($diag =~ /\n$/) ? "" : "\n"));
 	    }
 	    if ($::state || $result) {
-		print "ok $::numTests\n";
+		print "ok $::numTests ". (defined($error) ? "$error\n" : "\n");
 		return 1;
 	    } else {
-		printf("not ok $::numTests%s\n",
-			(defined($error) ? " $error" : ""));
+		print("not ok $::numTests - " .
+			(defined($error) ? "$error\n" : "\n"));
+		print STDERR ("FAILED Test $::numTests - " .
+			(defined($error) ? "$error\n" : "\n"));
 		return 0;
 	    }
 	}

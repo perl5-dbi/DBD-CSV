@@ -81,12 +81,13 @@ while (Testing()) {
     Test($state or $cursor->execute)
            or DbiError($dbh->err, $dbh->errstr);
 
-    Test($state or ($rv = $cursor->fetchrow_arrayref) or $dbdriver eq 'CSV')
-           or DbiError($dbh->err, $dbh->errstr);
+    Test($state or ($rv = $cursor->fetchrow_arrayref) or $dbdriver eq 'CSV'
+	 or $dbdriver eq 'ConfFile')
+	or DbiError($dbh->err, $dbh->errstr);
 
     Test($state or (!defined($$rv[0])  and  defined($$rv[1])) or
-	 $dbdriver eq 'CSV')
-           or DbiError($dbh->err, $dbh->errstr);
+	 $dbdriver eq 'CSV' or $dbdriver eq 'ConfFile')
+	or DbiError($dbh->err, $dbh->errstr);
 
     Test($state or $cursor->finish)
            or DbiError($dbh->err, $dbh->errstr);

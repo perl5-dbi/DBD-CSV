@@ -1,3 +1,24 @@
+1998-08-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1012)
+
+	* lib/DBD/File.pm (open_table): Added binmode.
+	* Added Gerald Richter's modifications for DBD::ConfFile to the
+	  test suite.
+	* DBD-File/File.pm: Removed DBD::File::SetError and SetWarning.
+	  Replaced $sth->func('get_fbav') with $sth->get_fbav() (Requires
+	  DBI 0.94). DBD::File is now a Perl-Only driver.
+	* DBD-File/File.pm (fetch): Fixed a DBD::CSV::SetError to
+	  DBD::File::SetError; thanks to Gerald Richter
+	  (richter@ecos.de)
+	* DBD-File/File.pm: Fixed some $sth->{attr}'s to $sth->FETCH|STORE,
+	  my thanks to Gerald Richter.
+
+1998-06-25  Jochen Wiedmann  <joe@ispsoft.de> (0.1011)
+
+	* DBD-File/File.pm (execute): Added missing eval around
+	  $stmt->execute();
+	* DBD-File/File.pm (FETCH): $sth->{TYPE} is now returning
+	  undef (workaround for a bug in DBI 0.93).
+
 1998-06-11  Jochen Wiedmann  <joe@ispsoft.de>   (0.1010)
 
 	* Added DBD::File, DBD::CSV is derived from it.

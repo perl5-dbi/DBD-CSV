@@ -63,7 +63,7 @@ while (Testing()) {
     #   Connect to the database
     Test($state or ($dbh = DBI->connect($test_dsn, $test_user,
 					$test_password)),
-	 undef,
+	 'connect',
 	 "Attempting to connect.\n")
 	or ErrMsgF("Cannot connect: Error %s.\n\n"
 		   . "Make sure, your database server is up and running.\n"
@@ -89,7 +89,7 @@ while (Testing()) {
 		   $dbh->errstr);
 
     Test($state or $dbh->{AutoCommit})
-	or ErrMsg("AutoCommit is off\n");
+	or ErrMsg("AutoCommit is off\n", 'AutoCommint on');
 
     #
     #   Tests for databases that do support transactions
@@ -155,16 +155,17 @@ while (Testing()) {
 	    eval { $dbh->{AutoCommit} = 0; }
 	}
 	Test($state or $@)
-	    or ErrMsg("Expected fatal error for AutoCommit => 0\n");
+	    or ErrMsg("Expected fatal error for AutoCommit => 0\n",
+		      'AutoCommit off -> error');
     }
 
     #   Check whether AutoCommit mode works.
     Test($state or $dbh->do("INSERT INTO $table VALUES (1, 'Jochen')"))
 	or ErrMsgF("Failed to delete: err %s, errstr %s.\n",
 		   $dbh->err, $dbh->errstr);
-    Test($state or !($msg = NumRows($dbh, $table, 1)))
+    Test($state or !($msg = NumRows($dbh, $table, 1)), 'NumRows')
 	or ErrMsg($msg);
-    Test($state or $dbh->disconnect)
+    Test($state or $dbh->disconnect, 'disconnect')
 	or ErrMsgF("Failed to disconnect: err %s, errstr %s.\n",
 		   $dbh->err, $dbh->errstr);
     Test($state or ($dbh = DBI->connect($test_dsn, $test_user,

@@ -8,12 +8,12 @@ require ExtUtils::MakeMaker;
 
 
 my($ok) = 1;
-print "Checking for DBI, 0.93 or later ... ";
+print "Checking for DBI, 1.00 or later ... ";
 $@ = '';
-eval "use DBI 0.93 (); require DBI::DBD;";
+eval "use DBI 1.00 (); require DBI::DBD;";
 if ($@) {
     $ok = 0;
-    print("\nYou don't have installed the DBI module, version 0.93 or",
+    print("\nYou don't have installed the DBI module, version 1.00 or",
 	  "later.\n");
 } else {
     print "ok\n";
@@ -91,7 +91,7 @@ END_OF_WARNING
 
 ExtUtils::MakeMaker::WriteMakefile(
     'NAME' => 'DBD::CSV',
-    'VERSION_FROM' => 'CSV.pm',
+    'VERSION_FROM' => 'lib/DBD/CSV.pm',
      'dist'         => { 'SUFFIX'       => ".gz",
 			 'DIST_DEFAULT' => 'all tardist',
 			 'COMPRESS'     => "gzip -9f" },
@@ -102,6 +102,11 @@ package MY;
 
 sub postamble {
     "\npm_to_blib: README\n" .
-    "\nREADME: CSV.pm" .
-    "\n\tperldoc -t CSV.pm >README\n\n"
+    "\nREADME: lib/DBD/CSV.pm" .
+    "\n\tperldoc -t lib/DBD/CSV.pm >README\n\n"
+}
+
+sub libscan {
+    my($self, $path) = @_;
+    ($path =~ /\~$/) ? undef : $path;
 }

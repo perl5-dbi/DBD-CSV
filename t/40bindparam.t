@@ -61,28 +61,29 @@ if (!defined(&SQL_INTEGER)) {
 while (Testing()) {
     #
     #   Connect to the database
-    Test($state or $dbh = DBI->connect($test_dsn, $test_user, $test_password))
+    Test($state or $dbh = DBI->connect($test_dsn, $test_user, $test_password),
+	 'connect')
 	or ServerError();
 
     #
     #   Find a possible new table name
     #
-    Test($state or $table = FindNewTable($dbh))
-	   or DbiError($dbh->err, $dbh->errstr);
+    Test($state or $table = FindNewTable($dbh), 'FindNewTable')
+	or DbiError($dbh->err, $dbh->errstr);
 
     #
     #   Create a new table; EDIT THIS!
     #
     Test($state or ($def = TableDefinition($table,
 					   ["id",   "INTEGER",  4, 0],
-					   ["name", "CHAR",    64, $COL_NULLABLE]),
-		    $dbh->do($def)))
-	   or DbiError($dbh->err, $dbh->errstr);
+					   ["name", "CHAR",    64, $COL_NULLABLE]) and
+		    $dbh->do($def)), 'create', $def)
+	or DbiError($dbh->err, $dbh->errstr);
 
 
     Test($state or $cursor = $dbh->prepare("INSERT INTO $table"
-	                                   . " VALUES (?, ?)"))
-	   or DbiError($dbh->err, $dbh->errstr);
+	                                   . " VALUES (?, ?)"), 'prepare')
+	or DbiError($dbh->err, $dbh->errstr);
 
     #
     #   Insert some rows
@@ -91,24 +92,25 @@ while (Testing()) {
     # Automatic type detection
     my $numericVal = 1;
     my $charVal = "Alligator Descartes";
-    Test($state or $cursor->execute($numericVal, $charVal))
-	   or DbiError($dbh->err, $dbh->errstr);
+    Test($state or $cursor->execute($numericVal, $charVal), 'execute insert 1')
+	or DbiError($dbh->err, $dbh->errstr);
 
     # Does the driver remember the automatically detected type?
-    Test($state or $cursor->execute("3", "Jochen Wiedmann"))
-	   or DbiError($dbh->err, $dbh->errstr);
+    Test($state or $cursor->execute("3", "Jochen Wiedmann"),
+	 'execute insert num as string')
+	or DbiError($dbh->err, $dbh->errstr);
     $numericVal = 2;
     $charVal = "Tim Bunce";
-    Test($state or $cursor->execute($numericVal, $charVal))
-	   or DbiError($dbh->err, $dbh->errstr);
+    Test($state or $cursor->execute($numericVal, $charVal), 'execute insert 2')
+	or DbiError($dbh->err, $dbh->errstr);
 
     # Now try the explicit type settings
-    Test($state or $cursor->bind_param(1, " 4", SQL_INTEGER()))
+    Test($state or $cursor->bind_param(1, " 4", SQL_INTEGER()), 'bind 1')
 	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->bind_param(2, "Andreas König"))
+    Test($state or $cursor->bind_param(2, "Andreas König"), 'bind 2')
 	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->execute)
-	   or DbiError($dbh->err, $dbh->errstr);
+    Test($state or $cursor->execute, 'execute binds')
+	or DbiError($dbh->err, $dbh->errstr);
 
     # Works undef -> NULL?
     Test($state or $cursor->bind_param(1, 5, SQL_INTEGER()))
@@ -119,11 +121,24 @@ while (Testing()) {
  	or DbiError($dbh->err, $dbh->errstr);
   
 
-    Test($state or undef $cursor  ||  1);
+    Test($state or $cursor -> finish, 'finish');
+
+    Test($state or undef $cursor  ||  1, 'undef cursor');
+
+    Test($state or $dbh -> disconnect, 'disconnect');
+
+    Test($state or undef $dbh  ||  1, 'undef dbh');
 
     #
     #   And now retreive the rows using bind_columns
     #
+    #
+    #   Connect to the database
+    #
+    Test($state or $dbh = DBI->connect($test_dsn, $test_user, $test_password),
+	 'connect for read')
+	or ServerError();
+
     Test($state or $cursor = $dbh->prepare("SELECT * FROM $table"
 					   . " ORDER BY id"))
 	   or DbiError($dbh->err, $dbh->errstr);

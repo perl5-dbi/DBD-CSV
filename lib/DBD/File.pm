@@ -36,7 +36,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.1000';
+$VERSION = '0.1001';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -74,9 +74,6 @@ sub driver ($;$) {
     }
     $drh;
 }
-
-bootstrap DBD::File $VERSION;
-
 
 
 package DBD::File::dr; # ====== DRIVER ======
@@ -123,14 +120,18 @@ sub data_sources ($;$) {
 	$attr->{'f_dir'} : '.';
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
-	$drh->DBD::File::SetError("Cannot open directory $dir", -1,
-				       "S1000");
+	$drh->STORE('errstr', "Cannot open directory $dir");
 	return undef;
     }
-    my($file, @dsns, %names);
+    my($file, @dsns, %names, $driver);
+    if ($drh->{'ImplementorClass'} =~ /^dbd\:\:([^\:]+)\:\:/i) {
+	$driver = $1;
+    } else {
+	$driver = 'File';
+    }
     while (defined($file = readdir($dirh))) {
 	if ($file ne '.'  &&  $file ne '..'  &&  -d "$dir/$file") {
-	    push(@dsns, "DBI:File:f_dir=$dir/$file");
+	    push(@dsns, "DBI:$driver:f_dir=$dir/$file");
 	}
     }
     @dsns;
@@ -153,21 +154,19 @@ sub prepare ($$;@) {
     my($dbh, $statement, @attribs)= @_;
 
     # create a 'blank' dbh
-    my $sth = DBI::_new_sth($dbh, {
-	'Statement' => $statement,
-    });
+    my $sth = DBI::_new_sth($dbh, {'Statement' => $statement});
 
     if ($sth) {
 	$@ = '';
-	my $class = $sth->{ImplementorClass};
+	my $class = $sth->FETCH('ImplementorClass');
 	$class =~ s/::st$/::Statement/;
 	my($stmt) = eval { $class->new($statement) };
 	if ($@) {
-	    $dbh->DBD::File::SetError($@, -1, 'S1000');
+	    $dbh->STORE('errstr', $@);
 	    undef $sth;
 	} else {
-	    $sth->{f_stmt} = $stmt;
-	    $sth->{f_params} = [];
+	    $sth->STORE('f_stmt', $stmt);
+	    $sth->STORE('f_params', []);
 	    $sth->STORE('NUM_OF_PARAMS', scalar($stmt->params()));
 	}
     }
@@ -213,8 +212,7 @@ sub list_tables ($) {
     my($dir) = $dbh->{f_dir};
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
-	$dbh->DBD::File::SetError("Cannot open directory $dir", -1,
-				       "S1000");
+	$dbh->STORE('errstr', "Cannot open directory $dir");
 	return undef;
     }
     my($file, @tables, %names);
@@ -228,6 +226,7 @@ sub list_tables ($) {
 
 sub quote ($$) {
     my($self, $str) = @_;
+    if (!defined($str)) { return "NULL" }
     $str =~ s/\\/\\\\/sg;
     $str =~ s/\0/\\0/sg;
     $str =~ s/\'/\\\'/sg;
@@ -238,15 +237,17 @@ sub quote ($$) {
 
 sub commit ($) {
     my($dbh) = shift;
-    $dbh->DBD::File::SetWarning("Commit ineffective while AutoCommit"
-				     . " is on", -1);
+    if ($dbh->FETCH('Warn')) {
+	warn("Commit ineffective while AutoCommit is on", -1);
+    }
     1;
 }
 
 sub rollback ($) {
     my($dbh) = shift;
-    $dbh->DBD::File::SetWarning("Rollback ineffective while AutoCommit"
-				     . " is on", -1);
+    if ($dbh->FETCH('Warn')) {
+	warn("Rollback ineffective while AutoCommit is on", -1);
+    }
     0;
 }
 
@@ -262,17 +263,20 @@ sub bind_param ($$$;$) {
 }
 
 sub execute {
-    my($sth, @bind_values) = @_;
+    my $sth = shift;
     my $params;
-    if (@bind_values) {
-	$sth->{f_params} = ($params = [@bind_values]);
+    if (@_) {
+	$sth->{'f_params'} = ($params = [@_]);
     } else {
-	$params = $sth->{f_params};
+	$params = $sth->{'f_params'};
     }
-    my $stmt = $sth->{f_stmt};
-    my $result = $stmt->execute($sth, $params);
-    if ($stmt->{NUM_OF_FIELDS}  &&  !$sth->FETCH('NUM_OF_FIELDS')) {
-	$sth->STORE('NUM_OF_FIELDS', $stmt->{NUM_OF_FIELDS});
+    my $stmt = $sth->{'f_stmt'};
+    my $result = eval { $stmt->execute($sth, $params); };
+    if ($@) {
+	$sth->STORE('errstr', $@);
+    }
+    if ($stmt->{'NUM_OF_FIELDS'}  &&  !$sth->FETCH('NUM_OF_FIELDS')) {
+	$sth->STORE('NUM_OF_FIELDS', $stmt->{'NUM_OF_FIELDS'});
     }
     return $result;
 }
@@ -280,32 +284,28 @@ sub execute {
 sub fetch ($) {
     my $sth = shift;
     my $data = $sth->{f_stmt}->{data};
-    my $av = $sth->func('get_fbav');
     if (!$data  ||  ref($data) ne 'ARRAY') {
-	$sth->DBD::CSV::SetError("Attempt to fetch row from a Non-SELECT"
-				 . " statement",
-				 -1, "S1000");
+	$sth->STORE('errstr', "Attempt to fetch row from a Non-SELECT"
+		    . " statement");
 	return undef;
     }
-    my $dav = shift(@$data);
+    my $dav = shift @$data;
     if (!$dav) {
 	return undef;
     }
-    my $val;
-    my $chopBlanks = $sth->FETCH('ChopBlanks');
-    for (my $i = 0;  $i < $sth->FETCH('NUM_OF_FIELDS');  $i++) {
-	my $val = $dav->[$i];
-	if ($chopBlanks) {
-	    $val =~ s/\s+$//s;
-	}
-	$av->[$i] = $val;
+    if ($sth->FETCH('ChopBlanks')) {
+	map { $_ =~ s/\s+$//; } @$dav;
     }
-    $av;
+    $sth->_set_fbav($dav);
 }
 *fetchrow_arrayref = \&fetch;
 
 sub FETCH ($$) {
     my ($sth, $attrib) = @_;
+    if ($attrib eq 'TYPE') {
+	# Workaround for a bug in DBI 0.93
+	return undef;
+    }
     if ($attrib eq 'NAME') {
 	my($meta) = $sth->FETCH('f_stmt')->{'NAME'};
 	if (!$meta) {
@@ -383,6 +383,7 @@ sub open_table ($$$$$) {
 	    die " Cannot open $file: $!";
 	}
     }
+    binmode($fh);
     if ($lockMode) {
 	if (!flock($fh, 2)) {
 	    die " Cannot obtain exclusive lock on $file: $!";

@@ -2,10 +2,8 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
-DBD-File/Makefile.PL
-DBD-File/File.pm
-DBD-File/File.xs
-CSV.pm
+lib/DBD/CSV.pm
+lib/DBD/File.pm
 t/00base.t
 t/10dsnlist.t
 t/20createdrop.t
