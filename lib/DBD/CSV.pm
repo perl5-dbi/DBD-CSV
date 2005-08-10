@@ -317,7 +317,9 @@ a later release
 
 =item SQL::Statement
 
-a simple SQL engine
+a simple SQL engine B<this module defines all of the SQL syntax for DBD::CSV,
+new SQL support is added with each release so you should look for updates to
+SQL::Statement regularly>
 
 =item Text::CSV_XS
 
@@ -349,14 +351,18 @@ Note that you almost definitely need root or administrator permissions.
 If you don't have them, read the ExtUtils::MakeMaker man page for details
 on installing in your own directories. L<ExtUtils::MakeMaker>.
 
-=head2
+=head2 Supported SQL Syntax
 
-  The level of SQL support available depends on the version of
-  SQL::Statement installed.  Any version will support *basic*
-  CREATE, INSERT, DELETE, UPDATE, and SELECT statements.  Only
-  versions of SQL::Statement 1.0 and above support additional
-  features such as table joins, string functions, etc.  See the
-  documentation of the latest version of SQL::Statement for details.
+All SQL processing for DBD::CSV is done by the L<SQL::Statement> module.
+Features include joins, aliases, built-in and user-defined functions,
+and more.  See L<SQL::Statement::Sytax> for a description of the SQL
+syntax supported in DBD::CSV.
+
+=head1 Using DBD-CSV with DBI
+
+For most things, DBD-CSV operates the same as any DBI driver.  See L<DBI>
+for detailed usage.
+
 
 =head2 Creating a database handle
 
@@ -521,6 +527,7 @@ attribute:
 This is not only shorter, it even works when using DBI methods within
 subroutines.
 
+=head1 DBI database handle attributes
 
 =head2 Metadata
 
@@ -576,6 +583,8 @@ These attributes and methods are not supported:
     LongReadLen
     LongTruncOk
 
+=head1 DBD-CSV specific database handle attributes
+
 In addition to the DBI attributes, you can use the following dbh
 attributes:
 
@@ -604,6 +613,33 @@ I<csv_escape_char> are corresponding to the respective attributes of the
 Text::CSV_XS object. You want to set these attributes if you have unusual
 CSV files like F</etc/passwd> or MS Excel generated CSV files with a semicolon
 as separator. Defaults are "\015\012", ';', '"' and '"', respectively.
+
+The I<csv_eol> attribute defines the end-of-line pattern, which is better
+known as a record separator pattern since it separates records.  The default
+is windows-style end-of-lines "\015\012" so if on unix you may want to set 
+this to newline ("\n") like this:
+
+  $dbh->{csv_eol} = "\n";
+
+It is also possible to use multi-character patterns as record separators.
+For example this file uses newlines as field separators (sep_char) and
+the pattern "\n__ENDREC__\n" as the record separators (eol):
+
+  name
+  city
+  __ENDREC__
+  joe
+  seattle
+  __ENDREC__
+  sue
+  portland
+  __ENDREC__
+
+To handle this file, you'd do this:
+
+  $dbh->{eol}      = "\n__ENDREC__\n" ,
+  $dbh->{sep_char} = "\n"
+
 
 The attributes are used to create an instance of the class I<csv_class>,
 by default Text::CSV_XS. Alternatively you may pass an instance as
@@ -721,85 +757,7 @@ L<Creating and dropping tables> above.
 =back
 
 
-=head2 Data restrictions
-
-When inserting and fetching data, you will sometimes be surprised: DBD::CSV
-doesn't correctly handle data types, in particular NULLs. If you insert
-integers, it might happen, that fetch returns a string. Of course, a string
-containing the integer, so that's perhaps not a real problem. But the
-following will never work:
-
-    $dbh->do("INSERT INTO $table (id, name) VALUES (?, ?)",
-             undef, "foo bar");
-    $sth = $dbh->prepare("SELECT * FROM $table WHERE id IS NULL");
-    $sth->execute();
-    my($id, $name);
-    $sth->bind_columns(undef, \$id, \$name);
-    while ($sth->fetch) {
-        printf("Found result row: id = %s, name = %s\n",
-              defined($id) ? $id : "NULL",
-              defined($name) ? $name : "NULL");
-    }
-    $sth->finish();
-
-The row we have just inserted, will never be returned! The reason is
-obvious, if you examine the CSV file: The corresponding row looks
-like
-
-    "","foo bar"
-
-In other words, not a NULL is stored, but an empty string. CSV files
-don't have a concept of NULL values. Surprisingly the above example
-works, if you insert a NULL value for the name! Again, you find
-the explanation by examining the CSV file:
-
-    ""
-
-In other words, DBD::CSV has "emulated" a NULL value by writing a row
-with less columns. Of course this works only if the rightmost column
-is NULL, the two rightmost columns are NULL, ..., but the leftmost
-column will never be NULL!
-
-See L<Creating and dropping tables> above for table name restrictions.
-
-
-=head1 TODO
-
-Extensions of DBD::CSV:
-
-=over 4
-
-=item CSV file scanner
-
-Write a simple CSV file scanner that reads a CSV file and attempts
-to guess sep_char, quote_char, escape_char and eol automatically.
-
-=back
-
-These are merely restrictions of the DBD::File or SQL::Statement
-modules:
-
-=over 4
-
-=item Table name mapping
-
-Currently it is not possible to use files with names like C<names.csv>.
-Instead you have to use soft links or rename files. As an alternative
-one might use, for example a dbh attribute 'table_map'. It might be a
-hash ref, the keys being the table names and the values being the file
-names.
-
-=item Column name mapping
-
-Currently the module assumes that column names are stored in the first
-row. While this is fine in most cases, there should be a possibility
-of setting column names and column number from the programmer: For
-example MS Access doesn't export column names by default.
-
-=back
-
-
-=head1 KNOWN BUGS
+=head1 KNOWN ISSUES
 
 =over 8
 
