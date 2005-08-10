@@ -33,7 +33,7 @@ use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
 
 @ISA = qw(DBD::File);
 
-$VERSION = '0.22';
+$VERSION = '0.23';
 
 $err = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
@@ -172,7 +172,8 @@ sub open_table ($$$$$) {
 	    $tbl->{first_row_pos} = $tbl->{fh}->tell();
 	    if (exists($meta->{col_names})) {
 		$array = $tbl->{col_names} = $meta->{col_names};
-	    } elsif (!$tbl->{col_names}  ||  !@{$tbl->{col_names}}) {
+	    }
+            if (!$tbl->{col_names}  ||  !@{$tbl->{col_names}}) {
 		# No column names given; fetch first row and create default
 		# names.
 		my $a = $tbl->{cached_row} = $tbl->fetch_row($data);
@@ -205,11 +206,25 @@ sub fetch_row ($$) {
 	$! = 0;
 	my $csv = $self->{csv_csv};
 	local $/ = $csv->{'eol'};
-	$fields = $csv->getline($self->{'fh'});
-	if (!$fields) {
+
+        # old way, use Text::CSV_XS's getline($fh) # C line seps
+        #
+	# $fields = $csv->getline($self->{'fh'});
+	# if (!$fields) {
+	#    die "Error while reading file " . $self->{'file'} . ": $!" if $!;
+	#    return undef;
+	# }
+
+        # new way, use IO::File's getline()  # Perl line seps
+        #
+        my $record = $self->{fh}->getline;
+        if (!$record) {
 	    die "Error while reading file " . $self->{'file'} . ": $!" if $!;
 	    return undef;
 	}
+        chomp $record;
+        $csv->parse($record) or die"Couldn't parse '$record'\n";
+        @$fields = $csv->fields();
     }
     $self->{row} = (@$fields ? $fields : undef);
 }

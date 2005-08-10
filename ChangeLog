@@ -1,3 +1,12 @@
+2005-08-10  Jeff Zucker <jzuckerATcpan.org> (0.23)
+
+	* fixed bug in automatic column generation, defining
+	  col_names => [] will auto generate col1, col2, etc.
+	  thanks for bug report, harleypig on AnnoCPAN
+
+	* added support for multi-character end-of-line separators
+	  thanks for suggestion, harleypig on AnnoCPAN
+	
 2005-04-01  Jeff Zucker <jzuckerATcpan.org> (0.22)
 
 	* removed DESTROY and disconnect - use DBD File's instead
