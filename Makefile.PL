@@ -1,60 +1,74 @@
 # -*- perl -*-
 
-require 5.004;
+# Copyright PROCURA B.V. (c) 2006-2009 H.Merijn Brand
+
+require 5.005;
+
 use strict;
-use vars qw($DBI_INC_DIR);
 
-require ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker;
 
-eval {
-  require DBD::CSV;
-  if ($DBD::CSV::VERSION < 0.1010) {
-    print <<END_OF_WARNING;
+eval { require DBD::CSV; };
+if (!$@ && $DBD::CSV::VERSION < 0.1010) {
+    print <<'MSG';
 
 WARNING! You seem to have installed a recent version of the DBD::CSV module.
-Note that the API (in particular attribute names) has changed, to conform
-to the DBI specifications. For example \$dbh->{directory} has been renamed
-to \$dbh->{f_dir} and \$dbh->{eol}, \$dbh->{quote_char}, ... are gone in
-favour of \$dbh->{tables}->{\$table}->{csv}, which is used for storing
-meta information. You might need to modify existing sources before doing a
-"make install". See the README for details.
+Note that the API (in particular attribute names) has changed, to conform to
+the DBI specifications. For example $dbh->{directory} has been renamed to
+$dbh->{f_dir} and $dbh->{eol}, $dbh->{quote_char}, ... are gone in favour of
+$dbh->{tables}{$table}{csv}, which is used for storing meta information. You
+might need to modify existing sources before doing a "make install". See the
+README for details.
 
-END_OF_WARNING
-  }
-};
-
-
-my %opts =
-  ( 'NAME' => 'DBD::CSV',
-    'VERSION_FROM' => 'lib/DBD/CSV.pm',
-    'dist'         => { 'SUFFIX'       => ".gz",
-			'DIST_DEFAULT' => 'all tardist',
-			'COMPRESS'     => "gzip -9vf" }
-  );
-
-if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
-  $opts{'ABSTRACT_FROM'} = 'lib/DBD/CSV.pm';
-  $opts{'AUTHOR'} = 'Jeff Zucker (jeff@vpservices.com)';
-  $opts{'PREREQ_PM'} =
-    { 'DBI' => '1.00',
-      'Text::CSV_XS' => '0.16',
-      'SQL::Statement' => '0.1011',
-      'DBD::File'      => '0.30',
+MSG
+    sleep 5;
     };
-}
 
-ExtUtils::MakeMaker::WriteMakefile(%opts);
+use vars qw( $DBI_INC_DIR );
 
+my %wm = (
+    NAME         => "DBD::CSV",
+    ABSTRACT     => "DBI driver for CSV and similar structured files",
+    AUTHOR       => "H.Merijn Brand <h.merijn\@xs4all.nl>",
+    VERSION_FROM => "lib/DBD/CSV.pm",
+    PREREQ_PM    => {
+	"DBI"            => 1.00,
+	"Text::CSV_XS"   => 0.64,
+	"SQL::Statement" => 0.1011,
+	"DBD::File"      => 0.36,
+	"Test::More"     => 0,
+	},
+    );
+$ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
+
+my $rv = WriteMakefile (%wm);
+
+1;
 
 package MY;
 
-#sub postamble {
-#    "\npm_to_blib: README\n" .
-#    "\nREADME: lib/DBD/CSV.pm" .
-#    "\n\tperldoc -t lib/DBD/CSV.pm >README\n\n"
-#}
-
-sub libscan {
-    my($self, $path) = @_;
-    ($path =~ /\~$/) ? undef : $path;
-}
+sub postamble
+{
+    my $min_vsn = ($] >= 5.010 && -d "xt" && -d "tmp" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
+	? join "\n" =>
+	    'test ::',
+	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
+	    ''
+	: "";
+    join "\n" =>
+	'cover test_cover:',
+	'	cover -test',
+	'',
+	'checkmeta:',
+	'	perl sandbox/genMETA.pl -c',
+	'',
+	'fixmeta:	distmeta',
+	'	perl sandbox/genMETA.pl',
+	'',
+	'tgzdist:	checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
+	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
+	'	-@cpants_lint.pl $(DISTVNAME).tgz',
+	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	$min_vsn;
+    } # postamble
