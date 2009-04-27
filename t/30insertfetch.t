@@ -6,18 +6,15 @@ $^W = 1;
 
 ($test_dsn, $test_user, $test_password) = ("", "", "");
 
-#   Include lib.pl
-#
+# Include lib.pl
 use DBI;
 
-my $mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
     do $file;
     if ($@) {
 	print STDERR "Error while executing lib.pl: $@\n";
 	exit 10;
 	}
-    $mdriver ne "" and last;
     }
 
 sub ServerError ()

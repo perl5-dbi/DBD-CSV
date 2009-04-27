@@ -1,32 +1,23 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 20createdrop.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
-#
-#   This is a skeleton test. For writing new tests, take this file
-#   and modify/extend it.
-#
+#!/usr/bin/perl
 
 use strict;
-use vars qw($test_dsn $test_user $test_password $mdriver $dbdriver);
+use vars qw( $test_dsn $test_user $test_password );
 $DBI::errstr = '';  # Make -w happy
 require DBI;
 
 
-#
 #   Include lib.pl
-#
-$mdriver = "";
 my $file;
 foreach $file ("lib.pl", "t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($mdriver ne '') {
-	last;
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
     }
-}
 
-sub ServerError() {
+sub ServerError ()
+{
     print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
 	"\tEither your server is not up and running or you have no\n",
 	"\tpermissions for acessing the DSN $test_dsn.\n",
@@ -34,7 +25,7 @@ sub ServerError() {
 	"\tPlease make sure your server is running and you have\n",
 	"\tpermissions, then retry.\n");
     exit 10;
-}
+    }
 
 #
 #   Main loop; leave this untouched, put tests into the loop

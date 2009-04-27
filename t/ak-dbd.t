@@ -1,20 +1,10 @@
-#!/usr/local/bin/perl
-#
-#   $Id: ak-dbd.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
-#
-#   This is a skeleton test. For writing new tests, take this file
-#   and modify/extend it.
-#
+#!/usr/bin/perl
 
 $^W = 1;
 $| = 1;
 
-
-#
 #   Make -w happy
-#
-use vars qw($test_dsn $test_user $test_password $dbdriver $mdriver
-	    $verbose $state);
+use vars qw($test_dsn $test_user $test_password $verbose $state);
 use vars qw($COL_NULLABLE $COL_KEY);
 #require SQL::Statement;
 #my $SVERSION = $SQL::Statement::VERSION;
@@ -22,23 +12,18 @@ $test_dsn = '';
 $test_user = '';
 $test_password = '';
 
-
-#
 #   Include lib.pl
-#
 use DBI;
 use strict;
-$dbdriver = "";
 {   my $file;
     foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
-	do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			    exit 10;
-			}
-	if ($dbdriver ne '') {
-	    last;
+	do $file;
+	if ($@) {
+	    print STDERR "Error while executing lib.pl: $@\n";
+	    exit 10;
+	    }
 	}
     }
-}
 
 my $test_db = '';
 my $test_hostname = $ENV{DBI_HOST} || 'localhost';
@@ -185,9 +170,6 @@ while (Testing()) {
 	or ErrMsgF("Cannot execute, query = $query, error %s.\n",
 		   $dbh->errstr);
     my $rv;
-    Test($state or defined($rv = $sth->fetch) or $dbdriver eq 'CSV'
-	 or $dbdriver eq 'ConfFile')
-	or ErrMsgF("fetch failed, error %s.\n", $dbh->errstr);
 #    Test($state or !defined($$rv[0]))
 #	or ErrMsgF("Expected NULL value, got %s.\n", $$rv[0]);
     Test($state or $sth->finish)

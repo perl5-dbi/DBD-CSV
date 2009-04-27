@@ -1,43 +1,29 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 40blobs.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
+#!/usr/bin/perl
 #
 #   This is a test for correct handling of BLOBS; namely $dbh->quote
 #   is expected to work correctly.
-#
 
 $^W = 1;
 
-
-#
 #   Make -w happy
-#
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
 
-
-#
 #   Include lib.pl
-#
 #require SQL::Statement;
 #my $SVERSION = $SQL::Statement::VERSION;
-require DBI;
-$mdriver = "";
+use DBI;
 foreach $file ("lib.pl", "t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($mdriver ne '') {
-	last;
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
     }
-}
-if ($dbdriver eq 'mSQL'  ||  $dbdriver eq 'mSQL1') {
-    print "1..0\n";
-    exit 0;
-}
 
-sub ServerError() {
+sub ServerError ()
+{
     my $err = $DBI::errstr; # Hate -w ...
     print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
 	"\tEither your server is not up and running or you have no\n",
@@ -46,7 +32,7 @@ sub ServerError() {
 	"\tPlease make sure your server is running and you have\n",
 	"\tpermissions, then retry.\n");
     exit 10;
-}
+    }
 
 
 sub ShowBlob($) {

@@ -1,42 +1,29 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 50chopblanks.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
+#!/usr/bin/perl
 #
 #   This driver should check whether 'ChopBlanks' works.
-#
 
-
-#
 #   Make -w happy
-#
-use vars qw($test_dsn $test_user $test_password $mdriver $verbose $state
-	    $dbdriver);
-use vars qw($COL_NULLABLE $COL_KEY);
+use vars qw( $test_dsn $test_user $test_password $verbose $state );
+use vars qw( $COL_NULLABLE $COL_KEY );
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
 #use SQL::Statement;
 #my $SVERSION = $SQL::Statement::VERSION;
 
-#
 #   Include lib.pl
-#
 use DBI;
 use strict;
-$mdriver = "";
-{
-    my $file;
-    foreach $file ("lib.pl", "t/lib.pl") {
-	do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			    exit 10;
-			}
-	if ($mdriver ne '') {
-	    last;
+foreach my $file ("lib.pl", "t/lib.pl") {
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
 	}
     }
-}
 
-sub ServerError() {
+sub ServerError ()
+{
     print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
 	"\tEither your server is not up and running or you have no\n",
 	"\tpermissions for acessing the DSN $test_dsn.\n",
@@ -44,9 +31,8 @@ sub ServerError() {
 	"\tPlease make sure your server is running and you have\n",
 	"\tpermissions, then retry.\n");
     exit 10;
-}
+    }
 
-#
 #   Main loop; leave this untouched, put tests after creating
 #   the new table.
 #

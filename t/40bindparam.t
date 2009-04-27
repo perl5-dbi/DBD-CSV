@@ -1,36 +1,22 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 40bindparam.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
-#
-#   This is a skeleton test. For writing new tests, take this file
-#   and modify/extend it.
-#
+#!/usr/bin/perl
 
 $^W = 1;
 
-
-#
 #   Make -w happy
-#
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
 
-
-#
 #   Include lib.pl
-#
 require DBI;
 use vars qw($COL_NULLABLE);
-$mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($mdriver ne '') {
-	last;
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
     }
-}
 
 sub ServerError() {
     my $err = $DBI::errstr;  # Hate -w ...

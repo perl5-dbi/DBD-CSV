@@ -9,18 +9,16 @@ $| = 1;
 #   Include lib.pl
 $DBI::errstr = ''; # Make -w happy
 require DBI;
-$mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($mdriver ne '') {
-	last;
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
     }
-}
 
-
-sub ServerError() {
+sub ServerError ()
+{
     print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
 	"\tEither your server is not up and running or you have no\n",
 	"\tpermissions for acessing the DSN $test_dsn.\n",
@@ -28,8 +26,7 @@ sub ServerError() {
 	"\tPlease make sure your server is running and you have\n",
 	"\tpermissions, then retry.\n");
     exit 10;
-}
-
+    }
 
 sub InDsnList($@) {
     my($dsn, @dsnList) = @_;
@@ -54,10 +51,10 @@ while (Testing()) {
 					$test_password)))
 	or ServerError();
 
-    Test($state or (@dsn = DBI->data_sources($mdriver)) >= 0);
+    Test($state or (@dsn = DBI->data_sources ("CSV")) >= 0);
     if (!$state  &&  $verbose) {
 	my $d;
-	print "List of $mdriver data sources:\n";
+	print "List of CSV data sources:\n";
 	foreach $d (@dsn) {
 	    print "    $d\n";
 	}
@@ -65,7 +62,7 @@ while (Testing()) {
     }
 
     my $drh;
-    Test($state or ($drh = DBI->install_driver($mdriver)))
+    Test($state or ($drh = DBI->install_driver("CSV")))
 	or print STDERR ("Cannot obtain drh: " . $DBI::errstr);
 
     #

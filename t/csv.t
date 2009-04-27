@@ -1,4 +1,4 @@
-# -*- perl -*-
+#/usr/bin/perl
 
 use strict;
 use DBI;
@@ -8,14 +8,8 @@ use lib "t";
 require "lib.pl";
 
 
-use vars qw($dbdriver $test_dsn $test_user $test_password $state
+use vars qw($test_dsn $test_user $test_password $state
             $haveFileSpec);
-
-
-if ($dbdriver ne 'CSV') {
-    print "1..0\n";
-    exit 0;
-}
 
 # Extract the directory from the dsn
 my $dir;

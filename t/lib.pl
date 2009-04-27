@@ -4,18 +4,14 @@
 # whereever possible. For example, you define certain constants
 # here and the like.
 
-use vars qw( $mdriver $dbdriver $childPid $test_dsn $test_user $test_password
-	     $haveFileSpec );
+use vars qw( $childPid $test_dsn $test_user $test_password $haveFileSpec );
 
-$mdriver  = "CSV";
-$dbdriver = $mdriver;
-
-# DSN being used; do not edit this, edit "$dbdriver.dbtest" instead
+# DSN being used; do not edit this, edit "CSV.dbtest" instead
 $haveFileSpec = eval { require File::Spec };
 my $table_dir = $haveFileSpec
     ? File::Spec->catdir (File::Spec->curdir (), "output")
     : "output";
-$test_dsn      = $ENV{DBI_DSN}  || "DBI:$dbdriver:f_dir=$table_dir";
+$test_dsn      = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$table_dir";
 $test_user     = $ENV{DBI_USER} || "";
 $test_password = $ENV{DBI_PASS} || "";
 
@@ -32,29 +28,121 @@ if ($@) {
     exit 0;
     }
 
-my $file;
-if (-f ($file = "t/$dbdriver.dbtest")		||
-    -f ($file = "$dbdriver.dbtest")		||
-    -f ($file = "../tests/$dbdriver.dbtest")	||
-    -f ($file = "tests/$dbdriver.dbtest"))	{
-    eval { require $file; };
-    if ($@) {
-	print STDERR "Cannot execute $file: $@.\n";
-	print "1..0\n";
-	exit 0;
+sub AnsiTypeToDb
+{
+    my ($type, $size) = @_;
+    my ($ret);
+
+    if ((lc $type) eq 'char' || (lc $type) eq 'varchar') {
+	$size ||= 1;
+	return (uc $type) . " ($size)";
 	}
-    }
-if (   -f ($file = "t/$mdriver.mtest")
-    || -f ($file = "$mdriver.mtest")
-    || -f ($file = "../tests/$mdriver.mtest")
-    || -f ($file = "tests/$mdriver.mtest")) {
-    eval { require $file; };
-    if ($@) {
-	print STDERR "Cannot execute $file: $@.\n";
-	print "1..0\n";
-	exit 0;
+    elsif ((lc $type) eq 'blob'
+	|| (lc $type) eq 'real'
+	|| (lc $type) eq 'integer') {
+	return uc $type;
 	}
+    elsif ((lc $type) eq 'int') {
+	return 'INTEGER';
+	}
+    else {
+	warn "Unknown type $type\n";
+	$ret = $type;
+	}
+    $ret;
+    } # AnsiTypeToDb
+
+#   This function generates a table definition based on an
+#   input list. The input list consists of references, each
+#   reference referring to a single column. The column
+#   reference consists of column name, type, size and a bitmask of
+#   certain flags, namely
+#
+#       $COL_NULLABLE - true, if this column may contain NULL's
+#       $COL_KEY - true, if this column is part of the table's
+#           primary key
+#
+#   Hopefully there's no big need for you to modify this function,
+#   if your database conforms to ANSI specifications.
+#
+
+sub TableDefinition ($@)
+{
+    my ($tablename, @cols) = @_;
+    my ($def);
+
+    #
+    #   Should be acceptable for most ANSI conformant databases;
+    #
+    #   msql 1 uses a non-ANSI definition of the primary key: A
+    #   column definition has the attribute "PRIMARY KEY". On
+    #   the other hand, msql 2 uses the ANSI fashion ...
+    #
+    my ($col, @keys, @colDefs, $keyDef);
+
+    #
+    #   Count number of keys
+    #
+    @keys = ();
+    foreach $col (@cols) {
+	if ($$col[2] & $::COL_KEY) {
+	    push (@keys, $$col[0]);
+	    }
+	}
+
+    foreach $col (@cols) {
+	my $colDef = $$col[0] . " " . AnsiTypeToDb ($$col[1], $$col[2]);
+	if (!($$col[3] & $::COL_NULLABLE)) {
+	    $colDef .= " NOT NULL";
+	    }
+	push (@colDefs, $colDef);
+	}
+    if (@keys) {
+	$keyDef = ", PRIMARY KEY (" . join (", ", @keys) . ")";
+	}
+    else {
+	$keyDef = "";
+	}
+    $def =
+	sprintf ("CREATE TABLE %s (%s%s)", $tablename, join (", ", @colDefs),
+	$keyDef);
     }
+
+#
+#   This function generates a list of tables associated to a
+#   given DSN.
+#
+sub ListTables(@)
+{
+    my ($dbh) = shift;
+    my (@tables);
+
+    @tables = $dbh->func ('list_tables');
+    if ($dbh->errstr) {
+	die "Cannot create table list: " . $dbh->errstr;
+	}
+    @tables;
+    }
+
+#
+#   Return a string for checking, whether a given column is NULL.
+#
+sub IsNull($)
+{
+    my ($var) = @_;
+
+    "$var IS NULL";
+    }
+
+#
+#   Return TRUE, if database supports transactions
+#
+sub HaveTransactions ()
+{
+    0;
+    }
+
+-d "output"or mkdir "output", 0755;
 
 open (STDERR, ">&STDOUT") || die "Cannot redirect stderr";
 select (STDERR);

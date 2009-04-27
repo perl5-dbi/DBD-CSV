@@ -1,37 +1,27 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 40numrows.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
+#!/usr/bin/perl
 #
 #   This tests, whether the number of rows can be retrieved.
-#
 
 $^W = 1;
 $| = 1;
 
-
-#
 #   Make -w happy
-#
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
 
-
-#
 #   Include lib.pl
-#
 use DBI;
-$mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($mdriver ne '') {
-	last;
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
     }
-}
 
-sub ServerError() {
+sub ServerError ()
+{
     print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
 	"\tEither your server is not up and running or you have no\n",
 	"\tpermissions for acessing the DSN $test_dsn.\n",
@@ -39,7 +29,7 @@ sub ServerError() {
 	"\tPlease make sure your server is running and you have\n",
 	"\tpermissions, then retry.\n");
     exit 10;
-}
+    }
 
 
 sub TrueRows($) {

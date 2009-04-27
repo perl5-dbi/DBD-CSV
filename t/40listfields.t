@@ -1,36 +1,24 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 #
-#   $Id: 40listfields.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
-#
-#   This is a test for statement attributes being present appropriately.
-#
+# This is a test for statement attributes being present appropriately.
 
-
-#
-#   Make -w happy
-#
+# Make -w happy
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
 $COL_KEY = '';
 
-
-#
-#   Include lib.pl
-#
+# Include lib.pl
 use DBI;
 use vars qw($verbose);
 
-$dbdriver = "";
 foreach $file ("lib.pl", "t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($dbdriver ne '') {
-	last;
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
     }
-}
-
 
 @table_def = (
 	      ["id",   "INTEGER",  4, $COL_KEY],
@@ -94,17 +82,12 @@ while (Testing()) {
 	}
     }
 
-    Test($state  or  ($dbdriver eq 'CSV') or ($dbdriver eq 'ConfFile')
-	 or ($ref = $cursor->{'NULLABLE'})  &&  @$ref == @table_def
-	     &&  !($$ref[0] xor ($table_def[0][3] & $COL_NULLABLE))
-	     &&  !($$ref[1] xor ($table_def[1][3] & $COL_NULLABLE)))
-	   or DbiError($cursor->err, $cursor->errstr);
     if (!$state && $verbose) {
 	print "Nullable:\n";
 	for ($i = 0;  $i < @$ref;  $i++) {
 	    print "    ", ($$ref[$i] & $COL_NULLABLE) ? "yes" : "no", "\n";
+	    }
 	}
-    }
 
     Test($state or undef $cursor  ||  1);
 
