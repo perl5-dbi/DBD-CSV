@@ -1,0 +1,31 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+
+my $url = "http://svn.perl.org/modules/DBD-CSV/trunk/";
+my $mod = "DBD-CSV";
+
+chdir "/pro/3gl/CPAN/$mod";
+
+my ($revision) = (`svn info $url` =~ m{\s Rev:     \s+            ([0-9]+)  }mx);
+my  @tbz = glob "$mod-*-[0-9]*.tbz";
+if (@tbz and $tbz[-1] =~ m{.*-([0-9]+)\.tbz$} && $1 == $revision) {
+    print STDERR "$tbz[-1] is the most recent already\n";
+    exit;
+    }
+
+system "svn export $url $mod";
+
+my ($version)  = (`cat $mod/lib/DBD/CSV.pm`  =~ m{\b VERSION  \s+ = \s* ["'] ([0-9.]+) }mx); # "
+
+my $moddir = "$mod-$version-$revision";
+rename "$mod", $moddir;
+
+print "Fetched $moddir\n";
+
+my $startrev = $revision - 400;	# Last 100 changes
+qx{svn log -r $startrev:$revision $url >$moddir/Changelog};
+qx{tar -c  -P -f - $moddir | bzip2 -9 >$moddir.tbz};
+print "See $moddir/Changelog for the most recent changes\n";
+#qx{rm -rf $moddir};

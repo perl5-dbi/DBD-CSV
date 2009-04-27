@@ -1,0 +1,12 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+
+use Test::XT qw( WriteXT );
+
+WriteXT (
+    "Test::Pod"            => "t/00_pod.t",
+    "Test::CPAN::Meta"     => "t/00_meta.t",
+    "Test::MinimumVersion" => "t/00_minimumversion.t",
+    );
