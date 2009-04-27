@@ -65,18 +65,18 @@ abstract:                DBI driver for CSV files
 license:                 perl
 author:              
     - Jochen Wiedmann
-    - Jeff Zucker <jeff@vpservices.com>
+    - Jeff Zucker
     - H.Merijn Brand <h.m.brand@xs4all.nl>
 generated_by:            Author
 distribution_type:       module
 provides:
     DBD::CSV:
         file:            lib/DBD/CSV.pm
-        version:         0.23
+        version:         VERSION
 requires:     
     perl:                5.005
-    DBD::File:           0.30
     DBI:                 1.00
+    DBD::File:           0.36
     SQL::Statement:      0.1011
     Text::CSV_XS:        0.43
 recommends:     
