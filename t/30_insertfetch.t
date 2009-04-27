@@ -1,7 +1,6 @@
 #!/usr/local/bin/perl
-#
-#   This is a simple insert/fetch test.
 
+# Test row insertion and retrieval
 $^W = 1;
 
 ($test_dsn, $test_user, $test_password) = ("", "", "");

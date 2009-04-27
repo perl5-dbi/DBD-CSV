@@ -1,4 +1,4 @@
-#/usr/bin/perl
+#!/usr/bin/perl
 
 use strict;
 use DBI;
@@ -7,9 +7,7 @@ use lib ".";
 use lib "t";
 require "lib.pl";
 
-
-use vars qw($test_dsn $test_user $test_password $state
-            $haveFileSpec);
+use vars qw( $test_dsn $test_user $test_password $state $haveFileSpec );
 
 # Extract the directory from the dsn
 my $dir;

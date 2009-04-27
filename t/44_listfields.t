@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#
+
 # This is a test for statement attributes being present appropriately.
 
 # Make -w happy
@@ -21,9 +21,9 @@ foreach $file ("lib.pl", "t/lib.pl") {
     }
 
 @table_def = (
-	      ["id",   "INTEGER",  4, $COL_KEY],
-	      ["name", "CHAR",    64, $COL_NULLABLE]
-	     );
+    [ "id",   "INTEGER",  4, $COL_KEY		],
+    [ "name", "CHAR",    64, $COL_NULLABLE	],
+    );
 
 sub ServerError() {
     print STDERR ("Cannot connect: ", $DBI::errstr, "\n",

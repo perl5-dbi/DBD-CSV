@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 #
-#   This is the base test, tries to install the drivers. Should be
-#   executed as the very first test.
+# Test whether the driver can be installed
 
 use strict;
 

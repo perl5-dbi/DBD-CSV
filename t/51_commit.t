@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+# Chack commit, rollback and "AutoCommit" attribute
 $^W = 1;
 
 use DBI;

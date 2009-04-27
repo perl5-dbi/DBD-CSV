@@ -1,12 +1,12 @@
 #!/usr/local/bin/perl
-#
-#   Test suite for the admin functions
 
-#   Make -w happy
+# Test suite for the admin functions
+
+# Make -w happy
 $test_dsn = $test_user = $test_password = $verbose = '';
 $| = 1;
 
-#   Include lib.pl
+# Include lib.pl
 $DBI::errstr = ''; # Make -w happy
 require DBI;
 foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {

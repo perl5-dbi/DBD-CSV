@@ -1,7 +1,6 @@
 #!/usr/bin/perl
-#
-#   This tests, whether the number of rows can be retrieved.
 
+# This tests, whether the number of rows can be retrieved.
 $^W = 1;
 $| = 1;
 

@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+# Test if bindparam () works
 $^W = 1;
 
 #   Make -w happy

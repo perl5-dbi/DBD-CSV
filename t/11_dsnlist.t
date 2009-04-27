@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 #
-#   This test creates a database and drops it. Should be executed
-#   after listdsn.
+# Test whether data_sources () returns something useful
 
-#   Include lib.pl
+# Include lib.pl
 require DBI;
 foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
     do $file;

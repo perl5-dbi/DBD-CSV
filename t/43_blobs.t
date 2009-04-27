@@ -1,18 +1,14 @@
 #!/usr/bin/perl
-#
-#   This is a test for correct handling of BLOBS; namely $dbh->quote
-#   is expected to work correctly.
 
+# This is a test for correct handling of BLOBS and $dbh->quote ()
 $^W = 1;
 
-#   Make -w happy
+# Make -w happy
 $test_dsn = '';
 $test_user = '';
 $test_password = '';
 
-#   Include lib.pl
-#require SQL::Statement;
-#my $SVERSION = $SQL::Statement::VERSION;
+# Include lib.pl
 use DBI;
 foreach $file ("lib.pl", "t/lib.pl") {
     do $file;

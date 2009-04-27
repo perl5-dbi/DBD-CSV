@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+# Test if a table can be created and dropped
 use strict;
 use vars qw( $test_dsn $test_user $test_password );
 $DBI::errstr = '';  # Make -w happy
