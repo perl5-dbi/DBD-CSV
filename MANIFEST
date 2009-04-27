@@ -5,6 +5,10 @@ Makefile.PL
 README
 lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
+t/00_pod.t
+t/00_pod_cov.t
+t/00_meta.t
+t/00_minimumversion.t
 t/00base.t
 t/10dsnlist.t
 t/20createdrop.t
@@ -28,4 +32,4 @@ t/mSQL.mtest
 t/mSQL1.dbtest
 t/mSQL1.mtest
 t/skeleton.test
-META.yml                                 Module meta-data (added by MakeMaker)
+example/passwd.pl

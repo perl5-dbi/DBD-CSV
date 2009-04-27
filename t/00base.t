@@ -1,54 +1,36 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 00base.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
+#!/usr/bin/perl
 #
 #   This is the base test, tries to install the drivers. Should be
 #   executed as the very first test.
-#
 
+use strict;
 
-#
-#   Include lib.pl
-#
-use lib '/home/jeff/data/module/SQL-Statement/SQL-Statement-1.12/lib';
-use SQL::Statement;
-warn  $SQL::Statement::VERSION;
+use Test::More tests => 8;
+use vars qw( $mdriver );
+
+BEGIN {
+    use_ok ("SQL::Statement");
+    use_ok ("DBI");
+    }
+
+ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION");
 
 $mdriver = "";
-foreach $file ("lib.pl", "t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
-			   exit 10;
-		      }
-    if ($mdriver ne '') {
-	last;
+foreach my $file ("lib.pl", "t/lib.pl") {
+    do $file;
+    if ($@) {
+	print STDERR "Error while executing lib.pl: $@\n";
+	exit 10;
+	}
+    $mdriver ne "" and last;
     }
-}
 
-# Base DBD Driver Test
-
-print "1..$tests\n";
-
-require DBI;
-print "ok 1\n";
-
-import DBI;
-print "ok 2\n";
-
-$switch = DBI->internal;
-(ref $switch eq 'DBI::dr') ? print "ok 3\n" : print "not ok 3\n";
-
-
+ok (my $switch = DBI->internal, "DBI->internal");
+is (ref $switch, "DBI::dr", "Driver class");
 
 # This is a special case. install_driver should not normally be used.
-$drh = DBI->install_driver($mdriver);
+ok (my $drh = DBI->install_driver ($mdriver), "Install driver");
 
-(ref $drh eq 'DBI::dr') ? print "ok 4\n" : print "not ok 4\n";
+is (ref $drh, "DBI::dr", "Driver class installed");
 
-if ($drh->{Version}) {
-    print "ok 5\n";
-    print "Driver version is ", $drh->{Version}, "\n";
-}
-
-BEGIN { $tests = 5 }
-exit 0;
-# end.
+ok ($drh->{Version}, "Driver version $drh->{Version}");

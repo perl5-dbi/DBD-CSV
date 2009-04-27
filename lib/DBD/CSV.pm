@@ -1,14 +1,16 @@
-# -*- perl -*-
+#! perl
 #
 #   DBD::CSV - A DBI driver for CSV and similar structured files
 #
 #   This module is currently maintained by
 #
-#       Jeff Zucker
-#       <jeff@vpservices.com>
+#	H.Merijn Brand <h.m.brand@xs4all.nl>
 #
 #   The original author is Jochen Wiedmann.
+#   Then maintained by Jeff Zucker
 #
+#   Copyright (C) 2009 by H.Merijn Brand
+#   Copyright (C) 2004 by Jeff Zucker
 #   Copyright (C) 1998 by Jochen Wiedmann
 #
 #   All rights reserved.
@@ -16,240 +18,230 @@
 #   You may distribute this module under the terms of either the GNU
 #   General Public License or the Artistic License, as specified in
 #   the Perl README file.
-#
 
 require 5.004;
 use strict;
-
 
 require DynaLoader;
 require DBD::File;
 require IO::File;
 
-
 package DBD::CSV;
 
-use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
+use strict;
 
-@ISA = qw(DBD::File);
+use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
-$VERSION = '0.23';
+@ISA =   qw( DBD::File );
 
-$err = 0;		# holds error code   for DBI::err
-$errstr = "";		# holds error string for DBI::errstr
+$VERSION  = "0.30";
+
+$err      = 0;		# holds error code   for DBI::err
+$errstr   = "";		# holds error string for DBI::errstr
 $sqlstate = "";         # holds error state  for DBI::state
-$drh = undef;		# holds driver handle once initialised
+$drh      = undef;	# holds driver handle once initialised
 
-package DBD::CSV::dr; # ====== DRIVER ======
+# --- DRIVER -------------------------------------------------------------------
 
-use Text::CSV_XS();
-use vars qw(@ISA @CSV_TYPES);
+package DBD::CSV::dr;
+
+use strict;
+
+use Text::CSV_XS ();
+use vars qw( @ISA @CSV_TYPES );
 
 @CSV_TYPES = (
-    Text::CSV_XS::IV(), # SQL_TINYINT
-    Text::CSV_XS::IV(), # SQL_BIGINT
-    Text::CSV_XS::PV(), # SQL_LONGVARBINARY
-    Text::CSV_XS::PV(), # SQL_VARBINARY
-    Text::CSV_XS::PV(), # SQL_BINARY
-    Text::CSV_XS::PV(), # SQL_LONGVARCHAR
-    Text::CSV_XS::PV(), # SQL_ALL_TYPES
-    Text::CSV_XS::PV(), # SQL_CHAR
-    Text::CSV_XS::NV(), # SQL_NUMERIC
-    Text::CSV_XS::NV(), # SQL_DECIMAL
-    Text::CSV_XS::IV(), # SQL_INTEGER
-    Text::CSV_XS::IV(), # SQL_SMALLINT
-    Text::CSV_XS::NV(), # SQL_FLOAT
-    Text::CSV_XS::NV(), # SQL_REAL
-    Text::CSV_XS::NV(), # SQL_DOUBLE
-);
+    Text::CSV_XS::IV (), # SQL_TINYINT
+    Text::CSV_XS::IV (), # SQL_BIGINT
+    Text::CSV_XS::PV (), # SQL_LONGVARBINARY
+    Text::CSV_XS::PV (), # SQL_VARBINARY
+    Text::CSV_XS::PV (), # SQL_BINARY
+    Text::CSV_XS::PV (), # SQL_LONGVARCHAR
+    Text::CSV_XS::PV (), # SQL_ALL_TYPES
+    Text::CSV_XS::PV (), # SQL_CHAR
+    Text::CSV_XS::NV (), # SQL_NUMERIC
+    Text::CSV_XS::NV (), # SQL_DECIMAL
+    Text::CSV_XS::IV (), # SQL_INTEGER
+    Text::CSV_XS::IV (), # SQL_SMALLINT
+    Text::CSV_XS::NV (), # SQL_FLOAT
+    Text::CSV_XS::NV (), # SQL_REAL
+    Text::CSV_XS::NV (), # SQL_DOUBLE
+    );
 
-@DBD::CSV::dr::ISA = qw(DBD::File::dr);
+@DBD::CSV::dr::ISA = qw( DBD::File::dr );
 
-$DBD::CSV::dr::imp_data_size = 0;
+$DBD::CSV::dr::imp_data_size     = 0;
 $DBD::CSV::dr::data_sources_attr = undef;
 
-sub connect ($$;$$$) {
-    my($drh, $dbname, $user, $auth, $attr) = @_;
-    my $dbh = $drh->DBD::File::dr::connect($dbname, $user, $auth, $attr);
-    $dbh->{'csv_tables'} ||= {};
-    $dbh->{Active} = 1;
+sub connect
+{
+    my ($drh, $dbname, $user, $auth, $attr) = @_;
+#   $dbname =~ m/\bf_ext=/i or $dbname .= ";f_ext=.csv";
+    my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
+    $dbh->{csv_tables} ||= {};
+    $dbh->{Active}       = 1;
     $dbh;
-}
+    } # connect
 
-package DBD::CSV::db; # ====== DATABASE ======
+# --- DATABASE -----------------------------------------------------------------
+
+package DBD::CSV::db;
+
+use strict;
 
 $DBD::CSV::db::imp_data_size = 0;
 
-@DBD::CSV::db::ISA = qw(DBD::File::db);
+@DBD::CSV::db::ISA = qw( DBD::File::db );
 
-sub csv_cache_sql_parser_object {
+sub csv_cache_sql_parser_object
+{
     my $dbh = shift;
     my $parser = {
-            dialect    => 'CSV',
-            RaiseError => $dbh->FETCH('RaiseError'),
-            PrintError => $dbh->FETCH('PrintError'),
+	dialect    => "CSV",
+	RaiseError => $dbh->FETCH ("RaiseError"),
+	PrintError => $dbh->FETCH ("PrintError"),
         };
-    my $sql_flags  = $dbh->FETCH('csv_sql') || {};
-    %$parser = (%$parser,%$sql_flags);
-    $parser = SQL::Parser->new($parser->{dialect},$parser);
+    my $sql_flags  =  $dbh->FETCH ("csv_sql") || {};
+    %$parser = (%$parser, %$sql_flags);
+     $parser = SQL::Parser->new ($parser->{dialect}, $parser);
     $dbh->{csv_sql_parser_object} = $parser;
     return $parser;
-}
+    } # csv_cache_sql_parser_object
 
-package DBD::CSV::st; # ====== STATEMENT ======
+# --- STATEMENT ----------------------------------------------------------------
+
+package DBD::CSV::st;
+
+use strict;
 
 $DBD::CSV::st::imp_data_size = 0;
 
 @DBD::CSV::st::ISA = qw(DBD::File::st);
 
-
 package DBD::CSV::Statement;
+
+use strict;
+use Carp;
 
 @DBD::CSV::Statement::ISA = qw(DBD::File::Statement);
 
-sub open_table ($$$$$) {
-    my($self, $data, $table, $createMode, $lockMode) = @_;
+sub open_table
+{
+    my ($self, $data, $table, $createMode, $lockMode) = @_;
     my $dbh = $data->{Database};
     my $tables = $dbh->{csv_tables};
-    if (!exists($tables->{$table})) {
-	$tables->{$table} = {};
-    }
+    $tables->{$table} ||= {};
     my $meta = $tables->{$table} || {};
-    my $csv = $meta->{csv} || $dbh->{csv_csv};
-    if (!$csv) {
-	my $class = $meta->{class}  ||  $dbh->{'csv_class'}  ||
-	    'Text::CSV_XS';
-	my %opts = ( 'binary' => 1 );
-	$opts{'eol'} = $meta->{'eol'} || $dbh->{'csv_eol'} || "\015\012";
-	$opts{'sep_char'} =
-	    exists($meta->{'sep_char'}) ? $meta->{'sep_char'} :
-		exists($dbh->{'csv_sep_char'}) ? $dbh->{'csv_sep_char'} : ",";
-	$opts{'quote_char'} =
-	    exists($meta->{'quote_char'}) ? $meta->{'quote_char'} :
-		exists($dbh->{'csv_quote_char'}) ? $dbh->{'csv_quote_char'} :
-		    '"';
-	$opts{'escape_char'} =
-	    exists($meta->{'escape_char'}) ? $meta->{'escape_char'} :
-		exists($dbh->{'csv_escape_char'}) ? $dbh->{'csv_escape_char'} :
-		    '"';
-	$csv = $meta->{csv} = $class->new(\%opts);
-    }
-    my $file = $meta->{file}  ||  $table;
-    my $tbl = $self->SUPER::open_table($data, $file, $createMode, $lockMode);
+    my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
+    unless ($csv_in) {
+	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
+	my %opts  = ( binary => 1 );
+	my $eol   = $meta->{eol} || $dbh->{csv_eol} || "\r\n";
+	$eol =~ m/^\A(?:[\r\n]|\r\n)\Z/ or $opts{eol} = $eol;
+	for ([ "sep",    ',' ],
+	     [ "quote",  '"' ],
+	     [ "escape", '"' ],
+	     ) {
+	    my ($attr, $def) = ($_->[0]."_char", $_->[1]);
+	    $opts{$attr} =
+		exists $meta->{$attr} ? $meta->{$attr} :
+		    exists $dbh->{"csv_$attr"} ? $dbh->{"csv_$attr"} : $def;
+	    }
+	$meta->{csv_in}  = $class->new (\%opts);
+	$opts{eol} = $eol;
+	$meta->{csv_out} = $class->new (\%opts);
+	}
+    my $file = $meta->{file} || $table;
+    my $tbl  = $self->SUPER::open_table ($data, $file, $createMode, $lockMode);
     if ($tbl) {
-	$tbl->{'csv_csv'} = $csv;
-	my $types = $meta->{types};
-	if ($types) {
+	$tbl->{csv_csv_in}  = $meta->{csv_in};
+	$tbl->{csv_csv_out} = $meta->{csv_out};
+	if (my $types = $meta->{types}) {
 	    # The 'types' array contains DBI types, but we need types
 	    # suitable for Text::CSV_XS.
 	    my $t = [];
-	    foreach (@{$types}) {
-		if ($_) {
-		    $_ = $DBD::CSV::CSV_TYPES[$_+6]  ||  Text::CSV_XS::PV();
-		} else {
-		    $_ = Text::CSV_XS::PV();
+	    for (@{$types}) {
+		$_ = $_
+		    ? $DBD::CSV::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
+		    : Text::CSV_XS::PV();
+		push @$t, $_;
 		}
-		push(@$t, $_);
-	    }
 	    $tbl->{types} = $t;
-	}
-	if (!$createMode and !$self->{ignore_missing_table} and $self->command ne 'DROP') {
-	    my($array, $skipRows);
-	    if (exists($meta->{skip_rows})) {
-		$skipRows = $meta->{skip_rows};
-	    } else {
-		$skipRows = exists($meta->{col_names}) ? 0 : 1;
 	    }
+	if (!$createMode and !$self->{ignore_missing_table} and $self->command ne 'DROP') {
+	    my $array;
+	    my $skipRows = exists $meta->{skip_rows}
+		? $meta->{skip_rows}
+		: exists $meta->{col_names} ? 0 : 1;
 	    if ($skipRows--) {
-		if (!($array = $tbl->fetch_row($data))) {
-		    die "Missing first row";
-		}
+		$array = $tbl->fetch_row ($data) or
+		    croak "Missing first row";
 		$tbl->{col_names} = $array;
 		while ($skipRows--) {
-		    $tbl->fetch_row($data);
+		    $tbl->fetch_row ($data);
+		    }
 		}
-	    }
-	    $tbl->{first_row_pos} = $tbl->{fh}->tell();
-	    if (exists($meta->{col_names})) {
+	    $tbl->{first_row_pos} = $tbl->{fh}->tell ();
+	    exists $meta->{col_names} and
 		$array = $tbl->{col_names} = $meta->{col_names};
-	    }
-            if (!$tbl->{col_names}  ||  !@{$tbl->{col_names}}) {
+            if (!$tbl->{col_names} || !@{$tbl->{col_names}}) {
 		# No column names given; fetch first row and create default
 		# names.
-		my $a = $tbl->{cached_row} = $tbl->fetch_row($data);
-		$array = $tbl->{'col_names'};
-		for (my $i = 0;  $i < @$a;  $i++) {
-		    push(@$array, "col$i");
+		my $ar = $tbl->{cached_row} = $tbl->fetch_row ($data);
+		$array = $tbl->{col_names};
+		push @$array, map { "col$_" } 0 .. $#$ar;
 		}
-	    }
-	    my($col, $i);
-	    my $columns = $tbl->{col_nums};
-	    foreach $col (@$array) {
-		$columns->{$col} = $i++;
+	    my $i = 0;
+	    $tbl->{col_nums}{$_} = $i++ for @$array;
 	    }
 	}
-    }
     $tbl;
-}
-
+    } # open_table
 
 package DBD::CSV::Table;
 
+use strict;
+use Carp;
+
 @DBD::CSV::Table::ISA = qw(DBD::File::Table);
 
-sub fetch_row ($$) {
-    my($self, $data) = @_;
+sub fetch_row
+{
+    my ($self, $data) = @_;
     my $fields;
-    if (exists($self->{cached_row})) {
-	$fields = delete($self->{cached_row});
-    } else {
-	$! = 0;
-	my $csv = $self->{csv_csv};
-	local $/ = $csv->{'eol'};
-
-        # old way, use Text::CSV_XS's getline($fh) # C line seps
-        #
-	# $fields = $csv->getline($self->{'fh'});
-	# if (!$fields) {
-	#    die "Error while reading file " . $self->{'file'} . ": $!" if $!;
-	#    return undef;
-	# }
-
-        # new way, use IO::File's getline()  # Perl line seps
-        #
-        my $record = $self->{fh}->getline;
-        if (!$record) {
-	    die "Error while reading file " . $self->{'file'} . ": $!" if $!;
-	    return undef;
+    if (exists $self->{cached_row}) {
+	$fields = delete $self->{cached_row};
 	}
-        chomp $record;
-        $csv->parse($record) or die"Couldn't parse '$record'\n";
-        @$fields = $csv->fields();
-    }
+    else {
+	$! = 0;
+	my $csv  = $self->{csv_csv_in};
+	unless ($fields = $csv->getline ($self->{fh})) {
+	    $! and croak "Error while reading file " . $self->{file} . ": $!";
+	    $csv->eof or $csv->error_diag;
+	    return;
+	    }
+	}
     $self->{row} = (@$fields ? $fields : undef);
-}
+    } # fetch_row
 
-sub push_row ($$$) {
-    my($self, $data, $fields) = @_;
-    my($csv) = $self->{csv_csv};
-    my($fh) = $self->{'fh'};
-    #
-    #  Remove undef from the right end of the fields, so that at least
-    #  in these cases undef is returned from FetchRow
-    #
-    while (@$fields  &&  !defined($fields->[$#$fields])) {
+sub push_row
+{
+    my ($self, $data, $fields) = @_;
+    my $csv = $self->{csv_csv_out};
+    my $fh  = $self->{fh};
+
+    # Remove undef from the right end of the fields, so that at least
+    # in these cases undef is returned from FetchRow
+    while (@$fields && !defined $fields->[$#$fields]) {
 	pop @$fields;
-    }
-    if (!$csv->print($fh, $fields)) {
-	die "Error while writing file " . $self->{'file'} . ": $!";
-    }
+	}
+    $csv->print ($fh, $fields) or
+	croak "Error while writing file " . $self->{'file'} . ": $!";
     1;
-}
+    } # push_row
 *push_names = \&push_row;
 
-
 1;
-
 
 __END__
 
@@ -260,26 +252,24 @@ DBD::CSV - DBI driver for CSV files
 =head1 SYNOPSIS
 
     use DBI;
-    $dbh = DBI->connect("DBI:CSV:f_dir=/home/joe/csvdb")
-        or die "Cannot connect: " . $DBI::errstr;
-    $sth = $dbh->prepare("CREATE TABLE a (id INTEGER, name CHAR(10))")
-        or die "Cannot prepare: " . $dbh->errstr();
-    $sth->execute() or die "Cannot execute: " . $sth->errstr();
-    $sth->finish();
-    $dbh->disconnect();
-
+    $dbh = DBI->connect ("DBI:CSV:f_dir=/home/joe/csvdb") or
+        die "Cannot connect: $DBI::errstr";
+    $sth = $dbh->prepare ("CREATE TABLE a (id INTEGER, name CHAR(10))") or
+        die "Cannot prepare: " . $dbh->errstr ();
+    $sth->execute or die "Cannot execute: " . $sth->errstr ();
+    $sth->finish;
+    $dbh->disconnect;
 
     # Read a CSV file with ";" as the separator, as exported by
     # MS Excel. Note we need to escape the ";", otherwise it
     # would be treated as an attribute separator.
-    $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
-    $sth = $dbh->prepare("SELECT * FROM info");
+    $dbh = DBI->connect (qq{DBI:CSV:csv_sep_char=\\;});
+    $sth = $dbh->prepare ("SELECT * FROM info");
 
     # Same example, this time reading "info.csv" as a table:
-    $dbh = DBI->connect(qq{DBI:CSV:csv_sep_char=\\;});
-    $dbh->{'csv_tables'}->{'info'} = { 'file' => 'info.csv'};
-    $sth = $dbh->prepare("SELECT * FROM info");
-
+    $dbh = DBI->connect (qq{DBI:CSV:csv_sep_char=\\;});
+    $dbh->{csv_tables}{info} = { file => "info.csv"};
+    $sth = $dbh->prepare ("SELECT * FROM info");
 
 =head1 DESCRIPTION
 
@@ -290,16 +280,14 @@ so-called CSV files (Comma separated values). Such files are mostly used for
 exporting MS Access and MS Excel data.
 
 See L<DBI(3)> for details on DBI, L<SQL::Statement(3)> for details on
-SQL::Statement and L<DBD::File(3)> for details on the base class
-DBD::File.
-
+SQL::Statement and L<DBD::File(3)> for details on the base class DBD::File.
 
 =head2 Prerequisites
 
-The only system dependent feature that DBD::File uses, is the C<flock()>
+The only system dependent feature that DBD::File uses, is the C<flock ()>
 function. Thus the module should run (in theory) on any system with
-a working C<flock()>, in particular on all Unix machines and on Windows
-NT. Under Windows 95 and MacOS the use of C<flock()> is disabled, thus
+a working C<flock ()>, in particular on all Unix machines and on Windows
+NT. Under Windows 95 and MacOS the use of C<flock ()> is disabled, thus
 the module should still be usable,
 
 Unlike other DBI drivers, you don't need an external SQL engine
@@ -317,16 +305,15 @@ a later release
 
 =item SQL::Statement
 
-a simple SQL engine B<this module defines all of the SQL syntax for DBD::CSV,
-new SQL support is added with each release so you should look for updates to
-SQL::Statement regularly>
+a simple SQL engine B<this module defines all of the SQL syntax for
+DBD::CSV, new SQL support is added with each release so you should
+look for updates to SQL::Statement regularly>
 
 =item Text::CSV_XS
 
 this module is used for writing rows to or reading rows from CSV files.
 
 =back
-
 
 =head2 Installation
 
@@ -360,8 +347,7 @@ syntax supported in DBD::CSV.
 
 =head1 Using DBD-CSV with DBI
 
-For most things, DBD-CSV operates the same as any DBI driver.  See L<DBI>
-for detailed usage.
+For most things, DBD-CSV operates the same as any DBI driver.  See L<DBI> for detailed usage.
 
 
 =head2 Creating a database handle
@@ -370,30 +356,29 @@ Creating a database handle usually implies connecting to a database server.
 Thus this command reads
 
     use DBI;
-    my $dbh = DBI->connect("DBI:CSV:f_dir=$dir");
+    my $dbh = DBI->connect ("DBI:CSV:f_dir=$dir");
 
 The directory tells the driver where it should create or open tables
 (a.k.a. files). It defaults to the current directory, thus the following
 are equivalent:
 
-    $dbh = DBI->connect("DBI:CSV:");
-    $dbh = DBI->connect("DBI:CSV:f_dir=.");
+    $dbh = DBI->connect ("DBI:CSV:");
+    $dbh = DBI->connect ("DBI:CSV:f_dir=.");
 
 (I was told, that VMS requires
 
-    $dbh = DBI->connect("DBI:CSV:f_dir=");
+    $dbh = DBI->connect ("DBI:CSV:f_dir=");
 
 for whatever reasons.)
 
 You may set other attributes in the DSN string, separated by semicolons.
 
-
 =head2 Creating and dropping tables
 
 You can create and drop tables with commands like the following:
 
-    $dbh->do("CREATE TABLE $table (id INTEGER, name CHAR(64))");
-    $dbh->do("DROP TABLE $table");
+    $dbh->do ("CREATE TABLE $table (id INTEGER, name CHAR(64))");
+    $dbh->do ("DROP TABLE $table");
 
 Note that currently only the column names will be stored and no other data.
 Thus all other information including column type (INTEGER or CHAR(x), for
@@ -410,22 +395,21 @@ character is alphabetic, followed by an arbitrary number of alphanumeric
 characters. If you want to use other files, the file names must start
 with '/', './' or '../' and they must not contain white space.
 
-
 =head2 Inserting, fetching and modifying data
 
 The following examples insert some data in a table and fetch it back:
 First all data in the string:
 
-    $dbh->do("INSERT INTO $table VALUES (1, "
-             . $dbh->quote("foobar") . ")");
+    $dbh->do ("INSERT INTO $table VALUES (1, "
+             . $dbh->quote ("foobar") . ")");
 
 Note the use of the quote method for escaping the word 'foobar'. Any
 string must be escaped, even if it doesn't contain binary data.
 
 Next an example using parameters:
 
-    $dbh->do("INSERT INTO $table VALUES (?, ?)", undef,
-	     2, "It's a string!");
+    $dbh->do ("INSERT INTO $table VALUES (?, ?)", undef,
+             2, "It's a string!");
 
 Note that you don't need to use the quote method here, this is done
 automatically for you. This version is particularly well designed for
@@ -435,94 +419,87 @@ You might wonder about the C<undef>. Don't wonder, just take it as it
 is. :-) It's an attribute argument that I have never ever used and
 will be parsed to the prepare method as a second argument.
 
-
 To retrieve data, you can use the following:
 
-    my($query) = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
-    my($sth) = $dbh->prepare($query);
-    $sth->execute();
+    my $query = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
+    my $sth   = $dbh->prepare ($query);
+    $sth->execute ();
     while (my $row = $sth->fetchrow_hashref) {
-        print("Found result row: id = ", $row->{'id'},
-              ", name = ", $row->{'name'});
-    }
-    $sth->finish();
+        print "Found result row: id = ", $row->{'id'},
+              ", name = ", $row->{'name'};
+        }
+    $sth->finish ();
 
 Again, column binding works: The same example again.
 
-    my($query) = "SELECT * FROM $table WHERE id > 1 ORDER BY id";
-    my($sth) = $dbh->prepare($query);
-    $sth->execute();
-    my($id, $name);
-    $sth->bind_columns(undef, \$id, \$name);
+    my $sth = $dbh->prepare (qq;
+        SELECT * FROM $table WHERE id > 1 ORDER BY id;
+        ;);
+    $sth->execute;
+    my ($id, $name);
+    $sth->bind_columns (undef, \$id, \$name);
     while ($sth->fetch) {
-        print("Found result row: id = $id, name = $name\n");
-    }
-    $sth->finish();
+        print "Found result row: id = $id, name = $name\n";
+        }
+    $sth->finish;
 
 Of course you can even use input parameters. Here's the same example
 for the third time:
 
-    my($query) = "SELECT * FROM $table WHERE id = ?";
-    my($sth) = $dbh->prepare($query);
-    $sth->bind_columns(undef, \$id, \$name);
-    for (my($i) = 1;  $i <= 2;   $i++) {
-	$sth->execute($id);
-	if ($sth->fetch) {
-	    print("Found result row: id = $id, name = $name\n");
-	}
-        $sth->finish();
-    }
+    my $sth = $dbh->prepare ("SELECT * FROM $table WHERE id = ?");
+    $sth->bind_columns (undef, \$id, \$name);
+    for (my $i = 1; $i <= 2; $i++) {
+        $sth->execute ($id);
+        if ($sth->fetch) {
+            print "Found result row: id = $id, name = $name\n";
+            }
+        $sth->finish;
+        }
 
 See L<DBI(3)> for details on these methods. See L<SQL::Statement(3)> for
 details on the WHERE clause.
 
 Data rows are modified with the UPDATE statement:
 
-    $dbh->do("UPDATE $table SET id = 3 WHERE id = 1");
+    $dbh->do ("UPDATE $table SET id = 3 WHERE id = 1");
 
 Likewise you use the DELETE statement for removing rows:
 
-    $dbh->do("DELETE FROM $table WHERE id > 1");
-
+    $dbh->do ("DELETE FROM $table WHERE id > 1");
 
 =head2 Error handling
 
 In the above examples we have never cared about return codes. Of course,
 this cannot be recommended. Instead we should have written (for example):
 
-    my($query) = "SELECT * FROM $table WHERE id = ?";
-    my($sth) = $dbh->prepare($query)
-        or die "prepare: " . $dbh->errstr();
-    $sth->bind_columns(undef, \$id, \$name)
-        or die "bind_columns: " . $dbh->errstr();
-    for (my($i) = 1;  $i <= 2;   $i++) {
-	$sth->execute($id)
-	    or die "execute: " . $dbh->errstr();
-	if ($sth->fetch) {
-	    print("Found result row: id = $id, name = $name\n");
-	}
-    }
-    $sth->finish($id)
-        or die "finish: " . $dbh->errstr();
+    my $sth = $dbh->prepare ("SELECT * FROM $table WHERE id = ?") or
+        die "prepare: " . $dbh->errstr ();
+    $sth->bind_columns (undef, \$id, \$name) or
+        die "bind_columns: " . $dbh->errstr ();
+    for (my $i = 1; $i <= 2; $i++) {
+        $sth->execute ($id) or
+            die "execute: " . $dbh->errstr ();
+        $sth->fetch and
+            print "Found result row: id = $id, name = $name\n";
+        }
+    $sth->finish ($id) or die "finish: " . $dbh->errstr ();
 
 Obviously this is tedious. Fortunately we have DBI's I<RaiseError>
 attribute:
 
-    $dbh->{'RaiseError'} = 1;
-    $@ = '';
+    $dbh->{RaiseError} = 1;
+    $@ = "";
     eval {
-        my($query) = "SELECT * FROM $table WHERE id = ?";
-        my($sth) = $dbh->prepare($query);
-        $sth->bind_columns(undef, \$id, \$name);
-        for (my($i) = 1;  $i <= 2;   $i++) {
-	    $sth->execute($id);
-	    if ($sth->fetch) {
-	        print("Found result row: id = $id, name = $name\n");
-	    }
-        }
-        $sth->finish($id);
-    };
-    if ($@) { die "SQL database error: $@"; }
+        my $sth = $dbh->prepare ("SELECT * FROM $table WHERE id = ?");
+        $sth->bind_columns (undef, \$id, \$name);
+        for (my $i = 1; $i <= 2; $i++) {
+            $sth->execute ($id);
+            $sth->fetch and
+                print "Found result row: id = $id, name = $name\n";
+            }
+        $sth->finish ($id);
+        };
+    $@ and die "SQL database error: $@";
 
 This is not only shorter, it even works when using DBI methods within
 subroutines.
@@ -596,6 +573,10 @@ This attribute is used for setting the directory where CSV files are
 opened. Usually you set it in the dbh, it defaults to the current
 directory ("."). However, it is overwritable in the statement handles.
 
+=item f_ext
+
+This attribute is used for setting the file extension.
+
 =item csv_eol
 
 =item csv_sep_char
@@ -616,8 +597,9 @@ as separator. Defaults are "\015\012", ';', '"' and '"', respectively.
 
 The I<csv_eol> attribute defines the end-of-line pattern, which is better
 known as a record separator pattern since it separates records.  The default
-is windows-style end-of-lines "\015\012" so if on unix you may want to set 
-this to newline ("\n") like this:
+is windows-style end-of-lines "\015\012" for output (writing) and unset for
+input (reading), so if on unix you may want to set this to newline ("\n")
+like this:
 
   $dbh->{csv_eol} = "\n";
 
@@ -699,32 +681,31 @@ C<col0>, C<col1>, ...
 Example: Suggest you want to use F</etc/passwd> as a CSV file. :-)
 There simplest way is:
 
-    require DBI;
-    my $dbh = DBI->connect("DBI:CSV:f_dir=/etc;csv_eol=\n;"
-                           . "csv_sep_char=:;csv_quote_char=;"
-                           . "csv_escape_char=");
-    $dbh->{'csv_tables'}->{'passwd'} = {
-        'col_names' => ["login", "password", "uid", "gid", "realname",
-                        "directory", "shell"]
-    };
-    $sth = $dbh->prepare("SELECT * FROM passwd");
+    use DBI;
+    my $dbh = DBI->connect ("DBI:CSV:f_dir=/etc;csv_eol=\n;".
+                            "csv_sep_char=:;csv_quote_char=;".
+                            "csv_escape_char=");
+    $dbh->{csv_tables}{passwd} = {
+        col_names => ["login", "password", "uid", "gid", "realname",
+                      "directory", "shell"];
+        };
+    $sth = $dbh->prepare ("SELECT * FROM passwd");
 
 Another possibility where you leave all the defaults as they are and
 overwrite them on a per table base:
 
     require DBI;
-    my $dbh = DBI->connect("DBI:CSV:");
-    $dbh->{'csv_tables'}->{'passwd'} = {
-        'eol' => "\n",
-        'sep_char' => ":",
-        'quote_char' => undef,
-        'escape_char' => undef,
-        'file' => '/etc/passwd',
-        'col_names' => ["login", "password", "uid", "gid", "realname",
-                        "directory", "shell"]
-    };
-    $sth = $dbh->prepare("SELECT * FROM passwd");
-
+    my $dbh = DBI->connect ("DBI:CSV:");
+    $dbh->{csv_tables}{passwd} = {
+        eol         => "\n",
+        sep_char    => ":",
+        quote_char  => undef,
+        escape_char => undef,
+        file        => "/etc/passwd",
+        col_names   => [qw( login password uid gid
+                            realname directory shell )],
+        };
+    $sth = $dbh->prepare ("SELECT * FROM passwd");
 
 =head2 Driver private methods
 
@@ -739,16 +720,16 @@ directory in the form "DBI:CSV:directory=$dirname".
 
 If you want to read the subdirectories of another directory, use
 
-    my($drh) = DBI->install_driver("CSV");
-    my(@list) = $drh->data_sources('f_dir' => '/usr/local/csv_data' );
+    my $drh  = DBI->install_driver ("CSV");
+    my @list = $drh->data_sources (f_dir => "/usr/local/csv_data");
 
 =item list_tables
 
-This method returns a list of file names inside $dbh->{'directory'}.
+This method returns a list of file names inside $dbh->{directory}.
 Example:
 
-    my($dbh) = DBI->connect("DBI:CSV:directory=/usr/local/csv_data");
-    my(@list) = $dbh->func('list_tables');
+    my $dbh  = DBI->connect ("DBI:CSV:directory=/usr/local/csv_data");
+    my @list = $dbh->func ("list_tables");
 
 Note that the list includes all files contained in the directory, even
 those that have non-valid table names, from the view of SQL. See
@@ -756,37 +737,18 @@ L<Creating and dropping tables> above.
 
 =back
 
-
 =head1 KNOWN ISSUES
 
 =over 8
 
 =item *
 
-The module is using flock() internally. However, this function is not
-available on platforms. Using flock() is disabled on MacOS and Windows
+The module is using flock () internally. However, this function is not
+available on platforms. Using flock () is disabled on MacOS and Windows
 95: There's no locking at all (perhaps not so important on these
 operating systems, as they are for single users anyways).
 
 =back
-
-
-=head1 AUTHOR AND COPYRIGHT
-
-This module is currently maintained by
-
-      Jeff Zucker
-      <jeff@vpservices.com>
-
-The original author is Jochen Wiedmann.
-
-Copyright (C) 1998 by Jochen Wiedmann
-
-All rights reserved.
-
-You may distribute this module under the terms of either the GNU
-General Public License or the Artistic License, as specified in
-the Perl README file.
 
 =head1 SEE ALSO
 
@@ -794,10 +756,31 @@ L<DBI(3)>, L<Text::CSV_XS(3)>, L<SQL::Statement(3)>
 
 For help on the use of DBD::CSV, see the DBI users mailing list:
 
-  http://www.isc.org/dbi-lists.html
+  http://lists.cpan.org/showlist.cgi?name=dbi-users
 
 For general information on DBI see
 
-  http://www.symbolstone.org/technology/perl/DBI
+  http://dbi.perl.org/ and http://faq.dbi-support.com/
+
+=head1 AUTHORS and MAINTAINERS
+
+This module is currently maintained by
+
+    H.Merijn Brand <h.m.brand@xs4all.nl>
+
+The original author is Jochen Wiedmann.
+Previous maintainer was Jeff Zucker
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009      by H.Merijn Brand
+Copyright (C) 2004-2009 by Jeff Zucker
+Copyright (C) 1998-2004 by Jochen Wiedmann
+
+All rights reserved.
+
+You may distribute this module under the terms of either the GNU
+General Public License or the Artistic License, as specified in
+the Perl README file.
 
 =cut

@@ -61,27 +61,6 @@ The test suite consists of a lot of files, currently these are:
 
   50commit.t       Checks commit, rollback and the "AutoCommit" attribute.
 
-  mysql.mtest      These files are used for setting up the DBMS specific
-  mysql.dbtest     part for the 'mysql' database with constants (dsn
-	           definitions, user, password for running tests), a
-	           possibility to create a table from a somewhat abstract
-	           table description, and a function for listing tables.
-	           Additionally some functions for supporting test script
-	           are included. These files are described in detail below.
-
-  mSQL.mtest       Likewise for mSQL.
-  mSQL.dbtest
-
-  pNET.mtest       Likewise for pNET.
-  pNET.dbtest
-
-  Ingres.mtest     Likewise for Ingres.
-  Ingres.dbtest
-
-  ODBC.mtest       Likewise for ODBC.
-  ODBC.dbtest
-
-
 How do I use the test suite for my driver?
 ==========================================
 
@@ -89,19 +68,12 @@ Basically you create scripts "mydriver.mtest" and "mydriver.dbtest",
 modify them for your needs and insert the name "mydriver" in "lib.pl".
 There should be no need for modifying the test files themselves, except
 for executing immediately after including lib.pl, if a test isn't well
-suited for your driver. (See mSQL and t/40blobs.t for an example.)
+suited for your driver. (See t/40blobs.t for an example.)
 
 In particular you should
 
   - set the variable $mdriver and $dbdriver to your driver name;
-    examples are
-
-	$mdriver = $dbdriver = 'mysql';  or
-	$mdriver = $dbdriver = 'mSQL';
-
-    (Using different values is only required for DBD::pNET where one
-    has to distinguish between the module driver ($mdriver = 'pNET')
-    and the database driver ($dbdriver).
+    'CSV' for DBD::CSV
 
     Ignore $test_dsn, $test_user and $test_password here, set this in
     "mydriver.dbtest".
@@ -295,22 +267,6 @@ your tests:
 
 There follows some stuff later, especially dropping the new
 table, but in general leave this as it is.
-
-
-Known problems
-==============
-
-mysql: The blob test fails with blobs larger than 252*256 bytes, you
-       must start the mysql daemon with -Omax_allowed_packet=<bigvalue>.
-
-msql: The null test fails, because the query
-
-	SELECT * FROM $table WHERE id = NULL
-
-      doesn't return anything. Does anyone have an idea, how to modify
-      this?
-
-ODBC: ChopBlank test fail; seems to be a driver problem.
 
 
 What remains to do?
