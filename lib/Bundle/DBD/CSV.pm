@@ -2,7 +2,7 @@
 
 package Bundle::DBD::CSV;
 
-$VERSION = '1.01'; # bumped from '0.1016'
+$VERSION = "1.02";
 
 1;
 
@@ -18,15 +18,15 @@ C<perl -MCPAN -e 'install Bundle::DBD::CSV'>
 
 =head1 CONTENTS
 
-DBI 1.02
+DBI 1.607
 
-Text::CSV_XS 0.14
+Text::CSV_XS 0.64
 
-SQL::Statement 1.14
+SQL::Statement 1.20
 
-DBD::File
+DBD::File 0.36
 
-DBD::CSV 0.23
+DBD::CSV 0.30
 
 =head1 DESCRIPTION
 
