@@ -31,10 +31,6 @@ foreach $file ("lib.pl", "t/lib.pl") {
 	last;
     }
 }
-if ($mdriver eq 'pNET') {
-    print "1..0\n";
-    exit 0;
-}
 
 sub ServerError() {
     my $err = $DBI::errstr;  # Hate -w ...

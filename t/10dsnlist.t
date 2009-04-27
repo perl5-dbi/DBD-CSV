@@ -1,15 +1,9 @@
-#!/usr/local/bin/perl
-#
-#   $Id: 10dsnlist.t,v 1.1.1.1 1999/06/13 12:59:35 joe Exp $
+#!/usr/bin/perl
 #
 #   This test creates a database and drops it. Should be executed
 #   after listdsn.
-#
 
-
-#
 #   Include lib.pl
-#
 require DBI;
 $mdriver = "";
 foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
@@ -19,10 +13,6 @@ foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
     if ($mdriver ne '') {
 	last;
     }
-}
-if ($mdriver eq 'pNET'  ||  $mdriver eq 'Adabas') {
-    print "1..0\n";
-    exit 0;
 }
 print "Driver is $mdriver\n";
 
@@ -61,12 +51,6 @@ while (Testing()) {
     #   Try different DSN's
     #
     my(@dsnList);
-    if (($mdriver eq 'mysql'  or  $mdriver eq 'mSQL')
-	and  $test_dsn eq "DBI:$mdriver:test") {
-	@dsnList = ("DBI:$mdriver:test:localhost",
-		    "DBI:$mdriver:test;localhost",
-		    "DBI:$mdriver:database=test;host=localhost");
-    }
     my($dsn);
     foreach $dsn (@dsnList) {
 	Test($state or ($dbh = DBI->connect($dsn, $test_user,

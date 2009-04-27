@@ -105,12 +105,7 @@ while (Testing()) {
 	    for ($i = 0;  $i < $size;  $i++) {
 		$blob .= $b;
 	    }
-	    if ($mdriver eq 'pNET') {
-		# Quote manually, no remote quote
-		$qblob = eval "DBD::" . $dbdriver . "::db->quote(\$blob)";
-	    } else {
-		$qblob = $dbh->quote($blob);
-	    }
+	    $qblob = $dbh->quote ($blob);
 	}
 
 	#

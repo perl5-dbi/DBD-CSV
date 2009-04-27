@@ -115,9 +115,7 @@ while (Testing()) {
 	Test($state or defined($ref = $sth->fetchrow_arrayref))
 	    or ErrMsgF("fetch failed: query $query, error %s.\n",
 		       $sth->errstr);
-	Test($state or ($$ref[1] eq $name)
-	            or ($name =~ /^$$ref[1]\s+$/  &&
-			($dbdriver eq 'mysql'  ||  $dbdriver eq 'ODBC')))
+	Test($state or $$ref[1] eq $name)
 	    or ErrMsgF("problems with ChopBlanks = 0:"
 		       . " expected '%s', got '%s'.\n",
 		       $name, $$ref[1]);
