@@ -2,9 +2,11 @@
 
 # This is a test for correctly handling NULL values.
 use strict;
-use Test::More "no_plan";
+use Test::More tests => 14;
 
-use DBI;
+BEGIN {
+    use_ok ("DBI");
+    }
 do "t/lib.pl";
 
 ok (my $dbh = Connect (),		"connect");

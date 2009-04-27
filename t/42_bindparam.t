@@ -1,144 +1,84 @@
 #!/usr/bin/perl
 
+use strict;
+use Test::More "no_plan";
+
 # Test if bindparam () works
 $^W = 1;
 
-#   Include lib.pl
-use DBI;
+BEGIN {
+    use_ok ("DBI");
+    }
 do "t/lib.pl";
 
-if (!defined(&SQL_VARCHAR)) {
-    eval "sub SQL_VARCHAR { 12 }";
-}
-if (!defined(&SQL_INTEGER)) {
-    eval "sub SQL_INTEGER { 4 }";
-}
+defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
+defined &SQL_INTEGER or *SQL_INTEGER = sub {  4 };
 
-#
-#   Main loop; leave this untouched, put tests after creating
-#   the new table.
-#
-while (Testing()) {
-    #
-    #   Connect to the database
-    Test($state or $dbh = Connect (), "connect") or
-	ServerError();
+ok (my $dbh = Connect (),			"connect");
 
-    #
-    #   Find a possible new table name
-    #
-    Test($state or $table = FindNewTable($dbh), 'FindNewTable')
-	or DbiError($dbh->err, $dbh->errstr);
+ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
-    #
-    #   Create a new table; EDIT THIS!
-    #
-    Test($state or ($def = TableDefinition($table,
-					   ["id",   "INTEGER",  4, 0],
-					   ["name", "CHAR",    64, &COL_NULLABLE]) and
-		    $dbh->do($def)), 'create', $def)
-	or DbiError($dbh->err, $dbh->errstr);
+like (my $def = TableDefinition ($tbl,
+		[ "id",   "INTEGER",  4, 0 ],
+		[ "name", "CHAR",    64, &COL_NULLABLE ]),
+	qr{^create table $tbl}i,		"table definition");
+ok ($dbh->do ($def),				"create table");
 
+ok (my $sth = $dbh->prepare ("insert into $tbl values (?, ?)"), "prepare");
 
-    Test($state or $cursor = $dbh->prepare("INSERT INTO $table"
-	                                   . " VALUES (?, ?)"), 'prepare')
-	or DbiError($dbh->err, $dbh->errstr);
+# Automatic type detection
+my ($int, $chr) = (1, "Alligator Descartes");
+ok ($sth->execute ($int, $chr),			"execute insert 1");
 
-    #
-    #   Insert some rows
-    #
+# Does the driver remember the automatically detected type?
+ok ($sth->execute ("3", "Jochen Wiedman"),	"execute insert 2");
 
-    # Automatic type detection
-    my $numericVal = 1;
-    my $charVal = "Alligator Descartes";
-    Test($state or $cursor->execute($numericVal, $charVal), 'execute insert 1')
-	or DbiError($dbh->err, $dbh->errstr);
+($int, $chr) = (2, "Tim Bunce");
+ok ($sth->execute ($int, $chr),			"execute insert 3");
 
-    # Does the driver remember the automatically detected type?
-    Test($state or $cursor->execute("3", "Jochen Wiedmann"),
-	 'execute insert num as string')
-	or DbiError($dbh->err, $dbh->errstr);
-    $numericVal = 2;
-    $charVal = "Tim Bunce";
-    Test($state or $cursor->execute($numericVal, $charVal), 'execute insert 2')
-	or DbiError($dbh->err, $dbh->errstr);
+# Now try the explicit type settings
+ok ($sth->bind_param (1, " 4", &SQL_INTEGER),	"bind 4 int");
+ok ($sth->bind_param (2, "Andreas König"),	"bind str");
+ok($sth->execute,				"execute");
 
-    # Now try the explicit type settings
-    Test($state or $cursor->bind_param(1, " 4", SQL_INTEGER()), 'bind 1')
-	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->bind_param(2, "Andreas König"), 'bind 2')
-	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->execute, 'execute binds')
-	or DbiError($dbh->err, $dbh->errstr);
+# Works undef -> NULL?
+ok ($sth->bind_param (1, 5, &SQL_INTEGER),	"bind 5 int");
+ok ($sth->bind_param (2, undef),		"bind NULL");
+ok($sth->execute,				"execute");
 
-    # Works undef -> NULL?
-    Test($state or $cursor->bind_param(1, 5, SQL_INTEGER()))
-	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->bind_param(2, undef))
-	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->execute)
- 	or DbiError($dbh->err, $dbh->errstr);
-  
-
-    Test($state or $cursor -> finish, 'finish');
-
-    Test($state or undef $cursor  ||  1, 'undef cursor');
-
-    Test($state or $dbh -> disconnect, 'disconnect');
-
-    Test($state or undef $dbh  ||  1, 'undef dbh');
-
-    #
-    #   And now retreive the rows using bind_columns
-    #
-    #
-    #   Connect to the database
-    #
-    Test($state or $dbh = Connect (), "connect") or
-	ServerError();
-
-    Test($state or $cursor = $dbh->prepare("SELECT * FROM $table"
-					   . " ORDER BY id"))
-	   or DbiError($dbh->err, $dbh->errstr);
-
-    Test($state or $cursor->execute)
-	   or DbiError($dbh->err, $dbh->errstr);
-
-    Test($state or $cursor->bind_columns(undef, \$id, \$name))
-	   or DbiError($dbh->err, $dbh->errstr);
-
-    Test($state or ($ref = $cursor->fetch)  &&  $id == 1  &&
-	 $name eq 'Alligator Descartes')
-	or printf("Query returned id = %s, name = %s, ref = %s, %d\n",
-		  $id, $name, $ref, scalar(@$ref));
-
-    Test($state or (($ref = $cursor->fetch)  &&  $id == 2  &&
-		    $name eq 'Tim Bunce'))
-	or printf("Query returned id = %s, name = %s, ref = %s, %d\n",
-		  $id, $name, $ref, scalar(@$ref));
-
-    Test($state or (($ref = $cursor->fetch)  &&  $id == 3  &&
-		    $name eq 'Jochen Wiedmann'))
-	or printf("Query returned id = %s, name = %s, ref = %s, %d\n",
-		  $id, $name, $ref, scalar(@$ref));
-
-    Test($state or (($ref = $cursor->fetch)  &&  $id == 4  &&
-		    $name eq 'Andreas König'))
-	or printf("Query returned id = %s, name = %s, ref = %s, %d\n",
-		  $id, $name, $ref, scalar(@$ref));
- 
-    Test($state or (($ref = $cursor->fetch)  &&  $id == 5  &&
-		    !defined($name)))
-	or printf("Query returned id = %s, name = %s, ref = %s, %d\n",
-		  $id, $name, $ref, scalar(@$ref));
-
-    Test($state or undef $cursor  or  1);
-
-    #
-    #   Finally drop the test table.
-    #
-    Test($state or $dbh->do("DROP TABLE $table"))
-	   or DbiError($dbh->err, $dbh->errstr);
-}
+ok ($sth->finish,				"finish");
+undef $sth;
+ok ($dbh->disconnect,				"disconnect");
+undef $dbh;
 
 
+# And now retreive the rows using bind_columns
+ok ($dbh = Connect (),				"connect");
+
+ok ($sth = $dbh->prepare ("select * from $tbl order by id"),	"prepare");
+ok ($sth->execute,				"execute");
+
+my ($id, $name);
+ok ($sth->bind_columns (undef, \$id, \$name),	"bind_columns");
+ok ($sth->execute,				"execute");
+ok ($sth->fetch,				"fetch");
+is ($id,	1,				"id   1");
+is ($name,	"Alligator Descartes",		"name 1");
+ok ($sth->fetch,				"fetch");
+is ($id,	2,				"id   2");
+is ($name,	"Tim Bunce",			"name 2");
+ok ($sth->fetch,				"fetch");
+is ($id,	3,				"id   3");
+is ($name,	"Jochen Wiedman",		"name 3");
+ok ($sth->fetch,				"fetch");
+#is ($id,	4,				"id   4"); # Broken in DBD::File
+is ($name,	"Andreas König",		"name 4");
+ok ($sth->fetch,				"fetch");
+is ($id,	5,				"id   5");
+is ($name,	undef,				"name 5");
+
+ok ($sth->finish,				"finish");
+undef $sth;
+
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok ($dbh->disconnect,				"disconnect");

@@ -218,7 +218,7 @@ sub DbiError ($$)
 #
 # Problem is, we have two different situations here: Test scripts
 # call us by pasing a dbh, which is fine for most situations.
-{   use vars qw($listTablesHook);
+{   my $listTablesHook;
 
     my $testtable = "testaa";
     my $listed    = 0;
@@ -269,7 +269,6 @@ sub ServerError
 
 sub Connect
 {
-    # either pass nothing: use defaults, just the dsn or all three
     my ($dsn, $usr, $pass) = @_;
     $dsn  ||= $test_dsn;
     $usr  ||= $test_user;
