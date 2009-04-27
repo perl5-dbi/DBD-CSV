@@ -1,52 +1,40 @@
 #!/usr/bin/perl
 
 # This is a test for correctly handling NULL values.
+use strict;
+use Test::More "no_plan";
 
-# Include lib.pl
 use DBI;
-use vars qw($COL_NULLABLE);
 do "t/lib.pl";
 
-# Main loop; leave this untouched, put tests after creating
-# the new table.
-#
-while (Testing ()) {
-    # Connect to the database
-    Test ($state or $dbh = Connect ()) or
-	ServerError ();
+ok (my $dbh = Connect (),		"connect");
 
-    # Find a possible new table name
-    Test ($state or $table = FindNewTable ($dbh)) or
-	DbiError ($dbh->err, $dbh->errstr);
+ok (my $tbl = FindNewTable ($dbh),	"find new test table");
 
-    # Create a new table; EDIT THIS!
-    Test ($state or (
-	  $def = TableDefinition ($table,
-		["id",   "INTEGER", 4,  $COL_NULLABLE],
-		["name", "CHAR",    64, 0]
-		),
-	  $dbh->do ($def))) or
-	DbiError ($dbh->err, $dbh->errstr);
+like (my $def = TableDefinition ($tbl,
+		[ "id",   "INTEGER",  4, &COL_NULLABLE ],
+		[ "name", "CHAR",    64, 0 ]),
+	qr{^create table $tbl}i,	"table definition");
+ok ($dbh->do ($def),			"create table");
 
-    # Test whether or not a field containing a NULL is returned correctly
-    # as undef, or something much more bizarre
-    Test ($state or
-	  $dbh->do ("INSERT INTO $table VALUES (NULL, 'NULL-valued id')")) or
-	DbiError ($dbh->err, $dbh->errstr);
+ok ($dbh->do ("insert into $tbl values (NULL, 'NULL-id')"), "insert");
 
-    Test ($state or
-	  $cursor = $dbh->prepare ("SELECT * FROM $table WHERE ".IsNull ("id"))) or
-	DbiError ($dbh->err, $dbh->errstr);
+ok (my $sth = $dbh->prepare ("select * from $tbl where id is NULL"), "prepare");
+ok ($sth->execute,			"execute");
+ok (my $row = $sth->fetch,		"fetch");
 
-    Test ($state or $cursor->execute) or
-	DbiError ($dbh->err, $dbh->errstr);
+is_deeply ($row, [ "", "NULL-id" ],	"default content");
+ok ($sth->finish,			"finish");
 
-    Test ($state or $cursor->finish) or
-	DbiError ($dbh->err, $dbh->errstr);
+# By default, CSV has no NULL concept, so ,, returns the same as ,"",
+# But Text::CSV_XS has an option to allow ,, to be undef, so lets cheat!
+#ok ($dbh->{csv_csv_in}->blank_is_undef (1),"CSV blank_is_undef");
+#ok ($sth->execute,			"execute");
+#ok (my $row = $sth->fetch,		"fetch");
+#is_deeply ($row, [ undef, "NULL-id" ],	"default content");
 
-    Test ($state or undef $cursor || 1);
+ok ($sth->finish,			"finish");
+undef $sth;
 
-    # Finally drop the test table.
-    Test ($state or $dbh->do ("DROP TABLE $table")) or
-	DbiError ($dbh->err, $dbh->errstr);
-    }
+ok ($dbh->do ("drop table $tbl"),	"drop table");
+ok ($dbh->disconnect,			"disconnect");

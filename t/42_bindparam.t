@@ -5,7 +5,6 @@ $^W = 1;
 
 #   Include lib.pl
 use DBI;
-use vars qw($COL_NULLABLE);
 do "t/lib.pl";
 
 if (!defined(&SQL_VARCHAR)) {
@@ -36,7 +35,7 @@ while (Testing()) {
     #
     Test($state or ($def = TableDefinition($table,
 					   ["id",   "INTEGER",  4, 0],
-					   ["name", "CHAR",    64, $COL_NULLABLE]) and
+					   ["name", "CHAR",    64, &COL_NULLABLE]) and
 		    $dbh->do($def)), 'create', $def)
 	or DbiError($dbh->err, $dbh->errstr);
 

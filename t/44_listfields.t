@@ -1,17 +1,15 @@
 #!/usr/bin/perl
 
 # This is a test for statement attributes being present appropriately.
-$COL_KEY = '';
 
-# Include lib.pl
 use DBI;
 use vars qw($verbose);
 
 do "t/lib.pl";
 
 @table_def = (
-    [ "id",   "INTEGER",  4, $COL_KEY		],
-    [ "name", "CHAR",    64, $COL_NULLABLE	],
+    [ "id",   "INTEGER",  4, &COL_KEY		],
+    [ "name", "CHAR",    64, &COL_NULLABLE	],
     );
 
 #
@@ -64,7 +62,7 @@ while (Testing()) {
     if (!$state && $verbose) {
 	print "Nullable:\n";
 	for ($i = 0;  $i < @$ref;  $i++) {
-	    print "    ", ($$ref[$i] & $COL_NULLABLE) ? "yes" : "no", "\n";
+	    print "    ", ($$ref[$i] & &COL_NULLABLE) ? "yes" : "no", "\n";
 	    }
 	}
 

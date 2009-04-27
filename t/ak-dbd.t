@@ -5,7 +5,6 @@ $| = 1;
 
 #   Make -w happy
 use vars qw($verbose $state);
-use vars qw($COL_NULLABLE $COL_KEY);
 
 #   Include lib.pl
 use DBI;
@@ -33,8 +32,8 @@ while (Testing()) {
     #   Create a new table; EDIT THIS!
     #
     Test($state or ($query = TableDefinition($test_table,
-				     ["id",   "INTEGER",  4, $COL_NULLABLE],
-				     ["name", "CHAR",    64, $COL_NULLABLE]),
+				     ["id",   "INTEGER",  4, &COL_NULLABLE],
+				     ["name", "CHAR",    64, &COL_NULLABLE]),
 		    $dbh->do($query)))
 	or ErrMsg("Cannot create table: query $query error $dbh->errstr.\n");
 
@@ -59,8 +58,8 @@ while (Testing()) {
     Test($state or $dbh->do("DROP TABLE $test_table"))
 	or ErrMsg("Dropping table failed: $dbh->errstr.\n");
     Test($state or ($query = TableDefinition($test_table,
-				     ["id",   "INTEGER",  4, $COL_NULLABLE],
-				     ["name", "CHAR",    64, $COL_NULLABLE]),
+				     ["id",   "INTEGER",  4, &COL_NULLABLE],
+				     ["name", "CHAR",    64, &COL_NULLABLE]),
 		    $dbh->do($query)))
         or ErrMsg("create failed, query $query, error $dbh->errstr.\n");
 
@@ -132,7 +131,7 @@ while (Testing()) {
     $query = "INSERT INTO $test_table VALUES ( NULL, 'NULL-valued id' )";
     Test($state or $dbh->do($query))
 	or ErrMsgF("INSERT failed: query $query, error %s.\n", $dbh->errstr);
-    $query = "SELECT id FROM $test_table WHERE " . IsNull("id");
+    $query = "SELECT id FROM $test_table WHERE id IS NULL";
     Test($state or ($sth = $dbh->prepare($query)))
 	or ErrMsgF("Cannot prepare, query = $query, error %s.\n",
 		   $dbh->errstr);

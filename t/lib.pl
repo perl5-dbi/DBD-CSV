@@ -14,8 +14,8 @@ my $test_dsn      = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$test_dir";
 my $test_user     = $ENV{DBI_USER} || "";
 my $test_password = $ENV{DBI_PASS} || "";
 
-$::COL_NULLABLE = 1;
-$::COL_KEY      = 2;
+sub COL_NULLABLE () { 1 }
+sub COL_KEY      () { 2 }
 
 my %v;
 eval "require $_; \$v->{'$_'} = \$_::VERSION;" for qw(
@@ -53,8 +53,8 @@ sub AnsiTypeToDb
 # reference consists of column name, type, size and a bitmask of
 # certain flags, namely
 #
-#     $COL_NULLABLE - true, if this column may contain NULL's
-#     $COL_KEY      - true, if this column is part of the table's
+#     COL_NULLABLE - true, if this column may contain NULL's
+#     COL_KEY      - true, if this column is part of the table's
 #                     primary key
 #
 # Hopefully there's no big need for you to modify this function,
@@ -66,13 +66,13 @@ sub TableDefinition
 
     my @keys = ();
     foreach my $col (@cols) {
-	$col->[2] & $::COL_KEY and push @keys, $col->[0];
+	$col->[2] & COL_KEY and push @keys, $col->[0];
 	}
 
     my @colDefs;
     foreach my $col (@cols) {
 	my $colDef = $col->[0] . " " . AnsiTypeToDb ($col->[1], $col->[2]);
-	$col->[3] & $::COL_NULLABLE or $colDef .= " NOT NULL";
+	$col->[3] & COL_NULLABLE or $colDef .= " NOT NULL";
 	push @colDefs, $colDef;
 	}
     my $keyDef = @keys ? ", PRIMARY KEY (" . join (", ", @keys) . ")" : "";
@@ -88,14 +88,6 @@ sub ListTables
     $dbh->errstr and die "Cannot create table list: " . $dbh->errstr;
     @tables;
     } # ListTables
-
-# Return a string for checking, whether a given column is NULL.
-sub IsNull
-{
-    my $var = shift;
-
-    "$var IS NULL";
-    } # IsNull
 
 -d "output"or mkdir "output", 0755;
 

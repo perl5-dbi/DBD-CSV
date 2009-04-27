@@ -4,7 +4,6 @@
 
 # Make -w happy
 use vars qw( $verbose $state );
-use vars qw( $COL_NULLABLE $COL_KEY );
 
 # Include lib.pl
 use DBI;
@@ -34,8 +33,8 @@ while (Testing()) {
     #   Create a new table; EDIT THIS!
     #
     Test($state or ($query = TableDefinition($table,
-				      ["id",   "INTEGER",  4, $COL_NULLABLE],
-				      ["name", "CHAR",    64, $COL_NULLABLE]),
+				      ["id",   "INTEGER",  4, &COL_NULLABLE],
+				      ["name", "CHAR",    64, &COL_NULLABLE]),
 		    $dbh->do($query)))
 	or ErrMsgF("Cannot create table: Error %s.\n",
 		      $dbh->errstr);
