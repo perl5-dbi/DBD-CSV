@@ -3,23 +3,16 @@
 # Test whether the driver can be installed
 
 use strict;
-
 use Test::More tests => 8;
 
 BEGIN {
-    use_ok ("SQL::Statement");
     use_ok ("DBI");
+    use_ok ("SQL::Statement");
     }
 
 ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION");
 
-foreach my $file ("lib.pl", "t/lib.pl") {
-    do $file;
-    if ($@) {
-	print STDERR "Error while executing lib.pl: $@\n";
-	exit 10;
-	}
-    }
+do "t/lib.pl";
 
 ok (my $switch = DBI->internal, "DBI->internal");
 is (ref $switch, "DBI::dr", "Driver class");

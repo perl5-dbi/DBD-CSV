@@ -35,14 +35,8 @@ sub NumRows ($$$)
 # Main loop; leave this untouched, put tests after creating the new table.
 while (Testing ()) {
     # Connect to the database
-    Test ($state or
-	 ($dbh = DBI->connect ($test_dsn, $test_user, $test_password)),
-	  "connect",
-	  "Attempting to connect.\n") or
-	ErrMsgF ("Cannot connect: Error %s.\n\n".
-		 "Make sure, your database server is up and running.\n".
-		 "Check that '$test_dsn' references a valid database".
-		 " name.\nDBI error message: %s\n", $DBI::err, $DBI::errstr);
+    Test ($state or $dbh = Connect (), "connect") or
+	ServerError ();
 
     # Find a possible new table name
     Test ($state or $table = FindNewTable ($dbh)) or
@@ -60,73 +54,13 @@ while (Testing ()) {
 	ErrMsg ("AutoCommit is off\n", "AutoCommint on");
 
     # Tests for databases that do support transactions
-    if (HaveTransactions ()) {
-	# Turn AutoCommit off
-	$dbh->{AutoCommit} = 0;
-	Test ($state or (!$dbh->err && !$dbh->errstr && !$dbh->{AutoCommit}))
-	    or ErrMsgF ("Failed to turn AutoCommit off: err %s, errstr %s\n",
-	    $dbh->err, $dbh->errstr);
-
-	# Check rollback
-	Test ($state or $dbh->do ("INSERT INTO $table VALUES (1, 'Jochen')"))
-	    or ErrMsgF ("Failed to insert value: err %s, errstr %s.\n",
-	    $dbh->err, $dbh->errstr);
-	my $msg;
-	Test ($state or !($msg = NumRows ($dbh, $table, 1)))
-	    or ErrMsg ($msg);
-	Test ($state or $dbh->rollback)
-	    or ErrMsgF ("Failed to rollback: err %s, errstr %s.\n",
-	    $dbh->err, $dbh->errstr);
-	Test ($state or !($msg = NumRows ($dbh, $table, 0)))
-	    or ErrMsg ($msg);
-
-	# Check commit
-	Test ($state or $dbh->do ("DELETE FROM $table WHERE id = 1"))
-	    or ErrMsgF ("Failed to insert value: err %s, errstr %s.\n",
-	    $dbh->err, $dbh->errstr);
-	Test ($state or !($msg = NumRows ($dbh, $table, 0)))
-	    or ErrMsg ($msg);
-	Test ($state or $dbh->commit)
-	    or ErrMsgF ("Failed to rollback: err %s, errstr %s.\n",
-	    $dbh->err, $dbh->errstr);
-	Test ($state or !($msg = NumRows ($dbh, $table, 0)))
-	    or ErrMsg ($msg);
-
-	# Check auto rollback after disconnect
-	Test ($state or $dbh->do ("INSERT INTO $table VALUES (1, 'Jochen')"))
-	    or ErrMsgF ("Failed to insert: err %s, errstr %s.\n", $dbh->err,
-	    $dbh->errstr);
-	Test ($state or !($msg = NumRows ($dbh, $table, 1)))
-	    or ErrMsg ($msg);
-	Test ($state or $dbh->disconnect)
-	    or ErrMsgF ("Failed to disconnect: err %s, errstr %s.\n",
-	    $dbh->err, $dbh->errstr);
-	Test (
-	    $state
-		or ($dbh = DBI->connect ($test_dsn, $test_user, $test_password))
-		)
-	    or ErrMsgF ("Failed to reconnect: err %s, errstr %s.\n",
-	    $DBI::err, $DBI::errstr);
-	Test ($state or !($msg = NumRows ($dbh, $table, 0)))
-	    or ErrMsg ($msg);
-
-	# Check whether AutoCommit is on again
-	Test ($state or $dbh->{AutoCommit})
-	    or ErrMsg ("AutoCommit is off\n");
-
-	#
-	#   Tests for databases that don't support transactions
-	#
+    unless ($state) {
+	$@ = "";
+	eval { $dbh->{AutoCommit} = 0; };
 	}
-    else {
-	if (!$state) {
-	    $@ = "";
-	    eval { $dbh->{AutoCommit} = 0; };
-	    }
-	Test ($state or $@)
-	    or ErrMsg ("Expected fatal error for AutoCommit => 0\n",
-	    "AutoCommit off -> error");
-	}
+    Test ($state or $@) or
+	ErrMsg ("Expected fatal error for AutoCommit => 0\n",
+		"AutoCommit off -> error");
 
     #   Check whether AutoCommit mode works.
     Test ($state or $dbh->do ("INSERT INTO $table VALUES (1, 'Jochen')"))
@@ -137,13 +71,10 @@ while (Testing ()) {
     Test ($state or $dbh->disconnect, "disconnect")
 	or ErrMsgF ("Failed to disconnect: err %s, errstr %s.\n", $dbh->err,
 	$dbh->errstr);
-    Test (
-	$state
-	    or ($dbh = DBI->connect ($test_dsn, $test_user, $test_password)))
-	or ErrMsgF ("Failed to reconnect: err %s, errstr %s.\n", $DBI::err,
-	$DBI::errstr);
-    Test ($state or !($msg = NumRows ($dbh, $table, 1)))
-	or ErrMsg ($msg);
+    Test ($state or $dbh = Connect (), "connect") or
+	ErrMsgF ("Failed to reconnect: err %s, errstr %s.\n", $DBI::err, $DBI::errstr);
+    Test ($state or !($msg = NumRows ($dbh, $table, 1))) or
+	ErrMsg ($msg);
 
     #   Check whether commit issues a warning in AutoCommit mode
     Test ($state or $dbh->do ("INSERT INTO $table VALUES (2, 'Tim')"))

@@ -4,53 +4,27 @@
 $^W = 1;
 $| = 1;
 
-#   Make -w happy
-$test_dsn = '';
-$test_user = '';
-$test_password = '';
-
 #   Include lib.pl
 use DBI;
-foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
-    do $file;
-    if ($@) {
-	print STDERR "Error while executing lib.pl: $@\n";
-	exit 10;
-	}
-    }
+require "t/lib.pl";
 
-sub ServerError ()
+sub TrueRows
 {
-    print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
-	"\tEither your server is not up and running or you have no\n",
-	"\tpermissions for acessing the DSN $test_dsn.\n",
-	"\tThis test requires a running server and write permissions.\n",
-	"\tPlease make sure your server is running and you have\n",
-	"\tpermissions, then retry.\n");
-    exit 10;
-    }
-
-
-sub TrueRows($) {
     my ($sth) = @_;
     my $count = 0;
     while ($sth->fetchrow_arrayref) {
 	++$count;
-    }
+	}
     $count;
-}
+    } # TrueRows
 
-
-#
 #   Main loop; leave this untouched, put tests after creating
 #   the new table.
-#
 while (Testing()) {
     #
     #   Connect to the database
-    Test($state or ($dbh = DBI->connect($test_dsn, $test_user,
-					$test_password)))
-	or ServerError();
+    Test ($state or $dbh = Connect ()) or
+	ServerError();
 
     #
     #   Find a possible new table name

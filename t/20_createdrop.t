@@ -2,73 +2,24 @@
 
 # Test if a table can be created and dropped
 use strict;
-use vars qw( $test_dsn $test_user $test_password );
-$DBI::errstr = '';  # Make -w happy
-require DBI;
+use Test::More tests => 8;
 
+use DBI;
 
-#   Include lib.pl
-my $file;
-foreach $file ("lib.pl", "t/lib.pl") {
-    do $file;
-    if ($@) {
-	print STDERR "Error while executing lib.pl: $@\n";
-	exit 10;
-	}
-    }
+# Include lib.pl
+do "t/lib.pl";
 
-sub ServerError ()
-{
-    print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
-	"\tEither your server is not up and running or you have no\n",
-	"\tpermissions for acessing the DSN $test_dsn.\n",
-	"\tThis test requires a running server and write permissions.\n",
-	"\tPlease make sure your server is running and you have\n",
-	"\tpermissions, then retry.\n");
-    exit 10;
-    }
+ok (my $dbh = Connect (),		"connect");
 
-#
-#   Main loop; leave this untouched, put tests into the loop
-#
-use vars qw($state);
-while (Testing()) {
-    #
-    #   Connect to the database
-    my $dbh;
-    Test($state or $dbh = DBI->connect($test_dsn, $test_user, $test_password))
-	or ServerError();
+ok (my $tbl = FindNewTable ($dbh),	"find new test table");
 
-    #
-    #   Find a possible new table name
-    #
-    my $table;
-    Test($state or $table = FindNewTable($dbh))
-	   or DbiError($dbh->err, $dbh->errstr);
-
-    #
-    #   Create a new table
-    #
-    my $def;
-    if (!$state) {
-	($def = TableDefinition($table,
-				["id",   "INTEGER",  4, 0],
-				["name", "CHAR",    64, 0]));
-	print "Creating table:\n$def\n";
-    }
-    Test($state or $dbh->do($def))
-	or DbiError($dbh->err, $dbh->errstr);
-
-
-    #
-    #   ... and drop it.
-    #
-    Test($state or $dbh->do("DROP TABLE $table"))
-	   or DbiError($dbh->err, $dbh->errstr);
-
-    #
-    #   Finally disconnect.
-    #
-    Test($state or $dbh->disconnect())
-	   or DbiError($dbh->err, $dbh->errstr);
-}
+like (my $def = TableDefinition ($tbl,
+		[ "id",   "INTEGER",  4, 0],
+		[ "name", "CHAR",    64, 0]),
+	qr{^create table $tbl}i,	"table definition");
+ok ($dbh->do ($def),			"create table");
+my $tbl_file = DbFile ($tbl);
+ok (-s $tbl_file,			"file exists");
+ok ($dbh->do ("drop table $tbl"),	"drop table");
+ok ($dbh->disconnect,			"disconnect");
+ok (!-f $tbl_file,			"file removed");

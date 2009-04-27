@@ -1,39 +1,18 @@
 #!/usr/bin/perl
 
 # This is a test for statement attributes being present appropriately.
-
-# Make -w happy
-$test_dsn = '';
-$test_user = '';
-$test_password = '';
 $COL_KEY = '';
 
 # Include lib.pl
 use DBI;
 use vars qw($verbose);
 
-foreach $file ("lib.pl", "t/lib.pl") {
-    do $file;
-    if ($@) {
-	print STDERR "Error while executing lib.pl: $@\n";
-	exit 10;
-	}
-    }
+do "t/lib.pl";
 
 @table_def = (
     [ "id",   "INTEGER",  4, $COL_KEY		],
     [ "name", "CHAR",    64, $COL_NULLABLE	],
     );
-
-sub ServerError() {
-    print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
-	"\tEither your server is not up and running or you have no\n",
-	"\tpermissions for acessing the DSN $test_dsn.\n",
-	"\tThis test requires a running server and write permissions.\n",
-	"\tPlease make sure your server is running and you have\n",
-	"\tpermissions, then retry.\n");
-    exit 10;
-}
 
 #
 #   Main loop; leave this untouched, put tests after creating
@@ -42,8 +21,8 @@ sub ServerError() {
 while (Testing()) {
     #
     #   Connect to the database
-    Test($state or $dbh = DBI->connect($test_dsn, $test_user, $test_password))
-	or ServerError();
+    Test($state or $dbh = Connect (), "connect") or
+	ServerError();
 
     #
     #   Find a possible new table name

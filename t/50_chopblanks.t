@@ -3,33 +3,13 @@
 # This driver should check if 'ChopBlanks' works.
 
 # Make -w happy
-use vars qw( $test_dsn $test_user $test_password $verbose $state );
+use vars qw( $verbose $state );
 use vars qw( $COL_NULLABLE $COL_KEY );
-$test_dsn = '';
-$test_user = '';
-$test_password = '';
 
 # Include lib.pl
 use DBI;
 use strict;
-foreach my $file ("lib.pl", "t/lib.pl") {
-    do $file;
-    if ($@) {
-	print STDERR "Error while executing lib.pl: $@\n";
-	exit 10;
-	}
-    }
-
-sub ServerError ()
-{
-    print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
-	"\tEither your server is not up and running or you have no\n",
-	"\tpermissions for acessing the DSN $test_dsn.\n",
-	"\tThis test requires a running server and write permissions.\n",
-	"\tPlease make sure your server is running and you have\n",
-	"\tpermissions, then retry.\n");
-    exit 10;
-    }
+do "t/lib.pl";
 
 #   Main loop; leave this untouched, put tests after creating
 #   the new table.
@@ -39,9 +19,8 @@ while (Testing()) {
 
     #
     #   Connect to the database
-    Test($state or ($dbh = DBI->connect($test_dsn, $test_user,
-					$test_password)))
-	   or ServerError();
+    Test($state or $dbh = Connect (), "connect") or
+	   ServerError();
 
     #
     #   Find a possible new table name

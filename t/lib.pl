@@ -1,19 +1,18 @@
-#/usr/bin/perl
-#
+#!/usr/bin/perl
+
 # lib.pl is the file where database specific things should live,
 # whereever possible. For example, you define certain constants
 # here and the like.
 
-use vars qw( $childPid $test_dsn $test_user $test_password $haveFileSpec );
+#use strict;
 
-# DSN being used; do not edit this, edit "CSV.dbtest" instead
-$haveFileSpec = eval { require File::Spec };
-my $table_dir = $haveFileSpec
-    ? File::Spec->catdir (File::Spec->curdir (), "output")
-    : "output";
-$test_dsn      = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$table_dir";
-$test_user     = $ENV{DBI_USER} || "";
-$test_password = $ENV{DBI_PASS} || "";
+use vars qw( $childPid );
+use File::Spec;
+
+my $test_dir      = File::Spec->catdir (File::Spec->curdir (), "output");
+my $test_dsn      = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$test_dir";
+my $test_user     = $ENV{DBI_USER} || "";
+my $test_password = $ENV{DBI_PASS} || "";
 
 $::COL_NULLABLE = 1;
 $::COL_KEY      = 2;
@@ -31,159 +30,109 @@ if ($@) {
 sub AnsiTypeToDb
 {
     my ($type, $size) = @_;
-    my ($ret);
+    my $uctype = uc $type;
 
-    if ((lc $type) eq 'char' || (lc $type) eq 'varchar') {
+    if ($uctype eq "CHAR" || $uctype eq "VARCHAR") {
 	$size ||= 1;
-	return (uc $type) . " ($size)";
+	return "$uctype ($size)";
 	}
-    elsif ((lc $type) eq 'blob'
-	|| (lc $type) eq 'real'
-	|| (lc $type) eq 'integer') {
-	return uc $type;
-	}
-    elsif ((lc $type) eq 'int') {
-	return 'INTEGER';
-	}
-    else {
-	warn "Unknown type $type\n";
-	$ret = $type;
-	}
-    $ret;
+
+    $uctype eq "BLOB" || $uctype eq "REAL" || $uctype eq "INTEGER" and
+	return $uctype;
+    
+    $uctype eq "INT" and
+	return "INTEGER";
+
+    warn "Unknown type $type\n";
+    return $type;
     } # AnsiTypeToDb
 
-#   This function generates a table definition based on an
-#   input list. The input list consists of references, each
-#   reference referring to a single column. The column
-#   reference consists of column name, type, size and a bitmask of
-#   certain flags, namely
+# This function generates a table definition based on an
+# input list. The input list consists of references, each
+# reference referring to a single column. The column
+# reference consists of column name, type, size and a bitmask of
+# certain flags, namely
 #
-#       $COL_NULLABLE - true, if this column may contain NULL's
-#       $COL_KEY - true, if this column is part of the table's
-#           primary key
+#     $COL_NULLABLE - true, if this column may contain NULL's
+#     $COL_KEY      - true, if this column is part of the table's
+#                     primary key
 #
-#   Hopefully there's no big need for you to modify this function,
-#   if your database conforms to ANSI specifications.
-#
+# Hopefully there's no big need for you to modify this function,
+# if your database conforms to ANSI specifications.
 
-sub TableDefinition ($@)
+sub TableDefinition
 {
     my ($tablename, @cols) = @_;
-    my ($def);
 
-    #
-    #   Should be acceptable for most ANSI conformant databases;
-    #
-    #   msql 1 uses a non-ANSI definition of the primary key: A
-    #   column definition has the attribute "PRIMARY KEY". On
-    #   the other hand, msql 2 uses the ANSI fashion ...
-    #
-    my ($col, @keys, @colDefs, $keyDef);
-
-    #
-    #   Count number of keys
-    #
-    @keys = ();
-    foreach $col (@cols) {
-	if ($$col[2] & $::COL_KEY) {
-	    push (@keys, $$col[0]);
-	    }
+    my @keys = ();
+    foreach my $col (@cols) {
+	$col->[2] & $::COL_KEY and push @keys, $col->[0];
 	}
 
-    foreach $col (@cols) {
-	my $colDef = $$col[0] . " " . AnsiTypeToDb ($$col[1], $$col[2]);
-	if (!($$col[3] & $::COL_NULLABLE)) {
-	    $colDef .= " NOT NULL";
-	    }
-	push (@colDefs, $colDef);
+    my @colDefs;
+    foreach my $col (@cols) {
+	my $colDef = $col->[0] . " " . AnsiTypeToDb ($col->[1], $col->[2]);
+	$col->[3] & $::COL_NULLABLE or $colDef .= " NOT NULL";
+	push @colDefs, $colDef;
 	}
-    if (@keys) {
-	$keyDef = ", PRIMARY KEY (" . join (", ", @keys) . ")";
-	}
-    else {
-	$keyDef = "";
-	}
-    $def =
-	sprintf ("CREATE TABLE %s (%s%s)", $tablename, join (", ", @colDefs),
-	$keyDef);
-    }
+    my $keyDef = @keys ? ", PRIMARY KEY (" . join (", ", @keys) . ")" : "";
+    return sprintf "CREATE TABLE %s (%s%s)", $tablename, join (", ", @colDefs), $keyDef;
+    } # TableDefinition
 
-#
-#   This function generates a list of tables associated to a
-#   given DSN.
-#
-sub ListTables(@)
+# This function generates a list of tables associated to a given DSN.
+sub ListTables
 {
-    my ($dbh) = shift;
-    my (@tables);
+    my $dbh = shift;
 
-    @tables = $dbh->func ('list_tables');
-    if ($dbh->errstr) {
-	die "Cannot create table list: " . $dbh->errstr;
-	}
+    my @tables = $dbh->func ("list_tables");
+    $dbh->errstr and die "Cannot create table list: " . $dbh->errstr;
     @tables;
-    }
+    } # ListTables
 
-#
-#   Return a string for checking, whether a given column is NULL.
-#
-sub IsNull($)
+# Return a string for checking, whether a given column is NULL.
+sub IsNull
 {
-    my ($var) = @_;
+    my $var = shift;
 
     "$var IS NULL";
-    }
-
-#
-#   Return TRUE, if database supports transactions
-#
-sub HaveTransactions ()
-{
-    0;
-    }
+    } # IsNull
 
 -d "output"or mkdir "output", 0755;
 
-open (STDERR, ">&STDOUT") || die "Cannot redirect stderr";
-select (STDERR);
-$| = 1;
-select (STDOUT);
-$| = 1;
+# This should be removed once we're done converting to Test::More
+open STDERR, ">&STDOUT" or die "Cannot redirect stderr";
+select STDERR; $| = 1;
+select STDOUT; $| = 1;
 
+# The Testing() function builds the frame of the test; it can be called
+# in many ways, see below.
 #
-#   The Testing() function builds the frame of the test; it can be called
-#   in many ways, see below.
+# Usually there's no need for you to modify this function.
 #
-#   Usually there's no need for you to modify this function.
+#     Testing() (without arguments) indicates the beginning of the
+#         main loop; it will return, if the main loop should be
+#         entered (which will happen twice, once with $state = 1 and
+#         once with $state = 0)
+#     Testing("off") disables any further tests until the loop ends
+#     Testing("group") indicates the begin of a group of tests; you
+#         may use this, for example, if there's a certain test within
+#         the group that should make all other tests fail.
+#     Testing("disable") disables further tests within the group; must
+#         not be called without a preceding Testing("group"); by default
+#         tests are enabled
+#     Testing("enabled") reenables tests after calling Testing("disable")
+#     Testing("finish") terminates a group; any Testing("group") must
+#         be paired with Testing("finish")
 #
-#       Testing() (without arguments) indicates the beginning of the
-#           main loop; it will return, if the main loop should be
-#           entered (which will happen twice, once with $state = 1 and
-#           once with $state = 0)
-#       Testing("off") disables any further tests until the loop ends
-#       Testing("group") indicates the begin of a group of tests; you
-#           may use this, for example, if there's a certain test within
-#           the group that should make all other tests fail.
-#       Testing("disable") disables further tests within the group; must
-#           not be called without a preceding Testing("group"); by default
-#           tests are enabled
-#       Testing("enabled") reenables tests after calling Testing("disable")
-#       Testing("finish") terminates a group; any Testing("group") must
-#           be paired with Testing("finish")
-#
-#   You may nest test groups.
-#
-{
-    # Note the use of the pairing {} in order to get local, but static,
-    # variables.
-    my (@stateStack, $count, $off);
+# You may nest test groups.
+{   my (@stateStack, $count, $off);
 
     $count = 0;
 
-    sub Testing(;$)
+    sub Testing (;$)
     {
-	my ($command) = shift;
-	if (!defined ($command)) {
+	my $command = shift;
+	if (!defined $command) {
 	    @stateStack = ();
 	    $off        = 0;
 	    if ($count == 0) {
@@ -203,9 +152,7 @@ $| = 1;
 	    else {
 		return 0;
 		}
-	    if ($off) {
-		$::state = 1;
-		}
+	    $off and $::state = 1;
 	    $::numTests = 0;
 	    }
 	elsif ($command eq "off") {
@@ -213,7 +160,7 @@ $| = 1;
 	    $::state = 0;
 	    }
 	elsif ($command eq "group") {
-	    push (@stateStack, $::state);
+	    push @stateStack, $::state;
 	    }
 	elsif ($command eq "disable") {
 	    $::state = 0;
@@ -226,7 +173,7 @@ $| = 1;
 		my $s;
 		$::state = 1;
 		foreach $s (@stateStack) {
-		    if (!$s) {
+		    unless ($s) {
 			$::state = 0;
 			last;
 			}
@@ -235,76 +182,67 @@ $| = 1;
 	    return;
 	    }
 	elsif ($command eq "finish") {
-	    $::state = pop (@stateStack);
+	    $::state = pop @stateStack;
 	    }
 	else {
-	    die ("Testing: Unknown argument\n");
+	    die "Testing: Unknown argument\n";
 	    }
 	return 1;
-	}
+	} # Testing
 
-#
-#   Read a single test result
-#
+    # Read a single test result
     sub Test
     {
 	my ($result, $error, $diag) = @_;
 
 	++$::numTests;
-	if ($count == 2) {
-	    defined $diag and
-		printf "$diag%s", $diag =~ /\n$/ ? "" : "\n";
-	    if ($::state || $result) {
-		print "ok $::numTests "
-		    . (defined $error ? "$error\n" : "\n");
-		return 1;
-		}
-	    print "not ok $::numTests - ".
-		    (defined $error ? "$error\n" : "\n");
-	    print STDERR "FAILED Test $::numTests - ".
-		    (defined $error ? "$error\n" : "\n");
-	    return 0;
+	$count == 2 or return 1;
+
+	defined $diag and printf "$diag%s", $diag =~ m/\n$/ ? "" : "\n";
+
+	defined $error or $error = "";
+	if ($::state || $result) {
+	    print "ok $::numTests $error\n";
+	    return 1;
 	    }
-	return 1;
+	print "not ok $::numTests - $error\n";
+	print STDERR "FAILED Test $::numTests - $error\n";
+	return 0;
 	} # Test
     }
 
-#
-#   Print a DBI error message
-#
+# Print a DBI error message
 sub DbiError ($$)
 {
     my ($rc, $err) = @_;
     $rc  ||= 0;
     $err ||= "";
     print "Test $::numTests: DBI error $rc, $err\n";
-    }
+    } # DbiError
 
+# This functions generates a list of possible DSN's aka
+# databases and returns a possible table name for a new
+# table being created.
 #
-#   This functions generates a list of possible DSN's aka
-#   databases and returns a possible table name for a new
-#   table being created.
-#
-#   Problem is, we have two different situations here: Test scripts
-#   call us by pasing a dbh, which is fine for most situations.
-{
-    use vars qw($listTablesHook);
+# Problem is, we have two different situations here: Test scripts
+# call us by pasing a dbh, which is fine for most situations.
+{   use vars qw($listTablesHook);
 
-    my (@tables, $testtable, $listed);
+    my $testtable = "testaa";
+    my $listed    = 0;
 
-    $testtable = "testaa";
-    $listed    = 0;
+    my @tables;
 
-    sub FindNewTable($)
+    sub FindNewTable
     {
-	my ($dbh) = @_;
+	my $dbh = shift;
 
-	if (!$listed) {
-	    if (defined ($listTablesHook)) {
-		@tables = &$listTablesHook ($dbh);
+	unless ($listed) {
+	       if (defined $listTablesHook) {
+		@tables = $listTablesHook->($dbh);
 		}
-	    elsif (defined (&ListTables)) {
-		@tables = &ListTables ($dbh);
+	    elsif (defined &ListTables) {
+		@tables = ListTables ($dbh);
 		}
 	    else {
 		die "Fatal: ListTables not implemented.\n";
@@ -329,10 +267,32 @@ sub DbiError ($$)
 	$table = $testtable;
 	$testtable++;
 	return $table;
-	}
+	} # FindNewTable
     }
 
-sub ErrMsg (\@)  { print (@_); }
+sub ServerError
+{
+    die "# Cannot connect: $DBI::errstr\n";
+    } # ServerError
+
+sub Connect
+{
+    # either pass nothing: use defaults, just the dsn or all three
+    my ($dsn, $usr, $pass) = @_;
+    $dsn  ||= $test_dsn;
+    $usr  ||= $test_user;
+    $pass ||= $test_pass;
+    my $dbh = DBI->connect ($dsn, $usr, $pass) or ServerError;
+    $dbh;
+    } # Connect
+
+sub DbFile
+{
+    my $file = shift or return;
+    return File::Spec->catdir ($test_dir, $file);
+    } # DbFile
+
+sub ErrMsg  (\@) { print  (@_); }
 sub ErrMsgF (\@) { printf (@_); }
 
 1;

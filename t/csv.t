@@ -25,9 +25,8 @@ while (Testing()) {
     #
     #   Connect to the database
     my $dbh;
-    Test($state or ($dbh = DBI->connect($test_dsn, $test_user,
-                                        $test_password)))
-	or die "Cannot connect";
+    Test($state or $dbh = Connect (), "connect") or
+	die "Cannot connect";
 
     #
     #   Check, whether the f_dir attribute works

@@ -4,39 +4,14 @@ $^W = 1;
 $| = 1;
 
 #   Make -w happy
-use vars qw($test_dsn $test_user $test_password $verbose $state);
+use vars qw($verbose $state);
 use vars qw($COL_NULLABLE $COL_KEY);
-#require SQL::Statement;
-#my $SVERSION = $SQL::Statement::VERSION;
-$test_dsn = '';
-$test_user = '';
-$test_password = '';
 
 #   Include lib.pl
 use DBI;
 use strict;
-{   my $file;
-    foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
-	do $file;
-	if ($@) {
-	    print STDERR "Error while executing lib.pl: $@\n";
-	    exit 10;
-	    }
-	}
-    }
+do "t/lib.pl";
 
-my $test_db = '';
-my $test_hostname = $ENV{DBI_HOST} || 'localhost';
-
-if ($test_dsn =~ /^DBI\:[^\:]+\:/) {
-    $test_db = $';
-    if ($test_db =~ /:/) {
-	$test_db = $`;
-	$test_hostname = $';
-    }
-}
-
-#
 #   Main loop; leave this untouched, put tests after creating
 #   the new table.
 #
@@ -45,9 +20,8 @@ while (Testing()) {
     #   Connect to the database
     my($dbh, $sth, $test_table, $query);
     $test_table = '';  # Avoid warnings for undefined variables.
-    Test($state or ($dbh = DBI->connect($test_dsn, $test_user,
-					$test_password)))
-	or ErrMsg("Cannot connect: $DBI::errstr.\n");
+    Test($state or $dbh = Connect (), "connect") or
+	ErrMsg("Cannot connect: $DBI::errstr.\n");
 
     #
     #   Find a possible new table name
@@ -79,9 +53,8 @@ while (Testing()) {
 		  "case of the server running on a remote machine.\n");
 
     ### Now, re-connect again so that we can do some more complicated stuff..
-    Test($state or ($dbh = DBI->connect($test_dsn, $test_user,
-					$test_password)))
-	or ErrMsg("reconnect failed: $DBI::errstr\n");
+    Test($state or $dbh = Connect (), "connect") or
+	ErrMsg("reconnect failed: $DBI::errstr\n");
 
     Test($state or $dbh->do("DROP TABLE $test_table"))
 	or ErrMsg("Dropping table failed: $dbh->errstr.\n");

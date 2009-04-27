@@ -1,134 +1,66 @@
 #!/usr/local/bin/perl
 
+use strict;
+use Test::More tests => 24;
+
 # Test row insertion and retrieval
 $^W = 1;
 
-($test_dsn, $test_user, $test_password) = ("", "", "");
-
 # Include lib.pl
 use DBI;
+do "t/lib.pl";
 
-foreach $file ("lib.pl", "t/lib.pl", "DBD-~DBD_DRIVER~/t/lib.pl") {
-    do $file;
-    if ($@) {
-	print STDERR "Error while executing lib.pl: $@\n";
-	exit 10;
-	}
-    }
+ok (my $dbh = Connect (),		"connect");
 
-sub ServerError ()
-{
-    print STDERR ("Cannot connect: ", $DBI::errstr, "\n",
-	"\tEither your server is not up and running or you have no\n",
-	"\tpermissions for acessing the DSN $test_dsn.\n",
-	"\tThis test requires a running server and write permissions.\n",
-	"\tPlease make sure your server is running and you have\n",
-	"\tpermissions, then retry.\n");
-    exit 10;
-    } # ServerError
+ok (my $tbl = FindNewTable ($dbh),	"find new test table");
+$tbl ||= "tmp99";
+eval {
+    local $SIG{__WARN__} = sub {};
+    $dbh->do ("drop table $tbl");
+    };
 
-#   Main loop; leave this untouched, put tests after creating
-#   the new table.
-#
-while (Testing ()) {
+like (my $def = TableDefinition ($tbl,
+		[ "id",   "INTEGER",  4, 0 ],
+		[ "name", "CHAR",    64, 0 ],
+		[ "val",  "INTEGER",  4, 0 ],
+		[ "txt",  "CHAR",    64, 0 ]),
+	qr{^create table $tbl}i,	"table definition");
 
-    # Connect to the database
-    Test ($state or
-          $dbh = DBI->connect ($test_dsn, $test_user, $test_password),
-	      "connect") or
-	ServerError();
+ok ($dbh->do ($def),			"create table");
+my $tbl_file = DbFile ($tbl);
+ok (my $sz = -s $tbl_file,		"file exists");
 
-    # Find a possible new table name
-    Test ($state or
-	  $table = FindNewTable ($dbh), "FindNewTable") or
-	DbiError ($dbh->err, $dbh->errstr);
-    $table ||= "tmp";
-    eval { $dbh->do ("DROP TABLE $table") };
+ok ($dbh->do ("insert into $tbl values ".
+	      "(1, 'Alligator Descartes', 1111, 'Some Text')"), "insert");
+ok ($sz < -s $tbl_file,			"file grew");
 
-    # Create a new table; EDIT THIS!
-    Test ($state or
-	 ($def = TableDefinition ($table,
-			       [ "id",   "INTEGER",  4, 0 ],
-			       [ "name", "CHAR",    64, 0 ],
-			       [ "val",  "INTEGER",  4, 0 ],
-			       [ "txt",  "CHAR",    64, 0 ]) and
-	  $dbh->do ($def)), "create", $def) or
-	DbiError ($dbh->err, $dbh->errstr);
+ok (my $sth = $dbh->prepare ("select * from $tbl where id = 1"), "prepare");
+is (ref $sth, "DBI::st",		"handle type");
 
-    # Insert a row into the test table.......
-    Test ($state or
-	  $dbh->do ("INSERT INTO $table ".
-		    "VALUES(1, 'Alligator Descartes', 1111, 'Some Text')"),
-		    "insert") or
-	DbiError ($dbh->err, $dbh->errstr);
+ok ($sth->execute,			"execute");
 
-    # Now, try SELECT'ing the row out. 
-    Test ($state or
-	  $cursor = $dbh->prepare ("SELECT * FROM $table WHERE id = 1"),
-				   "prepare select") or
-	DbiError ($dbh->err, $dbh->errstr);
-    
-    Test ($state or
-	  $cursor->execute, "execute select") or
-	DbiError($cursor->err, $cursor->errstr);
-    
-    my ($row, $errstr);
-    Test ($state or
-	 (defined ($row = $cursor->fetchrow_arrayref) && !$cursor->errstr),
-	 "fetch select") or
-	DbiError ($cursor->err, $cursor->errstr);
+ok (my $row = $sth->fetch,		"fetch");
+is (ref $row, "ARRAY",			"returned a list");
+is ($sth->errstr, undef,		"no error");
 
-    Test ($state or (
-	    $row->[0] == 1 &&
-	    $row->[1] eq "Alligator Descartes" &&    
-	    $row->[2] == 1111 &&    
-	    $row->[3] eq "Some Text"),
-	  "compare select") or
-	DbiError ($cursor->err, $cursor->errstr);
-    
-    Test ($state or
-	  $cursor->finish,
-	  "finish select") or
-	DbiError ($cursor->err, $cursor->errstr);
-    
-    Test ($state or undef $cursor || 1, "undef select");
-    
-    # ...and delete it........
-    Test ($state or
-	  $dbh->do ("DELETE FROM $table WHERE id = 1"),
-	  "delete") or
-	DbiError ($dbh->err, $dbh->errstr);
+is_deeply ($row, [ 1, "Alligator Descartes", 1111, "Some Text" ], "content");
 
-    # Now, try SELECT'ing the row out. This should fail.
-    Test ($state or
-	  $cursor = $dbh->prepare ("SELECT * FROM $table WHERE id = 1"),
-	  "prepare select deleted") or
-	DbiError ($dbh->err, $dbh->errstr);
+ok ($sth->finish,			"finish");
+undef $sth;
 
-    Test ($state or
-	  $cursor->execute,
-	  "execute select deleted") or
-	DbiError ($cursor->err, $cursor->errstr);
+# Try some other capitilization
+ok ($dbh->do ("DELETE FROM $tbl WHERE id = 1"),	"delete");
 
-    Test ($state or
-	 (!defined ($row = $cursor->fetchrow_arrayref) &&
-	 (!defined ($errstr = $cursor->errstr) ||
-	  $cursor->errstr eq "")),
-	  "fetch select deleted") or
-	DbiError ($cursor->err, $cursor->errstr);
+# Now, try SELECT'ing the row out. This should fail.
+ok ($sth = $dbh->prepare ("select * from $tbl where id = 1"), "prepare");
+is (ref $sth, "DBI::st",		"handle type");
 
-    Test ($state or
-	  $cursor->finish,
-	  "finish select deleted") or
-	DbiError ($cursor->err, $cursor->errstr);
+ok ($sth->execute,			"execute");
+is ($sth->fetch,  undef,		"fetch");
+is ($sth->errstr, undef,		"error");	# ???
 
-    Test ($state or
-	  undef $cursor || 1,
-	  "undef select deleted");
+ok ($sth->finish,			"finish");
+undef $sth;
 
-    # Finally drop the test table.
-    Test ($state or
-	  $dbh->do ("DROP TABLE $table"),
-	  "drop") or
-	DbiError ($dbh->err, $dbh->errstr);
-    }
+ok ($dbh->do ("drop table $tbl"),	"drop");
+ok ($dbh->disconnect,			"disconnect");

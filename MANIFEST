@@ -22,6 +22,5 @@ t/50_chopblanks.t
 t/51_commit.t
 t/ak-dbd.t
 t/csv.t
-t/dbdadmin.t
 t/lib.pl
 example/passwd.pl
