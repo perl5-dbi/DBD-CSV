@@ -1,118 +1,55 @@
 #!/usr/bin/perl
 
-# This driver should check if 'ChopBlanks' works.
-
-# Make -w happy
-use vars qw( $verbose $state );
-
-# Include lib.pl
-use DBI;
 use strict;
+use Test::More tests => 37;
+
+# This driver should check if 'ChopBlanks' works.
+$^W = 1;
+
+BEGIN {
+    use_ok ("DBI");
+    }
 do "t/lib.pl";
 
-#   Main loop; leave this untouched, put tests after creating
-#   the new table.
-#
-while (Testing()) {
-    my ($dbh, $sth, $query);
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, &COL_NULLABLE ],
+    [ "name", "CHAR",    64, &COL_NULLABLE ],
+    );
 
-    #
-    #   Connect to the database
-    Test($state or $dbh = Connect (), "connect") or
-	   ServerError();
+ok (my $dbh = Connect (),			"connect");
 
-    #
-    #   Find a possible new table name
-    #
-    my $table = '';
-    Test($state or $table = FindNewTable($dbh))
-	   or ErrMsgF("Cannot determine a legal table name: Error %s.\n",
-		      $dbh->errstr);
+ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
-    #
-    #   Create a new table; EDIT THIS!
-    #
-    Test($state or ($query = TableDefinition($table,
-				      ["id",   "INTEGER",  4, &COL_NULLABLE],
-				      ["name", "CHAR",    64, &COL_NULLABLE]),
-		    $dbh->do($query)))
-	or ErrMsgF("Cannot create table: Error %s.\n",
-		      $dbh->errstr);
+like (my $def = TableDefinition ($tbl, @tbl_def),
+	qr{^create table $tbl}i,		"table definition");
+ok ($dbh->do ($def),				"create table");
 
+my @rows = (
+    [ 1, "NULL",	],
+    [ 2, " ",		],
+    [ 3, " a b c ",	],
+    );
+ok (my $sti = $dbh->prepare ("insert into $tbl (id, name) values (?, ?)"), "prepare ins");
+ok (my $sth = $dbh->prepare ("select id, name from $tbl where id = ?"),    "prepare sel");
+foreach my $row (@rows) {
+    ok ($sti->execute (@$row),			"insert $row->[0]");
 
-    #
-    #   and here's the right place for inserting new tests:
-    #
-    my @rows;
-#    if ($SVERSION > 1) {
-        @rows = ([1, 'NULL'],
-	 	 [2, ' '],
-		 [3, ' a b c ']);
-#    }
-#    else {
-#        @rows = ([1, ''],
-#	 	 [2, ' '],
-#		 [3, ' a b c ']);
-#    }
-    my $ref;
-    foreach $ref (@rows) {
-	my ($id, $name) = @$ref;
-	if (!$state) {
-	    $query = sprintf("INSERT INTO $table (id, name) VALUES ($id, %s)",
-			     $dbh->quote($name));
-	}
-	Test($state or $dbh->do($query))
-	    or ErrMsgF("INSERT failed: query $query, error %s.\n",
-		       $dbh->errstr);
-        $query = "SELECT id, name FROM $table WHERE id = $id\n";
-	Test($state or ($sth = $dbh->prepare($query)))
-	    or ErrMsgF("prepare failed: query $query, error %s.\n",
-		       $dbh->errstr);
-
-	# First try to retreive without chopping blanks.
-	$sth->{'ChopBlanks'} = 0;
-	Test($state or $sth->execute)
-	    or ErrMsgF("execute failed: query %s, error %s.\n", $query,
-		       $sth->errstr);
-	Test($state or defined($ref = $sth->fetchrow_arrayref))
-	    or ErrMsgF("fetch failed: query $query, error %s.\n",
-		       $sth->errstr);
-	Test($state or $$ref[1] eq $name)
-	    or ErrMsgF("problems with ChopBlanks = 0:"
-		       . " expected '%s', got '%s'.\n",
-		       $name, $$ref[1]);
-	Test($state or $sth->finish());
-
-	# Now try to retreive with chopping blanks.
-	$sth->{'ChopBlanks'} = 1;
-	Test($state or $sth->execute)
-	    or ErrMsg("execute failed: query $query, error %s.\n",
-		      $sth->errstr);
-	my $n = $name;
-	$n =~ s/\s+$//;
-	Test($state or ($ref = $sth->fetchrow_arrayref))
-	    or ErrMsgF("fetch failed: query $query, error %s.\n",
-		       $sth->errstr);
-	Test($state or ($$ref[1] eq $n))
-	    or ErrMsgF("problems with ChopBlanks = 1:"
-		       . " expected '%s', got '%s'.\n",
-		       $n, $$ref[1]);
-
-	Test($state or $sth->finish)
-	    or ErrMsgF("Cannot finish: %s.\n", $sth->errstr);
+    $sth->{ChopBlanks} = 0;
+    ok (1,					"ChopBlanks 0");
+    ok ($sth->execute ($row->[0]),		"execute");
+    ok (my $r = $sth->fetch,			"fetch");
+    is_deeply ($r, $row,			"content");
+    
+    $sth->{ChopBlanks} = 1;
+    ok (1,					"ChopBlanks 1");
+    ok ($sth->execute ($row->[0]),		"execute");
+    s/ +$// for @$row;
+    ok ($r = $sth->fetch,			"fetch");
+    is_deeply ($r, $row,			"content");
     }
 
-    #
-    #   Finally drop the test table.
-    #
-    Test($state or $dbh->do("DROP TABLE $table"))
-	   or ErrMsgF("Cannot DROP test table $table: %s.\n",
-		      $dbh->errstr);
+ok ($sth->finish,				"finish");
+undef $sth;
 
-    #   ... and disconnect
-    Test($state or $dbh->disconnect)
-	or ErrMsgF("Cannot disconnect: %s.\n", $dbh->errmsg);
-}
-
-
-
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok ($dbh->disconnect,				"disconnect");
