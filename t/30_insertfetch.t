@@ -10,6 +10,13 @@ $^W = 1;
 use DBI;
 do "t/lib.pl";
 
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, 0 ],
+    [ "name", "CHAR",    64, 0 ],
+    [ "val",  "INTEGER",  4, 0 ],
+    [ "txt",  "CHAR",    64, 0 ],
+    );
+
 ok (my $dbh = Connect (),		"connect");
 
 ok (my $tbl = FindNewTable ($dbh),	"find new test table");
@@ -19,11 +26,7 @@ eval {
     $dbh->do ("drop table $tbl");
     };
 
-like (my $def = TableDefinition ($tbl,
-		[ "id",   "INTEGER",  4, 0 ],
-		[ "name", "CHAR",    64, 0 ],
-		[ "val",  "INTEGER",  4, 0 ],
-		[ "txt",  "CHAR",    64, 0 ]),
+like (my $def = TableDefinition ($tbl, @tbl_def),
 	qr{^create table $tbl}i,	"table definition");
 
 ok ($dbh->do ($def),			"create table");

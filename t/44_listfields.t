@@ -1,85 +1,52 @@
 #!/usr/bin/perl
 
+use strict;
+use Test::More "no_plan";
+
 # This is a test for statement attributes being present appropriately.
+$^W = 1;
 
-use DBI;
-use vars qw($verbose);
-
+BEGIN {
+    use_ok ("DBI");
+    }
 do "t/lib.pl";
 
-@table_def = (
+defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
+defined &SQL_INTEGER or *SQL_INTEGER = sub {  4 };
+
+my @tbl_def = (
     [ "id",   "INTEGER",  4, &COL_KEY		],
     [ "name", "CHAR",    64, &COL_NULLABLE	],
     );
 
-#
-#   Main loop; leave this untouched, put tests after creating
-#   the new table.
-#
-while (Testing()) {
-    #
-    #   Connect to the database
-    Test($state or $dbh = Connect (), "connect") or
-	ServerError();
+ok (my $dbh = Connect (),			"connect");
 
-    #
-    #   Find a possible new table name
-    #
-    Test($state or $table = FindNewTable($dbh))
-	   or DbiError($dbh->err, $dbh->errstr);
+ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
-    #
-    #   Create a new table
-    #
-    Test($state or ($def = TableDefinition($table, @table_def),
-		    $dbh->do($def)))
-	   or DbiError($dbh->err, $dbh->errstr);
+like (my $def = TableDefinition ($tbl, @tbl_def),
+	qr{^create table $tbl}i,		"table definition");
+ok ($dbh->do ($def),				"create table");
 
+ok (my $sth = $dbh->prepare ("select * from $tbl"), "prepare");
+ok ($sth->execute,				"execute");
 
-    Test($state or $cursor = $dbh->prepare("SELECT * FROM $table"))
-	   or DbiError($dbh->err, $dbh->errstr);
+is ($sth->{NUM_OF_FIELDS}, scalar @tbl_def,	"NUM_OF_FIELDS");
+is ($sth->{NUM_OF_PARAMS}, 0,			"NUM_OF_PARAMS");
+is ($sth->{NAME_lc}[0], lc $tbl_def[0][0],	"NAME_lc");
+is ($sth->{NAME_uc}[1], uc $tbl_def[1][0],	"NAME_uc");
+is_deeply ($sth->{NAME_lc_hash},
+    { map { ( lc $tbl_def[$_][0] => $_ ) } 0 .. $#tbl_def }, "NAME_lc_hash");
+# TODO tests
+#s ($sth->{TYPE}[0], &SQL_INTEGER,		"TYPE 1");
+#s ($sth->{TYPE}[1], &SQL_VARCHAR,		"TYPE 2");
+#s ($sth->{PRECISION}[0], 4,			"PRECISION 1");
+#s ($sth->{PRECISION}[1], 64,			"PRECISION 2");
+#s ($sth->{NULLABLE}[0], 0,			"NULLABLE 1");
+#s ($sth->{NULLABLE}[1], 1,			"NULLABLE 2");
 
-    Test($state or $cursor->execute)
-	   or DbiError($cursor->err, $cursor->errstr);
+ok ($sth->finish,				"finish");
+#s ($sth->{NUM_OF_FIELDS}, 0,			"NUM_OF_FIELDS");
+undef $sth;
 
-    my $res;
-    Test($state or (($res = $cursor->{'NUM_OF_FIELDS'}) == @table_def))
-	   or DbiError($cursor->err, $cursor->errstr);
-    if (!$state && $verbose) {
-	printf("Number of fields: %s\n", defined($res) ? $res : "undef");
-    }
-    Test($state or ($ref = $cursor->{'NAME'})  &&  @$ref == @table_def
-	            &&  (lc $$ref[0]) eq $table_def[0][0]
-		    &&  (lc $$ref[1]) eq $table_def[1][0])
-	   or DbiError($cursor->err, $cursor->errstr);
-    if (!$state && $verbose) {
-	print "Names:\n";
-	for ($i = 0;  $i < @$ref;  $i++) {
-	    print "    ", $$ref[$i], "\n";
-	}
-    }
-
-    if (!$state && $verbose) {
-	print "Nullable:\n";
-	for ($i = 0;  $i < @$ref;  $i++) {
-	    print "    ", ($$ref[$i] & &COL_NULLABLE) ? "yes" : "no", "\n";
-	    }
-	}
-
-    Test($state or undef $cursor  ||  1);
-
-
-    #
-    #  Drop the test table
-    #
-    Test($state or ($cursor = $dbh->prepare("DROP TABLE $table")))
-	or DbiError($dbh->err, $dbh->errstr);
-    Test($state or $cursor->execute)
-	or DbiError($cursor->err, $cursor->errstr);
-
-    #  NUM_OF_FIELDS should be zero (Non-Select)
-    Test($state or ($cursor->{'NUM_OF_FIELDS'} == 0))
-	or !$verbose or printf("NUM_OF_FIELDS is %s, not zero.\n",
-			       $cursor->{'NUM_OF_FIELDS'});
-    Test($state or (undef $cursor) or 1);
-}
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok ($dbh->disconnect,				"disconnect");

@@ -19,15 +19,18 @@ sub TrueRows
     $count;
     } # TrueRows
 
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, 0 ],
+    [ "name", "CHAR",    64, 0 ],
+    );
+
 my ($sth, $rows);
 
 ok (my $dbh = Connect (),		"connect");
 
 ok (my $tbl = FindNewTable ($dbh),	"find new test table");
 
-like (my $def = TableDefinition ($tbl,
-		[ "id",   "INTEGER",  4, 0],
-		[ "name", "CHAR",    64, 0]),
+like (my $def = TableDefinition ($tbl, @tbl_def),
 	qr{^create table $tbl}i,	"table definition");
 ok ($dbh->do ($def),			"create table");
 

@@ -27,5 +27,5 @@ ok ($dbh->disconnect,				"disconnect");
 # Try different DSN's
 foreach my $d (qw( . example lib t )) {
     ok (my $dns = Connect ("dbi:CSV:f_dir=$d"),	"use $d as f_dir");
-    ok ($dbh->disconnect,				"disconnect");
+    ok ($dbh->disconnect,			"disconnect");
     }

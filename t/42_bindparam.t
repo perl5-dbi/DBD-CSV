@@ -14,13 +14,16 @@ do "t/lib.pl";
 defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
 defined &SQL_INTEGER or *SQL_INTEGER = sub {  4 };
 
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, 0			],
+    [ "name", "CHAR",    64, &COL_NULLABLE	],
+    );
+
 ok (my $dbh = Connect (),			"connect");
 
 ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
-like (my $def = TableDefinition ($tbl,
-		[ "id",   "INTEGER",  4, 0 ],
-		[ "name", "CHAR",    64, &COL_NULLABLE ]),
+like (my $def = TableDefinition ($tbl, @tbl_def),
 	qr{^create table $tbl}i,		"table definition");
 ok ($dbh->do ($def),				"create table");
 
