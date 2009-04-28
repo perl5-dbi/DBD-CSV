@@ -1,14 +1,12 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 37;
+use Test::More tests => 38;
 
 # This driver should check if 'ChopBlanks' works.
 $^W = 1;
 
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 my @tbl_def = (
@@ -48,7 +46,9 @@ foreach my $row (@rows) {
     is_deeply ($r, $row,			"content");
     }
 
-ok ($sth->finish,				"finish");
+ok ($sti->finish,				"finish sti");
+undef $sti;
+ok ($sth->finish,				"finish sth");
 undef $sth;
 
 ok ($dbh->do ("drop table $tbl"),		"drop table");

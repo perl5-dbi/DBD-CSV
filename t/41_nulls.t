@@ -4,9 +4,7 @@
 use strict;
 use Test::More tests => 14;
 
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 my @tbl_def = (

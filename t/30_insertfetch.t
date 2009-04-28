@@ -1,13 +1,12 @@
 #!/usr/local/bin/perl
 
 use strict;
-use Test::More tests => 24;
+use Test::More tests => 25;
 
 # Test row insertion and retrieval
 $^W = 1;
 
-# Include lib.pl
-use DBI;
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 my @tbl_def = (

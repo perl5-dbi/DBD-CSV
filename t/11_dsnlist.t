@@ -6,9 +6,7 @@ use strict;
 use Test::More tests => 15;
 
 # Include lib.pl
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 ok (1,						"Driver is CSV\n");

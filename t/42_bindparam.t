@@ -1,14 +1,12 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More "no_plan";
+use Test::More tests => 40;
 
 # Test if bindparam () works
 $^W = 1;
 
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
@@ -74,7 +72,7 @@ ok ($sth->fetch,				"fetch");
 is ($id,	3,				"id   3");
 is ($name,	"Jochen Wiedman",		"name 3");
 ok ($sth->fetch,				"fetch");
-#is ($id,	4,				"id   4"); # Broken in DBD::File
+is ($id,	4,				"id   4");
 is ($name,	"Andreas König",		"name 4");
 ok ($sth->fetch,				"fetch");
 is ($id,	5,				"id   5");

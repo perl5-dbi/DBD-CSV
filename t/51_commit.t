@@ -1,117 +1,73 @@
 #!/usr/bin/perl
 
+use strict;
+use Test::More tests => 24;
+
 # Chack commit, rollback and "AutoCommit" attribute
 $^W = 1;
 
-use DBI;
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
-use vars qw($gotWarning);
-sub CatchWarning ($)
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, 0 ],
+    [ "name", "CHAR",    64, 0 ],
+    );
+
+sub RowCount
 {
-    $gotWarning = 1;
-    } # CatchWarning
+    my ($dbh, $tbl) = @_;
 
-sub NumRows ($$$)
-{
-    my ($dbh, $table, $num) = @_;
-    my ($sth, $got);
+    local $dbh->{PrintError} = 1;
+    my $sth = $dbh->prepare ("SELECT count (*) FROM $tbl") or return;
+    $sth->execute or return;
+    my $row = $sth->fetch or return;
+    $row->[0];
+    } # RowCount
 
-    $sth = $dbh->prepare ("SELECT * FROM $table") or
-	return "Failed to prepare: err ".$dbh->err.", errstr ".$dbh->errstr;
+ok (my $dbh = Connect (),			"connect");
 
-    $sth->execute or
-	return "Failed to execute: err ".$dbh->err.", errstr ".$dbh->errstr;
+ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
-    $got = 0;
-    while ($sth->fetchrow_arrayref) {
-	++$got;
-	}
-    $got ne $num and
-	return "Wrong result: Expected $num rows, got $got.\n";
-    return "";
-    } # NumRows
+like (my $def = TableDefinition ($tbl, @tbl_def),
+	qr{^create table $tbl}i,		"table definition");
+ok ($dbh->do ($def),				"create table");
 
-# Main loop; leave this untouched, put tests after creating the new table.
-while (Testing ()) {
-    # Connect to the database
-    Test ($state or $dbh = Connect (), "connect") or
-	ServerError ();
+is ($dbh->{AutoCommit}, 1,			"AutoCommit on");
 
-    # Find a possible new table name
-    Test ($state or $table = FindNewTable ($dbh)) or
-	ErrMsgF ("Cannot determine a legal table name: Error %s.\n", $dbh->errstr);
+eval { $dbh->{AutoCommit} = 0; };
+like ($@, qr{^Can't disable AutoCommit},	"disable");
+is ($dbh->{AutoCommit}, 1,			"AutoCommit still on");
 
-    # Create a new table
-    Test ($state or (
-	    $def = TableDefinition ($table,
-		[ "id",   "INTEGER", 4, 0 ],
-		[ "name", "CHAR",   64, 0 ]),
-	    $dbh->do ($def))) or
-	ErrMsgF ("Cannot create table: Error %s.\n", $dbh->errstr);
+# Check whether AutoCommit mode works.
+ok ($dbh->do ("insert into $tbl values (1, 'Jochen')"), "insert 1");
+is (RowCount ($dbh, $tbl), 1,			"1 row");
 
-    Test ($state or $dbh->{AutoCommit}) or
-	ErrMsg ("AutoCommit is off\n", "AutoCommint on");
+ok ($dbh->disconnect,				"disconnect");
 
-    # Tests for databases that do support transactions
-    unless ($state) {
-	$@ = "";
-	eval { $dbh->{AutoCommit} = 0; };
-	}
-    Test ($state or $@) or
-	ErrMsg ("Expected fatal error for AutoCommit => 0\n",
-		"AutoCommit off -> error");
+ok ($dbh = Connect (),				"connect");
+is (RowCount ($dbh, $tbl), 1,			"still 1 row");
 
-    #   Check whether AutoCommit mode works.
-    Test ($state or $dbh->do ("INSERT INTO $table VALUES (1, 'Jochen')"))
-	or ErrMsgF ("Failed to delete: err %s, errstr %s.\n", $dbh->err,
-	$dbh->errstr);
-    Test ($state or !($msg = NumRows ($dbh, $table, 1)), "NumRows")
-	or ErrMsg ($msg);
-    Test ($state or $dbh->disconnect, "disconnect")
-	or ErrMsgF ("Failed to disconnect: err %s, errstr %s.\n", $dbh->err,
-	$dbh->errstr);
-    Test ($state or $dbh = Connect (), "connect") or
-	ErrMsgF ("Failed to reconnect: err %s, errstr %s.\n", $DBI::err, $DBI::errstr);
-    Test ($state or !($msg = NumRows ($dbh, $table, 1))) or
-	ErrMsg ($msg);
-
-    #   Check whether commit issues a warning in AutoCommit mode
-    Test ($state or $dbh->do ("INSERT INTO $table VALUES (2, 'Tim')"))
-	or ErrMsgF ("Failed to insert: err %s, errstr %s.\n", $dbh->err,
-	$dbh->errstr);
-    my $result;
-    if (!$state) {
-	$@             = "";
-	$SIG{__WARN__} = \&CatchWarning;
-	$gotWarning    = 0;
-	eval { $result = $dbh->commit; };
-	$SIG{__WARN__} = "DEFAULT";
-	}
-    Test ($state or $gotWarning)
-	or ErrMsg ("Missing warning when committing in AutoCommit mode");
-
-    #   Check whether rollback issues a warning in AutoCommit mode
-    #   We accept error messages as being legal, because the DBI
-    #   requirement of just issueing a warning seems scary.
-    Test ($state or $dbh->do ("INSERT INTO $table VALUES (3, 'Alligator')"))
-	or ErrMsgF ("Failed to insert: err %s, errstr %s.\n", $dbh->err,
-	$dbh->errstr);
-    if (!$state) {
-	$@             = "";
-	$SIG{__WARN__} = \&CatchWarning;
-	$gotWarning    = 0;
-	eval { $result = $dbh->rollback; };
-	$SIG{__WARN__} = "DEFAULT";
-	}
-    Test ($state or $gotWarning or $dbh->err)
-	or ErrMsg ("Missing warning when rolling back in AutoCommit mode");
-
-    #
-    #   Finally drop the test table.
-    #
-    Test ($state or $dbh->do ("DROP TABLE $table"))
-	or ErrMsgF ("Cannot DROP test table $table: %s.\n", $dbh->errstr);
-    Test ($state or $dbh->disconnect ())
-	or ErrMsgF ("Cannot DROP test table $table: %s.\n", $dbh->errstr);
+# Check whether commit issues a warning in AutoCommit mode
+ok ($dbh->do ("insert into $tbl values (2, 'Tim')"), "insert 2");
+is ($dbh->{AutoCommit}, 1,			"AutoCommit on");
+{   my $got_warn = 0;
+    local $SIG{__WARN__} = sub { $got_warn++; };
+    eval { ok ($dbh->commit,			"commit"); };
+    is ($got_warn, 1,				"warning");
     }
+
+# Check whether rollback issues a warning in AutoCommit mode
+# We accept error messages as being legal, because the DBI
+# requirement of just issueing a warning seems scary.
+ok ($dbh->do ("insert into $tbl values (3, 'Alligator')"), "insert 3");
+is ($dbh->{AutoCommit}, 1,			"AutoCommit on");
+{   my $got_warn = 0;
+    local $SIG{__WARN__} = sub { $got_warn++; };
+    eval { is ($dbh->rollback, 0,		"rollback"); };
+    is ($got_warn, 1,				"warning");
+    is ($dbh->err, undef,			"err");
+    }
+
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok ($dbh->disconnect,				"disconnect");

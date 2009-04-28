@@ -2,11 +2,9 @@
 
 # Test if a table can be created and dropped
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
-use DBI;
-
-# Include lib.pl
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 my @tbl_def = (

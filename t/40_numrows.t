@@ -6,9 +6,7 @@ use Test::More tests => 25;
 # This tests, whether the number of rows can be retrieved.
 $^W = 1;
 
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 require "t/lib.pl";
 
 sub TrueRows

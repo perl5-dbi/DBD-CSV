@@ -6,9 +6,7 @@ use Test::More tests => 15;
 # This is a test for correct handling of BLOBS and $dbh->quote ()
 $^W = 1;
 
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 my $size = 128;

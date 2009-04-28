@@ -6,9 +6,7 @@ use Test::More "no_plan";
 # This is a test for statement attributes being present appropriately.
 $^W = 1;
 
-BEGIN {
-    use_ok ("DBI");
-    }
+BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
