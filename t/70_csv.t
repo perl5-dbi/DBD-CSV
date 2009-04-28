@@ -1,14 +1,12 @@
 #!/usr/bin/perl
 
 use strict;
-use DBI;
+use Test::More "no_plan";
 
-use lib ".";
-use lib "t";
-require "lib.pl";
+BEGIN { use_ok ("DBI"); }
+do "t/lib.pl";
 
-use vars qw( $test_dsn $test_user $test_password $state $haveFileSpec );
-
+__END__
 # Extract the directory from the dsn
 my $dir;
 if ($test_dsn =~ /(.*)\;?f_dir=([^\;]*)\;?(.*)/) {

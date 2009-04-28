@@ -8,8 +8,8 @@ BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 my @tbl_def = (
-    [ "id",   "INTEGER",  4, 0],
-    [ "name", "CHAR",    64, 0],
+    [ "id",   "INTEGER",  4, 0 ],
+    [ "name", "CHAR",    64, 0 ],
     );
 
 ok (my $dbh = Connect (),		"connect");
