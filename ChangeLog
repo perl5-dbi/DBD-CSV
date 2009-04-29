@@ -1,5 +1,6 @@
 2009-04-29  H.Merijn Brand (0.25)
 
+    * Raised minimum perl version to 5.005_03
     * Code cleanup (perlcritic, style, layout)
     * Implement f_exp
     * Split csv handles for input (no eol default) and

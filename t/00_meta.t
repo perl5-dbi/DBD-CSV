@@ -2,14 +2,9 @@
 
 # Test that our META.yml file matches the specification
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-    }
+$^W = 1;
 
-my @MODULES = (
-    "Test::CPAN::Meta 0.12",
-    );
+my @MODULES = ( "Test::CPAN::Meta 0.12" );
 
 # Don't run tests during end-user installs
 use Test::More;
@@ -25,6 +20,12 @@ foreach my $MODULE (@MODULES) {
 	: plan skip_all => "$MODULE not available for testing";
     }
 
+my $has_meta = -f "META.yml";
+!$has_meta && -x "sandbox/genMETA.pl" and
+    qx{ perl sandbox/genMETA.pl -v > META.yml };
+
 meta_yaml_ok ();
+
+$has_meta or unlink "META.yml";
 
 1;

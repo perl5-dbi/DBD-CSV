@@ -2,7 +2,7 @@
 
 # Copyright PROCURA B.V. (c) 2006-2009 H.Merijn Brand
 
-require 5.005;
+require 5.005003;
 
 use strict;
 

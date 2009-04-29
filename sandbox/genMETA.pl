@@ -51,7 +51,7 @@ elsif ($opt_v) {
     }
 else {
     my @my = glob <*/META.yml>;
-    @my == 1 && open my $my, ">", $my[0] or die "Cannot update META.yml|n";
+    @my == 1 && open my $my, ">", $my[0] or die "Cannot update META.yml\n";
     print $my @yml;
     close $my;
     chmod 0644, glob <*/META.yml>;
@@ -74,7 +74,7 @@ provides:
         file:            lib/DBD/CSV.pm
         version:         VERSION
 requires:     
-    perl:                5.005
+    perl:                5.005003
     DBI:                 1.00
     DBD::File:           0.36
     SQL::Statement:      0.1011
@@ -85,7 +85,7 @@ recommends:
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
-    perl:                5.005
+    perl:                5.005003
     Config:              0
     Test::Harness:       0
     Test::More:          0

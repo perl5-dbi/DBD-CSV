@@ -2,10 +2,7 @@
 
 # Test that our declared minimum Perl version matches our syntax
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-    }
+$^W = 1;
 
 my @MODULES = (
     "Perl::MinimumVersion 1.20",
@@ -26,6 +23,12 @@ foreach my $MODULE (@MODULES) {
 	: plan skip_all => "$MODULE not available for testing";
     }
 
+my $has_meta = -f "META.yml";
+!$has_meta && -x "sandbox/genMETA.pl" and
+    qx{ perl sandbox/genMETA.pl -v > META.yml };
+
 all_minimum_version_from_metayml_ok ();
+
+$has_meta or unlink "META.yml";
 
 1;
