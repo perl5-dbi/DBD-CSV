@@ -756,6 +756,8 @@ operating systems, as they are for single users anyways).
 
 =item Tests
 
+Aim for a full 100% code coverage
+
  - eol     Make tests for different record separators.
  - f_ext   Test f_ext possibilities.
  - csv_xs  Test with a variety of combinations for
@@ -765,6 +767,18 @@ operating systems, as they are for single users anyways).
            . read from badly formatted csv
            . pass bad arguments to csv parser while fetching
 
+Add tests that specifically test DBD::File functionality where
+that is useful.
+
+=item RT
+
+Attack all open DBD::CSV bugs in RT
+
+=item Documentation
+
+Expand on error-handling, and document all possible errors.
+Use Text::CSV_XS::error_diag () wherever possible.
+
 =item NULL
 
 Enable real NULL handling with blank_is_undef.
@@ -773,11 +787,6 @@ Enable real NULL handling with blank_is_undef.
 
 Test how well UTF-8 is supported, if not (yet), enable UTF-8, and maybe
 even more.
-
-=item Documentation
-
-Expand on error-handling, and document all possible errors.
-Use Text::CSV_XS::error_diag () wherever possible.
 
 =item Examples
 
