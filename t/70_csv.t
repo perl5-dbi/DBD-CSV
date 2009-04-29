@@ -6,142 +6,77 @@ use Test::More "no_plan";
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
 
-__END__
-# Extract the directory from the dsn
-my $dir;
-if ($test_dsn =~ /(.*)\;?f_dir=([^\;]*)\;?(.*)/) {
-    $dir = $2;
-    $test_dsn = $1 . (length($3) ? ";$3" : '');
-} else {
-    $dir = "output";
-}
-if (! -d $dir  &&  !mkdir $dir, 0755) {
-    die "Cannot create directory $dir: $!";
-}
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, 0 ],
+    [ "name", "CHAR",    64, 0 ],
+    );
 
-while (Testing()) {
-    #
-    #   Connect to the database
-    my $dbh;
-    Test($state or $dbh = Connect (), "connect") or
-	die "Cannot connect";
+sub DbFile;
 
-    #
-    #   Check, whether the f_dir attribute works
-    #
-    my $table = '';
-    my $tableb = '';
-    if (!$state) {
-	$dbh->{f_dir} = $dir;
-	print "Trying to create file $table in directory $dir.\n";
-    }
-    Test($state
-	 or (($table = FindNewTable($dbh))
-	  and  !(-f ($haveFileSpec ?
-		     File::Spec->catfile($dir, $table) : "$dir/$table"))))
-	or print("Cannot determine a legal table name: Error ",
-		 $dbh->errstr);
-    Test($state
-	 or (($tableb = FindNewTable($dbh))
-	     and  !(-f ($haveFileSpec ?
-			File::Spec->catfile($dir, $tableb) : "$dir/$tableb"))))
-	or print("Cannot determine a legal table name: Error ",
-		 $dbh->errstr);
-    Test($state or ($table ne $tableb))
-	or print("Second table name same as first.\n");
+my $dir = DbDir () || "output";
 
-    my $cquery;
-    Test($state or (($cquery = TableDefinition($table,
-					       ["id", "INTEGER", 4, 0],
-					       ["name", "CHAR", 64, 0]))
-		    and $dbh->do($cquery)))
-	or print("Cannot create table $table in directory $dir: ",
-		 $dbh->errstr);
-    Test($state
-	 or (-f ($haveFileSpec ?
-		 File::Spec->catfile($dir, $table) : "$dir/$table")))
-	or print("No such file in directory $dir: $table");
-    Test($state
-	 or ($dbh->do("DROP TABLE $table")
-	     and  !(-f ($haveFileSpec ?
-			File::Spec->catfile($dir, $table) : "$dir/$table"))))
-	or print("Cannot drop table $table in directory $dir: ",
-		 $dbh->errstr());
-    Test($state or $dbh->disconnect());
+ok (my $dbh = Connect (),			"connect");
 
+is ($dbh->{f_dir},  $dir,			"default dir");
+ok ($dbh->{f_dir} = $dir,			"set f_dir");
 
-    #
-    #   Try to read a semicolon separated file.
-    #
+ok (my $tbl = FindNewTable ($dbh),		"find new test table");
+ok (!-f DbFile ($tbl),				"does not exist");
 
-    my $dsn = "DBI:CSV:f_dir=$dir;csv_eol=\015\012;csv_sep_char=\\;;";
-    Test($state or ($dbh = DBI->connect($dsn)))
-	or print "Cannot connect to DSN $dsn: $DBI::errstr\n";
-    my $tablec;
-    Test($state
-	 or (($tablec = FindNewTable($dbh))
-	     and  !(-f ($haveFileSpec ?
-			File::Spec->catfile($dir, $tablec) : "$dir/$tablec"))))
-	or print("Cannot determine a legal table name: Error ",
-		 $dbh->errstr);
-    if (!$state) {
-	print "Trying to create file $tablec in directory $dir.\n";
-    }
-    Test($state or
-	 $dbh->do("CREATE TABLE $tablec (id INTEGER, name CHAR(64))"))
-	or print("Cannot create table $tablec: ", $dbh->errstr(), "\n");
-    Test($state or
-	 $dbh->do("INSERT INTO $tablec VALUES (1, ?)", undef, "joe"))
-	or print("Cannot insert data into $tablec: ", $dbh->errstr(), "\n");
-    Test($state or
-	 $dbh->do("INSERT INTO $tablec VALUES (2, ?)", undef, "Jochen;"))
-	or print("Cannot insert data into $tablec: ", $dbh->errstr(), "\n");
-    my($sth, $ref);
-    Test($state or
-	 ($sth = $dbh->prepare("SELECT * FROM $tablec")))
-	or print("Cannot prepare: ", $dbh->errstr(), "\n");
-    Test($state or $sth->execute())
-	or print("Cannot execute: ", $sth->errstr(), "\n");
-    Test($state or (($ref = $sth->fetchrow_arrayref()) and
-		    $ref->[0] eq "1" and $ref->[1] eq "joe"))
-	or printf("Expected 1,joe, got %s,%s\n", ($ref->[0] || "undef"),
-		  ($ref->[1] || "undef"));
-    Test($state or (($ref = $sth->fetchrow_arrayref()) and
-		    $ref->[0] eq "2" and $ref->[1] eq "Jochen;"))
-	or printf("Expected 2,Jochen;, got %s,%s\n", ($ref->[0] || "undef"),
-		  ($ref->[1] || "undef"));
-    Test($state
-	 or ($dbh->do("DROP TABLE $tablec")
-	     and  !(-f ($haveFileSpec ?
-			File::Spec->catfile($dir, $table) : "$dir/$tablec"))))
-	or print("Cannot drop table $tablec in directory $dir: ",
-		 $dbh->errstr());
-    Test($state or $dbh->disconnect());
+ok (my $tbl2 = FindNewTable ($dbh),		"find new test table");
+ok (!-f DbFile ($tbl2),				"does not exist");
 
-    #
-    #   Check, whether the csv_tables->{$table}->{file} attribute works
-    #
-    $dsn = "DBI:CSV:";
-    Test($state or ($dbh = DBI->connect($dsn)));
-    if (!$state) {
-	$dbh->{csv_tables}->{$table}->{file} =
-	    $haveFileSpec ? File::Spec->catfile($dir, $tableb)
-		: "$dir/$tableb";
-	print "Trying to create file $tableb in directory $dir.\n";
-    }
-    Test($state or $dbh->do($cquery))
-	or print("Cannot create table $table in directory $dir: ",
-		 $dbh->errstr);
-    Test($state
-	 or (-f ($haveFileSpec ? File::Spec->catfile($dir, $tableb)
-		 : "$dir/$tableb")))
-	or print("No such file in directory $dir: $tableb");
-    Test($state
-	 or ($dbh->do("DROP TABLE $table")
-	     and  !(-f ($haveFileSpec ?
-			File::Spec->catfile($dir, $table) : "$dir/$tableb"))))
-	or print("Cannot drop table $table in directory $dir: ",
-		 $dbh->errstr());
+ok (my $tbl3 = FindNewTable ($dbh),		"find new test table");
+ok (!-f DbFile ($tbl3),				"does not exist");
 
-}
+isnt ($tbl,  $tbl2,				"different 1 2");
+isnt ($tbl,  $tbl3,				"different 1 3");
+isnt ($tbl2, $tbl3,				"different 2 3");
 
+like (my $def = TableDefinition ($tbl, @tbl_def),
+	qr{^create table $tbl}i,		"table definition");
+ok ($dbh->do ($def),				"create table 1");
+ok (-f DbFile ($tbl),				"does exists");
+
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok (!-f DbFile ($tbl),				"does not exist");
+
+ok ($dbh->disconnect,				"disconnect");
+undef $dbh;
+
+my $dsn = "DBI:CSV:f_dir=$dir;csv_eol=\015\012;csv_sep_char=\\;;";
+ok ($dbh = Connect ($dsn),			"connect");
+
+ok ($dbh->do ($def),				"create table");
+ok (-f DbFile ($tbl),				"does exists");
+
+ok ($dbh->do ("insert into $tbl values (1, ?)", undef, "joe"),     "insert 1");
+ok ($dbh->do ("insert into $tbl values (2, ?)", undef, "Jochen;"), "insert 2");
+
+ok (my $sth = $dbh->prepare ("select * from $tbl"),	"prepare");
+ok ($sth->execute,				"execute");
+ok (my $row = $sth->fetch,			"fetch 1");
+is_deeply ($row, [ 1, "joe" ],			"content");
+ok (   $row = $sth->fetch,			"fetch 2");
+is_deeply ($row, [ 2, "Jochen;" ],		"content");
+ok ($sth->finish,				"finish");
+undef $sth;
+
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok (!-f DbFile ($tbl),				"does not exist");
+
+ok ($dbh->disconnect,				"disconnect");
+undef $dbh;
+
+$dsn = "DBI:CSV:";
+ok ($dbh = Connect ($dsn),			"connect");
+
+# Check, whether the csv_tables->{$tbl}{file} attribute works
+ok ($dbh->{csv_tables}{$tbl}{file} = DbFile ($tbl), "set table/file");
+ok ($dbh->do ($def),				"create table");
+ok (-f DbFile ($tbl),				"does exists");
+
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+
+ok ($dbh->disconnect,				"disconnect");
+undef $dbh;

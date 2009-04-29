@@ -4,25 +4,24 @@
 # whereever possible. For example, you define certain constants
 # here and the like.
 
-#use strict;
+use strict;
 
-use vars qw( $childPid );
 use File::Spec;
 
-my $test_dir      = File::Spec->catdir (File::Spec->curdir (), "output");
-my $test_dsn      = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$test_dir";
-my $test_user     = $ENV{DBI_USER} || "";
-my $test_password = $ENV{DBI_PASS} || "";
+my $test_dir  = File::Spec->catdir (File::Spec->curdir (), "output");
+my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$test_dir";
+my $test_user = $ENV{DBI_USER} || "";
+my $test_pass = $ENV{DBI_PASS} || "";
 
 sub COL_NULLABLE () { 1 }
 sub COL_KEY      () { 2 }
 
 my %v;
-eval "require $_; \$v->{'$_'} = \$_::VERSION;" for qw(
+eval "require $_; \$v{'$_'} = \$_::VERSION;" for qw(
     DBI SQL::Statement Text::CSV_XS DBD::CSV );
 
 if ($@) {
-    my @missing = grep { exists $v->{$_} } qw( DBI SQL CSV );
+    my @missing = grep { exists $v{$_} } qw( DBI SQL CSV );
     print STDERR "\n\nYOU ARE MISSING REQUIRED MODULES: [ @missing ]\n\n";
     exit 0;
     }
@@ -39,7 +38,7 @@ sub AnsiTypeToDb
 
     $uctype eq "BLOB" || $uctype eq "REAL" || $uctype eq "INTEGER" and
 	return $uctype;
-    
+
     $uctype eq "INT" and
 	return "INTEGER";
 
@@ -47,18 +46,13 @@ sub AnsiTypeToDb
     return $type;
     } # AnsiTypeToDb
 
-# This function generates a table definition based on an
-# input list. The input list consists of references, each
-# reference referring to a single column. The column
-# reference consists of column name, type, size and a bitmask of
-# certain flags, namely
+# This function generates a table definition based on an input list.  The input
+# list consists of references, each reference referring to a single column. The
+# column reference consists of column name, type, size and a bitmask of certain
+# flags, namely
 #
-#     COL_NULLABLE - true, if this column may contain NULL's
-#     COL_KEY      - true, if this column is part of the table's
-#                     primary key
-#
-# Hopefully there's no big need for you to modify this function,
-# if your database conforms to ANSI specifications.
+#   COL_NULLABLE - true, if this column may contain NULL's
+#   COL_KEY      - true, if this column is part of the table's primary key
 
 sub TableDefinition
 {
@@ -76,16 +70,18 @@ sub TableDefinition
 	push @colDefs, $colDef;
 	}
     my $keyDef = @keys ? ", PRIMARY KEY (" . join (", ", @keys) . ")" : "";
-    return sprintf "CREATE TABLE %s (%s%s)", $tablename, join (", ", @colDefs), $keyDef;
+    return sprintf "CREATE TABLE %s (%s%s)", $tablename,
+	join (", ", @colDefs), $keyDef;
     } # TableDefinition
 
 # This function generates a list of tables associated to a given DSN.
 sub ListTables
 {
-    my $dbh = shift;
+    my $dbh = shift or return;
 
     my @tables = $dbh->func ("list_tables");
-    $dbh->errstr and die "Cannot create table list: " . $dbh->errstr;
+    my $msg = $dbh->errstr || $DBI::errstr;
+    $msg and die "Cannot create table list: $msg";
     @tables;
     } # ListTables
 
@@ -156,10 +152,16 @@ sub Connect
     $dbh;
     } # Connect
 
+sub DbDir
+{
+    @_ and $test_dir = File::Spec->catdir (File::Spec->curdir (), shift);
+    $test_dir;
+    } # DbFile
+
 sub DbFile
 {
     my $file = shift or return;
-    return File::Spec->catdir ($test_dir, $file);
+    File::Spec->catdir ($test_dir, $file);
     } # DbFile
 
 1;
