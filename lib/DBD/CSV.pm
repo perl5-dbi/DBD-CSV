@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.30";
+$VERSION  = "0.25";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -168,7 +168,7 @@ sub open_table
 		}
 	    $tbl->{types} = $t;
 	    }
-	if (!$createMode and !$self->{ignore_missing_table} and $self->command ne 'DROP') {
+	if (!$createMode and !$self->{ignore_missing_table} and $self->command ne "DROP") {
 	    my $array;
 	    my $skipRows = exists $meta->{skip_rows}
 		? $meta->{skip_rows}
@@ -236,7 +236,7 @@ sub push_row
 	pop @$fields;
 	}
     $csv->print ($fh, $fields) or
-	croak "Error while writing file " . $self->{'file'} . ": $!";
+	croak "Error while writing file " . $self->{file} . ": $!";
     1;
     } # push_row
 *push_names = \&push_row;
@@ -425,8 +425,8 @@ To retrieve data, you can use the following:
     my $sth   = $dbh->prepare ($query);
     $sth->execute ();
     while (my $row = $sth->fetchrow_hashref) {
-        print "Found result row: id = ", $row->{'id'},
-              ", name = ", $row->{'name'};
+        print "Found result row: id = ", $row->{id},
+              ", name = ", $row->{name};
         }
     $sth->finish ();
 
@@ -565,7 +565,7 @@ These attributes and methods are not supported:
 In addition to the DBI attributes, you can use the following dbh
 attributes:
 
-=over 8
+=over 4
 
 =item f_dir
 
@@ -637,7 +637,7 @@ This hash ref is used for storing table dependent metadata. For any
 table it contains an element with the table name as key and another
 hash ref with the following attributes:
 
-=over 12
+=over 4
 
 =item file
 
@@ -739,7 +739,7 @@ L<Creating and dropping tables> above.
 
 =head1 KNOWN ISSUES
 
-=over 8
+=over 4
 
 =item *
 
@@ -747,6 +747,41 @@ The module is using flock () internally. However, this function is not
 available on platforms. Using flock () is disabled on MacOS and Windows
 95: There's no locking at all (perhaps not so important on these
 operating systems, as they are for single users anyways).
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item Tests
+
+ - eol     Make tests for different record separators.
+ - f_ext   Test f_ext possibilities.
+ - csv_xs  Test with a variety of combinations for
+           sep_char, quote_char, and escape_char testing
+ - errors  Make sure that all documented exceptions are tested.
+           . write to write-protected file
+           . read from badly formatted csv
+           . pass bad arguments to csv parser while fetching
+
+=item NULL
+
+Enable real NULL handling with blank_is_undef.
+
+=item Encoding
+
+Test how well UTF-8 is supported, if not (yet), enable UTF-8, and maybe
+even more.
+
+=item Documentation
+
+Expand on error-handling, and document all possible errors.
+Use Text::CSV_XS::error_diag () wherever possible.
+
+=item Examples
+
+Make more real-life examples from the docs in examples/
 
 =back
 

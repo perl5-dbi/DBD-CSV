@@ -23,4 +23,4 @@ t/51_commit.t
 t/60_misc.t
 t/70_csv.t
 t/lib.pl
-example/passwd.pl
+examples/passwd.pl

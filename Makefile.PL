@@ -38,6 +38,13 @@ my %wm = (
 	"DBD::File"      => 0.36,
 	"Test::More"     => 0,
 	},
+    clean        => {
+	FILES => join " ", qw(
+	    output
+	    cover_db
+	    valgrind.log
+	    )
+	},
     );
 $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 

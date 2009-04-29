@@ -1,4 +1,4 @@
-2009-04-26  H.Merijn Brand (0.30)
+2009-04-29  H.Merijn Brand (0.25)
 
     * Code cleanup (perlcritic, style, layout)
     * Implement f_exp
@@ -8,7 +8,8 @@
     * Cleaned up tests
     * Tests now use Test::More
     * Cut down README. No need to be a duplicate module pod
-    * 
+    * Added TODO to documentation
+    * Added examples/ from docs
 
 2005-08-10  Jeff Zucker <jzuckerATcpan.org> (0.23)
 
