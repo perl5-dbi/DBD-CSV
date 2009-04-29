@@ -41,10 +41,11 @@ if ($check) {
     eval { Parse::CPAN::Meta::Load ($yml) };
     $@ and die "$@\n";
 
-    print "Checking if 5.005 is still OK as minimal version for examples\n";
+    my $reqvsn = $h->{requires}{perl};
+    print "Checking if $reqvsn is still OK as minimal version for examples\n";
     use Test::MinimumVersion;
     # All other minimum version checks done in xt
-    all_minimum_version_ok ("5.005", { paths => [ "t", "lib" ]});
+    all_minimum_version_ok ($reqvsn, { paths => [ "t", "lib" ]});
     }
 elsif ($opt_v) {
     print @yml;
