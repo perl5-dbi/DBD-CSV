@@ -6,9 +6,11 @@ $^W = 1;
 
 my @MODULES = ( "Test::CPAN::Meta 0.12" );
 
+my $has_meta = -f "META.yml";
+
 # Don't run tests during end-user installs
 use Test::More;
-$ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING} or
+$ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING} || !$has_meta or
     plan skip_all => "Author tests not required for installation";
 
 # Load the testing modules
@@ -20,7 +22,6 @@ foreach my $MODULE (@MODULES) {
 	: plan skip_all => "$MODULE not available for testing";
     }
 
-my $has_meta = -f "META.yml";
 !$has_meta && -x "sandbox/genMETA.pl" and
     qx{ perl sandbox/genMETA.pl -v > META.yml };
 
