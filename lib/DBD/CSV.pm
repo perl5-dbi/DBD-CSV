@@ -118,6 +118,30 @@ $DBD::CSV::st::imp_data_size = 0;
 
 @DBD::CSV::st::ISA = qw(DBD::File::st);
 
+sub FETCH
+{
+    my ($sth, $attr) = @_;
+
+    my $struct = $sth->{f_stmt}{struct} || {};
+    my @cols = @{ $struct->{column_names} || [] };
+
+    $attr eq "TYPE"      and
+	return [ map { $struct->{column_defs}{$_}{data_type}   || "CHAR" }
+		    @cols ];
+
+    $attr eq "PRECISION" and
+	return [ map { $struct->{column_defs}{$_}{data_length} || 0 }
+		    @cols ];
+
+    $attr eq "NULLABLE"  and
+	return [ map { ( grep m/^NOT NULL$/ =>
+		    @{ $struct->{column_defs}{$_}{constraints} || [] } )
+		       ? 0 : 1 }
+		    @cols ];
+
+    return $sth->SUPER::FETCH ($attr);
+    } # FETCH
+
 package DBD::CSV::Statement;
 
 use strict;
@@ -136,15 +160,15 @@ sub open_table
     unless ($csv_in) {
 	my %opts  = ( binary => 1 );
 
+	# Allow specific Text::CSV_XS options
 	foreach my $key (grep m/^csv_/ => keys %$dbh) {
 	    (my $attr = $key) =~ s/csv_//;
-	    $attr =~ m{^(?: eol | sep | quote | escape 
-			  | tables | sql_parser_object
-			  | sponge_driver
+	    $attr =~ m{^(?: eol | sep | quote | escape	# Handled below
+			  | tables | sql_parser_object	# Not for Text::CSV_XS
+			  | sponge_driver		# internal
 			  )$}x and next;
 	    $opts{$attr} = $dbh->{$_};
 	    }
-	#use Data::Peek; DDumper \%opts;
 
 	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
 	my $eol   = $meta->{eol}   || $dbh->{csv_eol}   || "\r\n";
