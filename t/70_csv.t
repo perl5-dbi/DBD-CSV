@@ -96,5 +96,22 @@ is ($dbh->{f_ext},		".csv",		"f_ext set");
 is ($dbh->{csv_sep_char},	";",		"sep_char set");
 is ($dbh->{csv_blank_is_undef},	1,		"blank_is_undef set");
 
+ok ($dbh->do ($def),				"create table");
+ok (-f DbFile ($tbl).".csv",			"does exists");
+ok ($sth = $dbh->prepare ("insert into $tbl values (?, ?, ?)"), "prepare");
+#is ($sth->{blank_is_undef},	1,		"blank_is_undef");
+eval {
+    local $SIG{__WARN__} = sub { };
+    is ($sth->execute (1, ""), undef,		"not enough values");
+    like ($dbh->errstr, qr/passed 2 parameters where 3 required/, "error message");
+    is ($sth->execute (1, "", 1, ""), undef,	"too many values");
+    like ($dbh->errstr, qr/passed 4 parameters where 3 required/, "error message");
+    };
+ok ($sth->execute ($_, undef, "Code $_"),	"insert $_") for 0 .. 9;
+
+ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok (!-f DbFile ($tbl),				"does not exist");
+ok (!-f DbFile ($tbl).".csv",			"does not exist");
+
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;
