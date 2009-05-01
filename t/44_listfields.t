@@ -37,8 +37,8 @@ is_deeply ($sth->{NAME_lc_hash},
 # TODO tests
 #s ($sth->{TYPE}[0], &SQL_INTEGER,		"TYPE 1");
 #s ($sth->{TYPE}[1], &SQL_VARCHAR,		"TYPE 2");
-#s ($sth->{PRECISION}[0], 4,			"PRECISION 1");
-#s ($sth->{PRECISION}[1], 64,			"PRECISION 2");
+is ($sth->{PRECISION}[0], undef,		"PRECISION 1");
+is ($sth->{PRECISION}[1], undef,		"PRECISION 2");
 #s ($sth->{NULLABLE}[0], 0,			"NULLABLE 1");
 #s ($sth->{NULLABLE}[1], 1,			"NULLABLE 2");
 
