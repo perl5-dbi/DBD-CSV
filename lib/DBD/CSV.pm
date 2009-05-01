@@ -128,15 +128,26 @@ use Carp;
 sub open_table
 {
     my ($self, $data, $table, $createMode, $lockMode) = @_;
-    my $dbh = $data->{Database};
+    my $dbh    = $data->{Database};
     my $tables = $dbh->{csv_tables};
-    $tables->{$table} ||= {};
-    my $meta = $tables->{$table} || {};
+       $tables->{$table} ||= {};
+    my $meta   = $tables->{$table} || {};
     my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
     unless ($csv_in) {
-	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
 	my %opts  = ( binary => 1 );
-	my $eol   = $meta->{eol} || $dbh->{csv_eol} || "\r\n";
+
+	foreach my $key (grep m/^csv_/ => keys %$dbh) {
+	    (my $attr = $key) =~ s/csv_//;
+	    $attr =~ m{^(?: eol | sep | quote | escape 
+			  | tables | sql_parser_object
+			  | sponge_driver
+			  )$}x and next;
+	    $opts{$attr} = $dbh->{$_};
+	    }
+	#use Data::Peek; DDumper \%opts;
+
+	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
+	my $eol   = $meta->{eol}   || $dbh->{csv_eol}   || "\r\n";
 	$eol =~ m/^\A(?:[\r\n]|\r\n)\Z/ or $opts{eol} = $eol;
 	for ([ "sep",    ',' ],
 	     [ "quote",  '"' ],
@@ -147,9 +158,11 @@ sub open_table
 		exists $meta->{$attr} ? $meta->{$attr} :
 		    exists $dbh->{"csv_$attr"} ? $dbh->{"csv_$attr"} : $def;
 	    }
-	$meta->{csv_in}  = $class->new (\%opts);
+	$meta->{csv_in}  = $class->new (\%opts) or
+	    $class->error_diag;
 	$opts{eol} = $eol;
-	$meta->{csv_out} = $class->new (\%opts);
+	$meta->{csv_out} = $class->new (\%opts) or
+	    $class->error_diag;
 	}
     my $file = $meta->{file} || $table;
     my $tbl  = $self->SUPER::open_table ($data, $file, $createMode, $lockMode);
@@ -232,7 +245,7 @@ sub push_row
 
     # Remove undef from the right end of the fields, so that at least
     # in these cases undef is returned from FetchRow
-    while (@$fields && !defined $fields->[$#$fields]) {
+    while (@$fields && !defined $fields->[-1]) {
 	pop @$fields;
 	}
     $csv->print ($fh, $fields) or
@@ -400,16 +413,16 @@ with '/', './' or '../' and they must not contain white space.
 The following examples insert some data in a table and fetch it back:
 First all data in the string:
 
-    $dbh->do ("INSERT INTO $table VALUES (1, "
-             . $dbh->quote ("foobar") . ")");
+    $dbh->do ("INSERT INTO $table VALUES (1, ".
+               $dbh->quote ("foobar") . ")");
 
 Note the use of the quote method for escaping the word 'foobar'. Any
 string must be escaped, even if it doesn't contain binary data.
 
 Next an example using parameters:
 
-    $dbh->do ("INSERT INTO $table VALUES (?, ?)", undef,
-             2, "It's a string!");
+    $dbh->do ("INSERT INTO $table VALUES (?, ?)", undef, 2,
+              "It's a string!");
 
 Note that you don't need to use the quote method here, this is done
 automatically for you. This version is particularly well designed for
@@ -542,6 +555,10 @@ Valid after C<$sth-E<gt>execute>
 Valid after C<$sth-E<gt>prepare>
 
 =item NAME
+
+=item NAME_lc
+
+=item NAME_uc
 
 Valid after C<$sth-E<gt>execute>; undef for Non-Select statements.
 
@@ -779,6 +796,14 @@ Attack all open DBD::CSV bugs in RT
 Expand on error-handling, and document all possible errors.
 Use Text::CSV_XS::error_diag () wherever possible.
 
+=item Attributes
+
+Allow connect () flags as attributes instead of only by DSN.
+
+=item Debugging
+
+Implement and document dbd_verbose.
+
 =item NULL
 
 Enable real NULL handling with blank_is_undef.
@@ -787,6 +812,11 @@ Enable real NULL handling with blank_is_undef.
 
 Test how well UTF-8 is supported, if not (yet), enable UTF-8, and maybe
 even more.
+
+=item Data dictionary
+
+Investigate the possibility to store the data dictionary in a file like
+.sys$columns that can store the field attributes (type, key, nullable).
 
 =item Examples
 

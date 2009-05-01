@@ -7,8 +7,9 @@ BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
 
 my @tbl_def = (
-    [ "id",   "INTEGER",  4, 0 ],
-    [ "name", "CHAR",    64, 0 ],
+    [ "id",   "INTEGER",  4, &COL_KEY		],
+    [ "str",  "CHAR",    64, &COL_NULLABLE	],
+    [ "name", "CHAR",    64, &COL_NULLABLE	],
     );
 
 sub DbFile;
@@ -50,15 +51,15 @@ ok ($dbh = Connect ($dsn),			"connect");
 ok ($dbh->do ($def),				"create table");
 ok (-f DbFile ($tbl),				"does exists");
 
-ok ($dbh->do ("insert into $tbl values (1, ?)", undef, "joe"),     "insert 1");
-ok ($dbh->do ("insert into $tbl values (2, ?)", undef, "Jochen;"), "insert 2");
+ok ($dbh->do ("insert into $tbl values (1, 1, ?)", undef, "joe"),     "insert 1");
+ok ($dbh->do ("insert into $tbl values (2, 2, ?)", undef, "Jochen;"), "insert 2");
 
 ok (my $sth = $dbh->prepare ("select * from $tbl"),	"prepare");
 ok ($sth->execute,				"execute");
 ok (my $row = $sth->fetch,			"fetch 1");
-is_deeply ($row, [ 1, "joe" ],			"content");
+is_deeply ($row, [ 1, "1", "joe" ],		"content");
 ok (   $row = $sth->fetch,			"fetch 2");
-is_deeply ($row, [ 2, "Jochen;" ],		"content");
+is_deeply ($row, [ 2, "2", "Jochen;" ],		"content");
 ok ($sth->finish,				"finish");
 undef $sth;
 
@@ -77,6 +78,23 @@ ok ($dbh->do ($def),				"create table");
 ok (-f DbFile ($tbl),				"does exists");
 
 ok ($dbh->do ("drop table $tbl"),		"drop table");
+
+ok ($dbh->disconnect,				"disconnect");
+undef $dbh;
+
+ok ($dbh = DBI->connect ("dbi:CSV:", "", "", {
+    f_dir		=> DbDir (),
+    f_ext		=> ".csv",
+    dbd_verbose		=> 8,
+    csv_sep_char	=> ";",
+    csv_blank_is_undef	=> 1,
+    csv_always_quote	=> 1,
+    }),						"connect with attr");
+
+is ($dbh->{dbd_verbose},	8,		"dbd_verbose set");
+is ($dbh->{f_ext},		".csv",		"f_ext set");
+is ($dbh->{csv_sep_char},	";",		"sep_char set");
+is ($dbh->{csv_blank_is_undef},	1,		"blank_is_undef set");
 
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;
