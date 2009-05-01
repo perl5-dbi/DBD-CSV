@@ -122,6 +122,8 @@ sub FETCH
 {
     my ($sth, $attr) = @_;
 
+    # Being a bit dirty here, as SQL::Statement::Structure does not offer
+    # me an interface to the data I want
     my $struct = $sth->{f_stmt}{struct} || {};
     my @cols = @{ $struct->{column_names} || [] };
 
