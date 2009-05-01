@@ -252,12 +252,13 @@ sub fetch_row
 	$fields = delete $self->{cached_row};
 	}
     else {
-	$! = 0;
 	my $csv  = $self->{csv_csv_in};
-	unless ($fields = $csv->getline ($self->{fh})) {
-	    $! and croak "Error while reading file " . $self->{file} . ": $!";
-	    $csv->eof or $csv->error_diag;
-	    return;
+	eval { $fields = $csv->getline ($self->{fh}) };
+	unless ($fields) {
+	    $csv->eof and return;
+
+	    my @diag = $csv->error_diag;
+	    croak "Error $diag[0] while reading file $self->{file}: $diag[1]";
 	    }
 	}
     $self->{row} = (@$fields ? $fields : undef);
@@ -274,8 +275,10 @@ sub push_row
     while (@$fields && !defined $fields->[-1]) {
 	pop @$fields;
 	}
-    $csv->print ($fh, $fields) or
-	croak "Error while writing file " . $self->{file} . ": $!";
+    unless ($csv->print ($fh, $fields)) {
+	my @diag = $csv->error_diag;
+	croak "Error $diag[0] while writing file $self->{file}: $diag[1]";
+	}
     1;
     } # push_row
 *push_names = \&push_row;
