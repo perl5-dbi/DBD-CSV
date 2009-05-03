@@ -825,10 +825,6 @@ Attack all open DBD::CSV bugs in RT
 Expand on error-handling, and document all possible errors.
 Use Text::CSV_XS::error_diag () wherever possible.
 
-=item Attributes
-
-Allow connect () flags as attributes instead of only by DSN.
-
 =item Debugging
 
 Implement and document dbd_verbose.
