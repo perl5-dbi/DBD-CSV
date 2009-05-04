@@ -22,6 +22,7 @@ t/50_chopblanks.t
 t/51_commit.t
 t/60_misc.t
 t/70_csv.t
+t/71_csv-ext.t
 t/80_rt.t
 t/lib.pl
 examples/passwd.pl

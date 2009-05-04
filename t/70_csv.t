@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More "no_plan";
+use Test::More tests => 66;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
