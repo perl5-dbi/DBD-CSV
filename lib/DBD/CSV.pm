@@ -76,7 +76,6 @@ $DBD::CSV::dr::data_sources_attr = undef;
 sub connect
 {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
-#   $dbname =~ m/\bf_ext=/i or $dbname .= ";f_ext=.csv";
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
     $dbh->{csv_tables} ||= {};
     $dbh->{Active}       = 1;
@@ -623,6 +622,17 @@ directory ("."). However, it is overwritable in the statement handles.
 
 This attribute is used for setting the file extension.
 
+=item f_schema
+
+This attribute allows you to set the database schema name. The default
+is to use the user name. C<undef> is allowed, but not in the DSN part.
+
+    my $dbh = DBI->connect ("dbi:CSV:", "", "", {
+        f_schema => undef,
+        f_dir    => "data",
+        f_ext    => ".csv/r",
+        }) or die $DBI::errstr;
+
 =item csv_eol
 
 =item csv_sep_char
@@ -804,14 +814,17 @@ operating systems, as they are for single users anyways).
 
 Aim for a full 100% code coverage
 
- - eol     Make tests for different record separators.
- - f_ext   Test f_ext possibilities.
- - csv_xs  Test with a variety of combinations for
-           sep_char, quote_char, and escape_char testing
- - errors  Make sure that all documented exceptions are tested.
-           . write to write-protected file
-           . read from badly formatted csv
-           . pass bad arguments to csv parser while fetching
+ - eol      Make tests for different record separators.
+ - case     case sensitive table names (Foo.CSV + "select * from foo")
+ - f_ext    Test f_ext possibilities.
+ - f_schema Allow other schema names, including undef
+ - csv_xs   Test with a variety of combinations for
+            sep_char, quote_char, and escape_char testing
+ - quoting  $dbh->do ("drop table $_") for DBI-tables ();
+ - errors   Make sure that all documented exceptions are tested.
+            . write to write-protected file
+            . read from badly formatted csv
+            . pass bad arguments to csv parser while fetching
 
 Add tests that specifically test DBD::File functionality where
 that is useful.
