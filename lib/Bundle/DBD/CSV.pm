@@ -39,7 +39,7 @@ This module is currently maintained by
 
     H.Merijn Brand <h.m.brand@xs4all.nl>
 
-=COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2009      by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
