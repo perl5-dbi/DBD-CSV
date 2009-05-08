@@ -11,8 +11,6 @@ my @tbl_def = (
     [ "name", "CHAR",    64, 0 ],
     );
 
-my $dbh;
-
 my $dir = DbDir () || "output";
 
 ok (my $dbh = DBI->connect ("dbi:CSV:", "", "", {

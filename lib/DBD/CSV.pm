@@ -625,7 +625,7 @@ This attribute is used for setting the file extension.
 =item f_schema
 
 This attribute allows you to set the database schema name. The default
-is to use the user name. C<undef> is allowed, but not in the DSN part.
+is to use the owner of C<f_dir>. C<undef> is allowed, but not in the DSN part.
 
     my $dbh = DBI->connect ("dbi:CSV:", "", "", {
         f_schema => undef,
@@ -677,7 +677,6 @@ To handle this file, you'd do this:
 
   $dbh->{eol}      = "\n__ENDREC__\n" ,
   $dbh->{sep_char} = "\n"
-
 
 The attributes are used to create an instance of the class I<csv_class>,
 by default Text::CSV_XS. Alternatively you may pass an instance as
