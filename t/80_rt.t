@@ -89,6 +89,7 @@ while (<DATA>) {
 	);
 
     ok (my $dbh = Connect (),					"connect");
+    $dbh->{csv_null} = 1;
 
     foreach my $t (@tbl) {
 	like (my $def = TableDefinition ($t->[0], @{$t->[1]}),
