@@ -1,4 +1,4 @@
-2009-05-05  H.Merijn Brand (0.25)
+2009-05-08  H.Merijn Brand (0.25)
 
     * Raised minimum perl version to 5.005_03
     * Code cleanup (perlcritic, style, layout)
@@ -12,6 +12,8 @@
     * Cut down README. No need to be a duplicate module pod
     * Added TODO to documentation
     * Added examples/ from docs
+    * Add csv_null
+    * Add csv_* to pass to the parser
 
 2005-08-10  Jeff Zucker <jzuckerATcpan.org> (0.23)
 

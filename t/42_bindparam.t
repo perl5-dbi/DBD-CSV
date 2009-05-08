@@ -18,6 +18,7 @@ my @tbl_def = (
     );
 
 ok (my $dbh = Connect (),			"connect");
+$dbh->{csv_null} = 1;
 
 ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
@@ -55,6 +56,7 @@ undef $dbh;
 
 # And now retreive the rows using bind_columns
 ok ($dbh = Connect (),				"connect");
+$dbh->{csv_null} = 1;
 
 ok ($sth = $dbh->prepare ("select * from $tbl order by id"),	"prepare");
 ok ($sth->execute,				"execute");

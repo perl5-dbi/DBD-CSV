@@ -168,8 +168,10 @@ sub open_table
 			  | tables | sql_parser_object	# Not for Text::CSV_XS
 			  | sponge_driver		# internal
 			  )$}x and next;
-	    $opts{$attr} = $dbh->{$_};
+	    $opts{$attr} = $dbh->{$key};
 	    }
+	delete $opts{null} and
+	    $opts{blank_is_undef} = $opts{always_quote} = 1;
 
 	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
 	my $eol   = $meta->{eol}   || $dbh->{csv_eol}   || "\r\n";
@@ -269,11 +271,6 @@ sub push_row
     my $csv = $self->{csv_csv_out};
     my $fh  = $self->{fh};
 
-    # Remove undef from the right end of the fields, so that at least
-    # in these cases undef is returned from FetchRow
-    while (@$fields && !defined $fields->[-1]) {
-	pop @$fields;
-	}
     unless ($csv->print ($fh, $fields)) {
 	my @diag = $csv->error_diag;
 	croak "Error $diag[0] while writing file $self->{file}: $diag[1]";
@@ -686,11 +683,35 @@ attribute I<must> be set to a true value in that case.
 Additionally you may overwrite these attributes on a per-table base in
 the I<csv_tables> attribute.
 
+=item csv_null
+
+With this option set, all new statement handles will set C<always_quote>
+and C<blank_is_undef> in the CSV parser and writer, so it knows how to
+distinquish between the empty string and C<undef> or C<NULL>. You cannot
+reset it with a false value. You can pass it to connect, or set it later:
+
+  $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_null => 1 });
+
+  $dbh->{csv_null} = 1;
+
 =item csv_tables
 
 This hash ref is used for storing table dependent metadata. For any
 table it contains an element with the table name as key and another
 hash ref with the following attributes:
+
+=item csv_*
+
+All other attributes that start with C<csv_> and are not described above
+will be passed to C<Text::CSV_XS> (without the C<csv_> prefix). these
+extra options are most likely to be only useful for reading (select)
+handles. Examples:
+
+  $dbh->{csv_allow_whitespace}    = 1;
+  $dbh->{csv_allow_loose_quotes}  = 1;
+  $dbh->{csv_allow_loose_escapes} = 1;
+
+See the C<Text::CSV_XS> documentation for the full list and the documentation.
 
 =over 4
 
@@ -840,10 +861,6 @@ Use Text::CSV_XS::error_diag () wherever possible.
 =item Debugging
 
 Implement and document dbd_verbose.
-
-=item NULL
-
-Enable real NULL handling with blank_is_undef.
 
 =item Encoding
 
