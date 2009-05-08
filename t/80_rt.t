@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/perl
 
 use strict;
 $^W = 1;
@@ -69,6 +69,50 @@ while (<DATA>) {
 	};
     ok ($sth->finish,						"finish");
     ok ($dbh->do ("drop table rt$rt"),				"drop table");
+    ok ($dbh->disconnect,					"disconnect");
+    }
+
+{   $rt = 43010;
+    ok ($rt, "RT-$rt - $desc{$rt}");
+
+    my @tbl = (
+	[ "rt${rt}_0" => [
+	    [ "id",   "INTEGER", 4, &COL_KEY		],
+	    [ "one",  "INTEGER", 4, &COL_NULLABLE	],
+	    [ "two",  "INTEGER", 4, &COL_NULLABLE	],
+	    ]],
+	[ "rt${rt}_1" => [
+	    [ "id",   "INTEGER", 4, &COL_KEY		],
+	    [ "thre", "INTEGER", 4, &COL_NULLABLE	],
+	    [ "four", "INTEGER", 4, &COL_NULLABLE	],
+	    ]],
+	);
+
+    ok (my $dbh = Connect (),					"connect");
+
+    foreach my $t (@tbl) {
+	like (my $def = TableDefinition ($t->[0], @{$t->[1]}),
+		qr{^create table $t->[0]}i,			"table def");
+	ok ($dbh->do ($def),					"create table");
+	}
+
+    ok ($dbh->do ("INSERT INTO $tbl[0][0] (id, one)  VALUES (8, 1)"), "insert 1");
+    ok ($dbh->do ("INSERT INTO $tbl[1][0] (id, thre) VALUES (8, 3)"), "insert 2");
+
+    ok (my $row = $dbh->selectrow_hashref (join (" ",
+	"SELECT *",
+	"FROM   $tbl[0][0]",
+	"JOIN   $tbl[1][0]",
+	"USING  (id)")),					"join 1 2");
+
+    TODO: {
+	local $TODO = "NULL handling not finished yet";
+
+	is_deeply ($row, { id => 8,
+	    one => 1, two => undef, thre => 3, four => undef }, "content");
+	}
+
+    ok ($dbh->do ("drop table $_"),	"drop table") for map { $_->[0] } @tbl;
     ok ($dbh->disconnect,					"disconnect");
     }
 
