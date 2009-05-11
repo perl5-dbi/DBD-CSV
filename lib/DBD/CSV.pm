@@ -19,7 +19,7 @@
 #   General Public License or the Artistic License, as specified in
 #   the Perl README file.
 
-require 5.004;
+require 5.005003;
 use strict;
 
 require DynaLoader;
@@ -72,6 +72,8 @@ use vars qw( @ISA @CSV_TYPES );
 
 $DBD::CSV::dr::imp_data_size     = 0;
 $DBD::CSV::dr::data_sources_attr = undef;
+
+$DBD::CSV::ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 sub connect
 {
@@ -835,9 +837,10 @@ operating systems, as they are for single users anyways).
 Aim for a full 100% code coverage
 
  - eol      Make tests for different record separators.
- - case     case sensitive table names (Foo.CSV + "select * from foo")
- - f_ext    Test f_ext possibilities.
- - f_schema Allow other schema names, including undef
+ - case     case sensitive table names
+	    . Foo.CSV + qq{select * from  foo } => PASS
+	    . Foo     + qq{select * from  foo } => PASS
+	    . Foo     + qq{select * from "foo"} => FAIL
  - csv_xs   Test with a variety of combinations for
             sep_char, quote_char, and escape_char testing
  - quoting  $dbh->do ("drop table $_") for DBI-tables ();
