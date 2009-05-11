@@ -210,14 +210,14 @@ sub open_table
 		}
 	    $tbl->{types} = $t;
 	    }
-	if (!$createMode and !$self->{ignore_missing_table} and $self->command ne "DROP") {
+	if ( !$createMode and
+	     !$self->{ignore_missing_table} and $self->command ne "DROP") {
 	    my $array;
 	    my $skipRows = exists $meta->{skip_rows}
 		? $meta->{skip_rows}
 		: exists $meta->{col_names} ? 0 : 1;
 	    if ($skipRows--) {
-		$array = $tbl->fetch_row ($data) or
-		    croak "Missing first row";
+		$array = $tbl->fetch_row ($data) or croak "Missing first row";
 		$tbl->{col_names} = $array;
 		while ($skipRows--) {
 		    $tbl->fetch_row ($data);
