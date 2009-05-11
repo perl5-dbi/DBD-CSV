@@ -47,6 +47,15 @@ while (<DATA>) {
     ok ($dbh->disconnect,					"disconnect");
     }
 
+{   $rt = 20550;
+    ok ($rt, "RT-$rt - $desc{$rt}");
+
+    ok (my $dbh = Connect (),					"connect");
+    ok ($dbh->do ("CREATE TABLE rt$rt(test INT, PRIMARY KEY (test))"),	"prepare");
+    ok ($dbh->do ("drop table rt$rt"),				"drop table");
+    ok ($dbh->disconnect,					"disconnect");
+    }
+
 {   $rt = 33764;
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
