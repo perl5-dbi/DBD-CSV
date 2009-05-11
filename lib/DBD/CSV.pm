@@ -195,7 +195,7 @@ sub open_table
 	}
     my $file = $meta->{file} || $table;
     my $tbl  = $self->SUPER::open_table ($data, $file, $createMode, $lockMode);
-    if ($tbl) {
+    if ($tbl && $tbl->{fh}) {
 	$tbl->{csv_csv_in}  = $meta->{csv_in};
 	$tbl->{csv_csv_out} = $meta->{csv_out};
 	if (my $types = $meta->{types}) {
@@ -250,19 +250,20 @@ use Carp;
 sub fetch_row
 {
     my ($self, $data) = @_;
-    my $fields;
-    if (exists $self->{cached_row}) {
-	$fields = delete $self->{cached_row};
-	}
-    else {
-	my $csv  = $self->{csv_csv_in};
-	eval { $fields = $csv->getline ($self->{fh}) };
-	unless ($fields) {
-	    $csv->eof and return;
 
-	    my @diag = $csv->error_diag;
-	    croak "Error $diag[0] while reading file $self->{file}: $diag[1]";
-	    }
+    exists $self->{cached_row} and
+	return $self->{row} = delete $self->{cached_row};
+
+    my $csv = $self->{csv_csv_in} or
+	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
+
+    my $fields;
+    eval { $fields = $csv->getline ($self->{fh}) };
+    unless ($fields) {
+	$csv->eof and return;
+
+	my @diag = $csv->error_diag;
+	croak "Error $diag[0] while reading file $self->{file}: $diag[1]";
 	}
     $self->{row} = (@$fields ? $fields : undef);
     } # fetch_row
@@ -347,7 +348,7 @@ a later release
 
 a simple SQL engine B<this module defines all of the SQL syntax for
 DBD::CSV, new SQL support is added with each release so you should
-look for updates to SQL::Statement regularly>
+look for updates to SQL::Statement regularly.
 
 =item Text::CSV_XS
 
@@ -385,10 +386,12 @@ Features include joins, aliases, built-in and user-defined functions,
 and more.  See L<SQL::Statement::Sytax> for a description of the SQL
 syntax supported in DBD::CSV.
 
+Table names are case insensitive unless quoted.
+
 =head1 Using DBD-CSV with DBI
 
-For most things, DBD-CSV operates the same as any DBI driver.  See L<DBI> for detailed usage.
-
+For most things, DBD-CSV operates the same as any DBI driver.
+See L<DBI> for detailed usage.
 
 =head2 Creating a database handle
 
@@ -837,10 +840,6 @@ operating systems, as they are for single users anyways).
 Aim for a full 100% code coverage
 
  - eol      Make tests for different record separators.
- - case     case sensitive table names
-	    . Foo.CSV + qq{select * from  foo } => PASS
-	    . Foo     + qq{select * from  foo } => PASS
-	    . Foo     + qq{select * from "foo"} => FAIL
  - csv_xs   Test with a variety of combinations for
             sep_char, quote_char, and escape_char testing
  - quoting  $dbh->do ("drop table $_") for DBI-tables ();
