@@ -144,11 +144,12 @@ sub ServerError
 
 sub Connect
 {
+    my $attr = @_ && ref $_[-1] eq "HASH" ? pop @_ : {};
     my ($dsn, $usr, $pass) = @_;
     $dsn  ||= $test_dsn;
     $usr  ||= $test_user;
     $pass ||= $test_pass;
-    my $dbh = DBI->connect ($dsn, $usr, $pass) or ServerError;
+    my $dbh = DBI->connect ($dsn, $usr, $pass, $attr) or ServerError;
     $dbh;
     } # Connect
 

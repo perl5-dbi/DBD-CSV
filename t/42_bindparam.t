@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 40;
+use Test::More tests => 41;
 
 # Test if bindparam () works
 $^W = 1;
@@ -18,7 +18,7 @@ my @tbl_def = (
     );
 
 ok (my $dbh = Connect (),			"connect");
-$dbh->{csv_null} = 1;
+ok ($dbh->{csv_null} = 1,			"Allow NULL");
 
 ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 
@@ -55,8 +55,7 @@ undef $dbh;
 
 
 # And now retreive the rows using bind_columns
-ok ($dbh = Connect (),				"connect");
-$dbh->{csv_null} = 1;
+ok ($dbh = Connect ({ csv_null => 1 }),		"connect");
 
 ok ($sth = $dbh->prepare ("select * from $tbl order by id"),	"prepare");
 ok ($sth->execute,				"execute");
