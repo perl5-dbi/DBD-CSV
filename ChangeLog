@@ -1,4 +1,4 @@
-2009-05-08  H.Merijn Brand (0.25)
+2009-05-12  H.Merijn Brand (0.25)
 
     * Raised minimum perl version to 5.005_03
     * Code cleanup (perlcritic, style, layout)
@@ -14,6 +14,8 @@
     * Added examples/ from docs
     * Add csv_null
     * Add csv_* to pass to the parser
+    * Improved error handling and reporting
+    * Table names case sensitiveness
 
 2005-08-10  Jeff Zucker <jzuckerATcpan.org> (0.23)
 
