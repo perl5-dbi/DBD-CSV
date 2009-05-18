@@ -1,6 +1,8 @@
-2009-05-12  H.Merijn Brand (0.25)
+2009-05-14  H.Merijn Brand (0.25)
 
     * Raised minimum perl version to 5.005_03
+    * Requires Text::CSV_XS 0.43 (needs eof () method and
+      error_diag ())
     * Code cleanup (perlcritic, style, layout)
     * Implemented f_ext
     * Implemented f_schema (in DBD::File)

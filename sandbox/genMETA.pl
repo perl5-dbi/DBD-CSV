@@ -82,7 +82,7 @@ requires:
     Text::CSV_XS:        0.43
 recommends:     
     perl:                5.008005
-    Text::CSV_XS:        0.64
+    Text::CSV_XS:        0.65
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
