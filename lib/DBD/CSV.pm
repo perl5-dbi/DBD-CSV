@@ -341,18 +341,24 @@ available from any CPAN mirror, for example
 
 =item DBI
 
-the DBI (Database independent interface for Perl), version 1.00 or
+The DBI (Database independent interface for Perl), version 1.00 or
 a later release
+
+=item DBD::File
+
+This is the base class for DBD::CSV, and it is included in the DBI
+distribution. As DBD::CSV requires version 0.37 or newer for DBD::File
+it effectively requires DBI version 1.609 or newer.
 
 =item SQL::Statement
 
-a simple SQL engine B<this module defines all of the SQL syntax for
+A simple SQL engine. This module defines all of the SQL syntax for
 DBD::CSV, new SQL support is added with each release so you should
 look for updates to SQL::Statement regularly.
 
 =item Text::CSV_XS
 
-this module is used for writing rows to or reading rows from CSV files.
+This module is used for writing rows to or reading rows from CSV files.
 
 =back
 
