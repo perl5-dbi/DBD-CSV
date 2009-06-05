@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 41;
+use Test::More tests => 48;
 
 # Test if bindparam () works
 $^W = 1;
@@ -79,6 +79,16 @@ ok ($sth->fetch,				"fetch");
 is ($id,	5,				"id   5");
 is ($name,	undef,				"name 5");
 
+ok ($sth->finish,				"finish");
+undef $sth;
+
+ok ($sth = $dbh->prepare ("update $tbl set name = ? where id = ?"), "prepare update");
+is ($sth->execute ("Tux", 5), 1,		"update");
+ok ($sth->finish,				"finish");
+undef $sth;
+ok ($sth = $dbh->prepare ("update $tbl set id = ? where name = ?"), "prepare update");
+is ($sth->execute (5, "Tux"), 1,		"update");
+is ($sth->execute (6, ""),    "0E0",		"update");
 ok ($sth->finish,				"finish");
 undef $sth;
 
