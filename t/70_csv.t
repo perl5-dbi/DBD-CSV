@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 66;
+use Test::More tests => 67;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
@@ -21,7 +21,7 @@ ok (my $dbh = Connect (),			"connect");
 is ($dbh->{f_dir},  $dir,			"default dir");
 ok ($dbh->{f_dir} = $dir,			"set f_dir");
 
-ok (my $tbl = FindNewTable ($dbh),		"find new test table");
+ok (my $tbl  = FindNewTable ($dbh),		"find new test table");
 ok (!-f DbFile ($tbl),				"does not exist");
 
 ok (my $tbl2 = FindNewTable ($dbh),		"find new test table");
@@ -98,12 +98,16 @@ is ($dbh->{csv_blank_is_undef},	1,		"blank_is_undef set");
 
 ok ($dbh->do ($def),				"create table");
 ok (-f DbFile ($tbl).".csv",			"does exists");
-ok ($sth = $dbh->prepare ("insert into $tbl values (?, ?, ?)"), "prepare");
 #is ($sth->{blank_is_undef},	1,		"blank_is_undef");
 eval {
     local $SIG{__WARN__} = sub { };
+
+    ok ($sth = $dbh->prepare ("insert into $tbl values (?, ?, ?)"), "prepare");
     is ($sth->execute (1, ""), undef,		"not enough values");
     like ($dbh->errstr, qr/passed 2 parameters where 3 required/, "error message");
+
+    # Cannot use the same handle twice. SQL::Statement bug
+    ok ($sth = $dbh->prepare ("insert into $tbl values (?, ?, ?)"), "prepare");
     is ($sth->execute (1, "", 1, ""), undef,	"too many values");
     like ($dbh->errstr, qr/passed 4 parameters where 3 required/, "error message");
     };
