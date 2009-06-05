@@ -126,6 +126,52 @@ while (<DATA>) {
     ok ($dbh->disconnect,					"disconnect");
     }
 
+{   $rt = 46627;
+
+    ok ($rt, "RT-$rt - $desc{$rt}");
+
+    ok (my $dbh = Connect ({f_ext => ".csv/r"}),"connect");
+    unlink "RT$rt.csv";
+
+    ok ($dbh->do ("
+	create table RT$rt (
+	    name  varchar,
+	    id    integer
+	    )"),				"create");
+
+    ok (my $sth = $dbh->prepare ("
+	insert into RT$rt values (?, ?)"),	"prepare ins");
+    ok ($sth->execute ("Steffen", 1),		"insert 1");
+    ok ($sth->execute ("Tux",	  2),   	"insert 2");
+    ok ($sth->finish,				"finish");
+    ok ($dbh->do ("
+	insert into RT$rt (
+	    name,
+	    id,
+	    ) values (?, ?)",
+	undef, "", 3),				"insert 3");
+
+    ok ($sth = $dbh->prepare ("
+	update RT$rt
+	set name = ?
+	where id = ?"
+	),					"prepare upd");
+    ok ($sth->execute ("Tim", 1),		"update");
+    ok ($sth->execute ("Tux", 2),		"update");
+    ok ($sth->finish,				"finish");
+
+    open my $fh, "<", DbFile ("RT$rt.csv");
+    is (scalar <$fh>, qq{name,id\r\n},		"Field names");
+    is (scalar <$fh>, qq{Tim,1\r\n},		"Record 1");
+    is (scalar <$fh>, qq{Tux,2\r\n},		"Record 2");
+    is (scalar <$fh>, qq{,3\r\n},		"Record 3");
+    is (scalar <$fh>, undef,			"EOF");
+    close $fh;
+
+    ok ($dbh->do ("drop table RT$rt"),		"drop");
+    ok ($dbh->disconnect,			"disconnect");
+    }
+
 __END__
 «357»	- build failure of DBD::CSV
 «2193»	- DBD::File fails on create
@@ -149,6 +195,8 @@ segno,owner,type,namespace,experiment,stream,updated,size
 c_tab,s_tab
 1,correct
 2,Fal"se
+3,Wr"ong
 «33767»	- (No subject)
 «43010»	- treatment of nulls scrambles joins
 «44583»	- DBD::CSV cannot read CSV files with dots on the first line
+«46627» - DBD::File is damaged now
