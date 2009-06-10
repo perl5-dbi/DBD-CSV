@@ -18,6 +18,7 @@
     * Add csv_* to pass to the parser
     * Improved error handling and reporting
     * Table names case sensitiveness
+    * Implemented raw_header (RT#44583)
 
 2005-08-10  Jeff Zucker <jzuckerATcpan.org> (0.23)
 

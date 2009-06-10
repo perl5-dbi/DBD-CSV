@@ -218,6 +218,9 @@ sub open_table
 		: exists $meta->{col_names} ? 0 : 1;
 	    if ($skipRows--) {
 		$array = $tbl->fetch_row ($data) or croak "Missing first row";
+		unless ($self->{raw_header}) {
+		    s/[-\x00-\x20'":;.,\/\\]/_/g for @$array;
+		    }
 		$tbl->{col_names} = $array;
 		while ($skipRows--) {
 		    $tbl->fetch_row ($data);
@@ -752,14 +755,25 @@ The difference is that they work on a per-table base.
 
 =item skip_first_row
 
-By default DBD::CSV assumes that column names are stored in the first
-row of the CSV file. If this is not the case, you can supply an array
-ref of table names with the I<col_names> attribute. In that case the
-attribute I<skip_first_row> will be set to FALSE.
+By default DBD::CSV assumes that column names are stored in the first row
+of the CSV file and sanitzes them (see C<raw_header> below). If this is
+not the case, you can supply an array ref of table names with the
+I<col_names> attribute. In that case the attribute I<skip_first_row> will
+be set to FALSE.
 
 If you supply an empty array ref, the driver will read the first row
 for you, count the number of columns and create column names like
 C<col0>, C<col1>, ...
+
+=item raw_header
+
+Due to the SQL standard, field names cannot contain special characters
+like a dot (C<.>). Following the approach of mdb_tools, all these tokens
+are translated to an underscore (C<_>) when reading the first line of the
+CSV file, so all field names are `sanitized'. If you do not want this to
+happen, set C<raw_header> to a true value. DBD::CSV cannot guarantee that
+any part in the toolchain will work if field names have those characters,
+and the chances are high that the SQL statements will fail.
 
 =back
 
@@ -860,6 +874,15 @@ that is useful.
 =item RT
 
 Attack all open DBD::CSV bugs in RT
+
+Add 'sane_colnames' attribute to allow weird characters in col_names.
+Translate all illegal characters to '_' like mdb_tools does.
+
+ s{[-\x00-\x20'":;.,/\\]}{_}g for @$row;
+
+=item CPAN::Forum
+
+Attack all items in http://www.cpanforum.com/dist/DBD-CSV
 
 =item Documentation
 

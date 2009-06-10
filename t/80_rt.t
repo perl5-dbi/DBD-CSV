@@ -33,7 +33,7 @@ while (<DATA>) {
 
     ok ($sth = $dbh->prepare (qq;
 	select SEGNO, OWNER, TYPE, NAMESPACE, EXPERIMENT, STREAM, UPDATED, SIZE
-	from   rt18477
+	from   rt$rt
 	where  NAMESPACE  =    ?
 	   and EXPERIMENT LIKE ?
 	   and STREAM     LIKE ?
@@ -126,6 +126,39 @@ while (<DATA>) {
     ok ($dbh->disconnect,					"disconnect");
     }
 
+{   $rt = 44583;
+    ok ($rt, "RT-$rt - $desc{$rt}");
+    my @lines = @{$input{$rt}};
+
+    open  FILE, ">output/rt$rt";
+    print FILE @lines;
+    close FILE;
+
+    ok (my $dbh = Connect (),					"connect");
+    ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
+    ok ($sth->execute,						"execute");
+    is_deeply ($sth->{NAME_lc},   [qw( c_tab s_tab )],		"field names");
+
+    ok ($sth = $dbh->prepare (qq;
+	select c_tab, s_tab
+	from   rt$rt
+	where  c_tab = 1
+	;),							"prepare");
+    ok ($sth->execute (),					"execute");
+    ok (my $row = $sth->fetch,					"fetch");
+    is_deeply ($row, [ 1, "ok" ],				"content");
+    ok ($sth->finish,						"finish");
+
+    ok ($dbh = Connect ({ raw_headers => 1 }),			"connect");
+    ok ($sth = $dbh->prepare ("select * from rt$rt"),		"prepare");
+    # $sth is `empty' and should fail on all actions
+    is ($sth->{NAME_lc}, undef,					"field names");
+    ok ($sth->finish,						"finish");
+
+    ok ($dbh->do ("drop table rt$rt"),				"drop table");
+    ok ($dbh->disconnect,					"disconnect");
+    }
+
 {   $rt = 46627;
 
     ok ($rt, "RT-$rt - $desc{$rt}");
@@ -199,4 +232,6 @@ c_tab,s_tab
 «33767»	- (No subject)
 «43010»	- treatment of nulls scrambles joins
 «44583»	- DBD::CSV cannot read CSV files with dots on the first line
+c.tab,"s,tab"
+1,ok
 «46627» - DBD::File is damaged now
