@@ -35,6 +35,10 @@ undef $dbh;
 ok ($dbh = Connect (),				"connect");
 ok ($dbh->{ignore_missing_table} = 1,		"ignore missing tables");
 
+# I have not yet found an *easy* way to test the case sensitivity of
+# the target FS, which might not prove at all that things will work
+# on all folders, as case in-sensitive and case-sensitive FS's might
+# co-exist.
 for (qw( foo foO fOo fOO Foo FoO FOo FOO )) {
     ok (my $sth = $dbh->prepare (qq{select * from "$_"}), "prepare \"$_\"");
 
@@ -42,8 +46,11 @@ for (qw( foo foO fOo fOO Foo FoO FOo FOO )) {
 	ok ( $sth->execute,			"execute ok");
 	}
     else {
-	local $sth->{PrintError} = 0;
-	ok (!$sth->execute,			"table name doesn't match");
+	TODO: {
+	    local $TODO = "Filesystem has to be case-aware";
+	    local $sth->{PrintError} = 0;
+	    ok (!$sth->execute,			"table name '$_' should not match 'foo'");
+	    }
 	}
     }
 
