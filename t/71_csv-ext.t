@@ -16,11 +16,16 @@ my @ext = ("", ".csv", ".foo", ".txt");
 
 sub DbFile;
 
-my $usr = getpwuid $<;
+my $usr = eval { getpwuid $< };
 sub Tables
 {
     my @tbl = $dbh->tables ();
-    s/^['"]*$usr["']*\.// for @tbl;
+    if ($usr) {
+	s/^['"]*$usr["']*\.// for @tbl;
+	}
+    else {
+	s/^[^.]+.// for @tbl;
+	}
     sort @tbl;
     } # Tables
 
