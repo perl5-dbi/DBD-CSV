@@ -78,7 +78,7 @@ requires:
     perl:                5.005003
     DBI:                 1.00
     DBD::File:           0.37
-    SQL::Statement:      0.1011
+    SQL::Statement:      0.16
     Text::CSV_XS:        0.43
 recommends:     
     perl:                5.008005
