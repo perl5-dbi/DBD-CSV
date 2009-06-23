@@ -83,6 +83,7 @@ requires:
 recommends:     
     perl:                5.008005
     Text::CSV_XS:        0.65
+    SQL::Statement:      1.20
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
