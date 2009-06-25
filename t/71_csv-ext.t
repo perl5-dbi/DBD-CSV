@@ -24,7 +24,7 @@ sub Tables
 	s/^['"]*$usr["']*\.// for @tbl;
 	}
     else {
-	s/^[^.]+.// for @tbl;
+	s/^[^.]+\.// for @tbl;
 	}
     sort @tbl;
     } # Tables
