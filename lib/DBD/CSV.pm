@@ -1,4 +1,4 @@
-#! perl
+#!/pro/bin/perl
 #
 #   DBD::CSV - A DBI driver for CSV and similar structured files
 #

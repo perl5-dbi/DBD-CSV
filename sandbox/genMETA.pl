@@ -78,12 +78,11 @@ requires:
     perl:                5.005003
     DBI:                 1.00
     DBD::File:           0.37
-    SQL::Statement:      0.16
-    Text::CSV_XS:        0.43
+    SQL::Statement:      1.22
+    Text::CSV_XS:        0.64
 recommends:     
-    perl:                5.008005
-    Text::CSV_XS:        0.65
-    SQL::Statement:      1.20
+    perl:                5.010001
+    Text::CSV_XS:        0.69
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
