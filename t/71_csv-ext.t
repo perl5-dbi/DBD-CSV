@@ -23,9 +23,6 @@ sub Tables
     if ($usr) {
 	s/^['"]*$usr["']*\.// for @tbl;
 	}
-    else {
-	s/^[^.]+\.// for @tbl;
-	}
     sort @tbl;
     } # Tables
 

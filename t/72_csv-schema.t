@@ -22,10 +22,15 @@ like (my $def = TableDefinition ($tbl, @tbl_def),
     qr{^create table $tbl}i,			"table definition");
 ok ($dbh->do ($def),				"create table");
 
-my $usr = eval { getpwuid $< };
-   $usr and $usr = qq{"$usr"};
-is_deeply ([ $dbh->tables () ],
-	   [ qq{$usr.$tbl}   ],			"tables");
+if (my $usr = eval { getpwuid $< }) {
+    $usr = qq{"$usr"};
+    is_deeply ([ $dbh->tables () ],
+	       [ qq{$usr.$tbl}   ],		"tables");
+    }
+else {
+    is_deeply ([ $dbh->tables () ],
+	       [ qq{$tbl}        ],		"tables");
+    }
 
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;

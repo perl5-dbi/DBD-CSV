@@ -194,6 +194,7 @@ while (<DATA>) {
     ok ($sth->finish,				"finish");
 
     open my $fh, "<", DbFile ("RT$rt.csv");
+    binmode $fh;
     is (scalar <$fh>, qq{name,id\r\n},		"Field names");
     is (scalar <$fh>, qq{Tim,1\r\n},		"Record 1");
     is (scalar <$fh>, qq{Tux,2\r\n},		"Record 2");
