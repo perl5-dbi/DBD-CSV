@@ -219,7 +219,7 @@ sub open_table
 	    if ($skipRows--) {
 		$array = $tbl->fetch_row ($data) or croak "Missing first row";
 		unless ($self->{raw_header}) {
-		    s/[-\x00-\x20'":;.,\/\\]/_/g for @$array;
+		    s/\W/_/g for @$array;
 		    }
 		$tbl->{col_names} = $array;
 		while ($skipRows--) {
