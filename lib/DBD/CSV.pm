@@ -204,7 +204,7 @@ sub open_table
 	    my $t = [];
 	    for (@{$types}) {
 		$_ = $_
-		    ? $DBD::CSV::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
+		    ? $DBD::CSV::dr::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
 		    : Text::CSV_XS::PV();
 		push @$t, $_;
 		}

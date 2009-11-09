@@ -4,6 +4,7 @@ use strict;
 $^W = 1;
 
 use Test::More "no_plan";
+use DBI qw(:sql_types);
 do "t/lib.pl";
 
 my ($rt, %input, %desc);
@@ -206,6 +207,28 @@ while (<DATA>) {
     ok ($dbh->disconnect,			"disconnect");
     }
 
+{   $rt = 51090;
+    ok ($rt, "RT-$rt - $desc{$rt}");
+    my @lines = @{$input{$rt}};
+    my @dbitp = ( SQL_INTEGER, SQL_LONGVARCHAR, SQL_NUMERIC );
+    my @csvtp = ( 1, 0, 2 );
+
+    open  FILE, ">output/rt$rt";
+    print FILE @lines;
+    close FILE;
+
+    ok (my $dbh = Connect (),					"connect");
+    ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
+    $dbh->{csv_tables}{rt51090}{types} = [ @dbitp ];
+    is_deeply ($dbh->{csv_tables}{rt51090}{types}, \@dbitp,	"set types (@dbitp)");
+
+    ok ($sth->execute (),					"execute");
+    is_deeply ($dbh->{csv_tables}{rt51090}{types}, \@csvtp,	"get types (@csvtp)");
+
+    ok ($dbh->do ("drop table RT$rt"),		"drop");
+    ok ($dbh->disconnect,			"disconnect");
+    }
+
 __END__
 «357»	- build failure of DBD::CSV
 «2193»	- DBD::File fails on create
@@ -236,3 +259,5 @@ c_tab,s_tab
 c.tab,"s,tab"
 1,ok
 «46627» - DBD::File is damaged now
+«51090» - Report a bug in DBD-CSV
+integer,longvarchar,numeric

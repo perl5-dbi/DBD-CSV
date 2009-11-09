@@ -1,6 +1,8 @@
-2009-10-17  0.26  H.Merijn Brand
+2009-11-09  0.26  H.Merijn Brand
 
     * Adjustments for windows (RT#50544)
+    * Mark all non-\w chars illegal in field and table names
+    * Fix field types after execute (RT#51090, vgdoqd)
 
 2009-10-15  0.25  H.Merijn Brand
 
