@@ -116,12 +116,8 @@ while (<DATA>) {
 	"JOIN   $tbl[1][0]",
 	"USING  (id)")),					"join 1 2");
 
-    TODO: {
-	local $TODO = "NULL handling not finished yet";
-
-	is_deeply ($row, { id => 8,
-	    one => 1, two => undef, thre => 3, four => undef }, "content");
-	}
+    is_deeply ($row, { id => 8,
+	one => 1, two => undef, thre => 3, four => undef }, "content");
 
     ok ($dbh->do ("drop table $_"),	"drop table") for map { $_->[0] } @tbl;
     ok ($dbh->disconnect,					"disconnect");

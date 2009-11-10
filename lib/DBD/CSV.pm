@@ -268,6 +268,8 @@ sub fetch_row
 	my @diag = $csv->error_diag;
 	croak "Error $diag[0] while reading file $self->{file}: $diag[1]";
 	}
+    @$fields < @{$self->{col_names}} and
+	push @$fields, (undef) x (@{$self->{col_names}} - @$fields);
     $self->{row} = (@$fields ? $fields : undef);
     } # fetch_row
 
