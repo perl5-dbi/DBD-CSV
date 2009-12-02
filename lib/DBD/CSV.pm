@@ -703,7 +703,7 @@ the I<csv_tables> attribute.
 
 With this option set, all new statement handles will set C<always_quote>
 and C<blank_is_undef> in the CSV parser and writer, so it knows how to
-distinquish between the empty string and C<undef> or C<NULL>. You cannot
+distinguish between the empty string and C<undef> or C<NULL>. You cannot
 reset it with a false value. You can pass it to connect, or set it later:
 
   $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_null => 1 });
@@ -758,7 +758,7 @@ The difference is that they work on a per-table base.
 =item skip_first_row
 
 By default DBD::CSV assumes that column names are stored in the first row
-of the CSV file and sanitzes them (see C<raw_header> below). If this is
+of the CSV file and sanitizes them (see C<raw_header> below). If this is
 not the case, you can supply an array ref of table names with the
 I<col_names> attribute. In that case the attribute I<skip_first_row> will
 be set to FALSE.
