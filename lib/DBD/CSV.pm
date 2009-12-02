@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.26";
+$VERSION  = "0.27";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -394,7 +394,7 @@ on installing in your own directories. L<ExtUtils::MakeMaker>.
 
 All SQL processing for DBD::CSV is done by the L<SQL::Statement> module.
 Features include joins, aliases, built-in and user-defined functions,
-and more.  See L<SQL::Statement::Sytax> for a description of the SQL
+and more.  See L<SQL::Statement::Syntax> for a description of the SQL
 syntax supported in DBD::CSV.
 
 Table names are case insensitive unless quoted.
