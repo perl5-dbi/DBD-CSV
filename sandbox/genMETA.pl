@@ -27,6 +27,18 @@ while (<DATA>) {
     }
 
 if ($check) {
+    print STDERR "Check required and recommended module versions ...\n";
+    BEGIN { $V::NO_EXIT = $V::NO_EXIT = 1 } require V;
+    my %vsn = map { m/^\s*([\w:]+):\s+([0-9.]+)$/ ? ($1, $2) : () } @yml;
+    delete @vsn{qw( perl version )};
+    for (sort keys %vsn) {
+	$vsn{$_} eq "0" and next;
+	my $v = V::get_version ($_);
+	$v eq $vsn{$_} and next;
+	printf STDERR "%-35s %-6s => %s\n", $_, $vsn{$_}, $v;
+	}
+
+    print STDERR "Checking generated YAML ...\n";
     use YAML::Syck;
     use Test::YAML::Meta::Version;
     my $h;
@@ -80,9 +92,6 @@ requires:
     DBD::File:           0.37
     SQL::Statement:      1.23
     Text::CSV_XS:        0.64
-recommends:     
-    perl:                5.010001
-    Text::CSV_XS:        0.69
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
@@ -90,6 +99,11 @@ build_requires:
     Config:              0
     Test::Harness:       0
     Test::More:          0
+recommends:     
+    perl:                5.010001
+    Text::CSV_XS:        0.71
+    DBI:                 1.611
+    DBD::File:           0.38
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
