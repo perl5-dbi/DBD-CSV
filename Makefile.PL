@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# Copyright PROCURA B.V. (c) 2006-2009 H.Merijn Brand
+# Copyright (c) 2009-2010 H.Merijn Brand
 
 require 5.005003;
 

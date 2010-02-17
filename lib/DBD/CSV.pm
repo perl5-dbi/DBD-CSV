@@ -9,7 +9,7 @@
 #   The original author is Jochen Wiedmann.
 #   Then maintained by Jeff Zucker
 #
-#   Copyright (C) 2009 by H.Merijn Brand
+#   Copyright (C) 2010 by H.Merijn Brand
 #   Copyright (C) 2004 by Jeff Zucker
 #   Copyright (C) 1998 by Jochen Wiedmann
 #
@@ -934,7 +934,7 @@ Previous maintainer was Jeff Zucker
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009      by H.Merijn Brand
+Copyright (C) 2009-2010 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 
