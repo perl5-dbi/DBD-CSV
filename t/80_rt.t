@@ -190,7 +190,7 @@ while (<DATA>) {
     ok ($sth->execute ("Tux", 2),		"update");
     ok ($sth->finish,				"finish");
 
-    open my $fh, "<", DbFile ("RT$rt.csv");
+    open my $fh, "<".DbFile ("RT$rt.csv");
     binmode $fh;
     is (scalar <$fh>, qq{name,id\r\n},		"Field names");
     is (scalar <$fh>, qq{Tim,1\r\n},		"Record 1");
