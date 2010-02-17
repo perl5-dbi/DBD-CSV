@@ -213,7 +213,7 @@ while (<DATA>) {
     print FILE @lines;
     close FILE;
 
-    ok (my $dbh = Connect (),					"connect");
+    ok (my $dbh = Connect ({ f_lock => 0 }),					"connect");
     ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
     $dbh->{csv_tables}{rt51090}{types} = [ @dbitp ];
     is_deeply ($dbh->{csv_tables}{rt51090}{types}, \@dbitp,	"set types (@dbitp)");
