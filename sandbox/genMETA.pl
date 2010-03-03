@@ -37,6 +37,15 @@ if ($check) {
 	$v eq $vsn{$_} and next;
 	printf STDERR "%-35s %-6s => %s\n", $_, $vsn{$_}, $v;
 	}
+    if (open my $bh, "<", "lib/Bundle/DBD/CSV.pm") {
+	print STDERR "Check bundle module versions ...\n";
+	while (<$bh>) {
+	    my ($m, $dv) = m/^([A-Za-z_:]+)\s+([0-9.]+)\s*$/ or next;
+	    my $v = $m eq "DBD::CSV" ? $version : V::get_version ($m);
+	    $v eq $dv and next;
+	    printf STDERR "%-35s %-6s => %s\n", $m, $dv, $v;
+	    }
+	}
 
     print STDERR "Checking generated YAML ...\n";
     use YAML::Syck;
