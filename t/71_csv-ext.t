@@ -34,8 +34,9 @@ ok (my $tbl = FindNewTable ($dbh),		"find new test table");
 ok (!-f DbFile ($tbl),				"does not exist");
 
 foreach my $ext (@ext) {
-    like (my $def = TableDefinition ($tbl.$ext, @tbl_def),
-	qr{^create table $tbl}i,		"table definition");
+    my $qt = '"'.$tbl.$ext.'"';
+    like (my $def = TableDefinition ($qt, @tbl_def),
+	qr{^create table $qt}i,			"table definition");
     ok ($dbh->do ($def),			"create table $ext");
     ok (-f DbFile ($tbl.$ext),			"does exists");
     }

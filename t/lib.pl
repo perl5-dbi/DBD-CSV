@@ -70,7 +70,8 @@ sub TableDefinition
 	push @colDefs, $colDef;
 	}
     my $keyDef = @keys ? ", PRIMARY KEY (" . join (", ", @keys) . ")" : "";
-    return sprintf "CREATE TABLE %s (%s%s)", $tablename,
+    my $tq = $tablename =~ m/^\w+\./ ? qq{"$tablename"} : $tablename;
+    return sprintf "CREATE TABLE %s (%s%s)", $tq,
 	join (", ", @colDefs), $keyDef;
     } # TableDefinition
 
