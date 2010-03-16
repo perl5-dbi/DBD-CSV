@@ -80,7 +80,7 @@ else {
     }
 
 __END__
---- #YAML:1.1
+--- #YAML:1.0
 name:                    DBD::CSV
 version:                 VERSION
 abstract:                DBI driver for CSV files
