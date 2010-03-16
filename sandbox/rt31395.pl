@@ -34,6 +34,7 @@ leaktrace {
     my $n = 0;
     while ($n++ < $c) {
 	$sth->execute ("$n$z") and printf STDERR "%7d %s\r", $n, $z;
+	system "ps -lf $$";
 	}
 
     $sth->finish;
