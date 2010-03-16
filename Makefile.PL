@@ -34,7 +34,7 @@ my %wm = (
     PREREQ_PM    => {
 	"DBI"            => 1.00,
 	"Text::CSV_XS"   => 0.64,
-	"SQL::Statement" => 1.22,
+	"SQL::Statement" => 1.25,
 	"DBD::File"      => 0.37,
 	"Test::More"     => 0,
 	},
