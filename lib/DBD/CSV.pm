@@ -41,6 +41,10 @@ $errstr   = "";		# holds error string for DBI::errstr
 $sqlstate = "";         # holds error state  for DBI::state
 $drh      = undef;	# holds driver handle once initialised
 
+sub CLONE		# empty method: prevent warnings when threads are cloned
+{
+    } # CLONE
+
 # --- DRIVER -------------------------------------------------------------------
 
 package DBD::CSV::dr;
