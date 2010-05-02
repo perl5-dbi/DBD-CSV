@@ -651,6 +651,13 @@ is to use the owner of C<f_dir>. C<undef> is allowed, but not in the DSN part.
         f_ext    => ".csv/r",
         }) or die $DBI::errstr;
 
+=item f_encoding
+
+This attribute allows you to set the encoding of the data. With CSV, it is
+not possible to set (and remember) the encoding on a per-field basis, but
+DBD::File now allows to set the encoding of the underlying file. If this
+attribute is not set, or undef is passed, the file will be seen as binary.
+
 =item csv_eol
 
 =item csv_sep_char
