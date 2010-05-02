@@ -38,6 +38,7 @@ my %wm = (
 	"DBD::File"      => 0.38,
 	"Test::More"     => 0,
 	"Encode"         => 0,
+	"charnames"      => 0,
 	},
     clean        => {
 	FILES => join " ", qw(
