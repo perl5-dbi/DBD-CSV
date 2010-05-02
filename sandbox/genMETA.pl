@@ -113,6 +113,7 @@ build_requires:
 recommends:     
     perl:                5.012000
     Text::CSV_XS:        0.72
+    SQL::Statement:      1.26
     DBI:                 1.611
 installdirs:             site
 resources:
