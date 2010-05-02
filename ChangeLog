@@ -2,6 +2,7 @@
 
     * Fix git URL in META.yml
     * Add empty CLONE method to prevent warning when cloning threads
+    * Minimum perl 5.8.1
 
 2010-03-16  0.28  H.Merijn Brand
 

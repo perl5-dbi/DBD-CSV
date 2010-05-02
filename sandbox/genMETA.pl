@@ -96,7 +96,7 @@ provides:
         file:            lib/DBD/CSV.pm
         version:         VERSION
 requires:     
-    perl:                5.005003
+    perl:                5.008001
     DBI:                 1.00
     DBD::File:           0.37
     SQL::Statement:      1.25
@@ -104,12 +104,12 @@ requires:
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
-    perl:                5.005003
+    perl:                5.008001
     Config:              0
     Test::Harness:       0
     Test::More:          0
 recommends:     
-    perl:                5.010001
+    perl:                5.012000
     Text::CSV_XS:        0.71
     DBI:                 1.611
     DBD::File:           0.38
