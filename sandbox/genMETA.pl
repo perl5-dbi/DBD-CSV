@@ -98,9 +98,9 @@ provides:
 requires:     
     perl:                5.008001
     DBI:                 1.00
-    DBD::File:           0.37
+    DBD::File:           0.38
     SQL::Statement:      1.25
-    Text::CSV_XS:        0.64
+    Text::CSV_XS:        0.71
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
@@ -108,11 +108,12 @@ build_requires:
     Config:              0
     Test::Harness:       0
     Test::More:          0
+    Encode:              0
+    charnames:           0
 recommends:     
     perl:                5.012000
-    Text::CSV_XS:        0.71
+    Text::CSV_XS:        0.72
     DBI:                 1.611
-    DBD::File:           0.38
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

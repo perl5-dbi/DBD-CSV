@@ -33,10 +33,11 @@ my %wm = (
     VERSION_FROM => "lib/DBD/CSV.pm",
     PREREQ_PM    => {
 	"DBI"            => 1.00,
-	"Text::CSV_XS"   => 0.64,
+	"Text::CSV_XS"   => 0.71,
 	"SQL::Statement" => 1.25,
-	"DBD::File"      => 0.37,
+	"DBD::File"      => 0.38,
 	"Test::More"     => 0,
+	"Encode"         => 0,
 	},
     clean        => {
 	FILES => join " ", qw(
