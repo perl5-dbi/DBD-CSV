@@ -7,7 +7,7 @@ use charnames ":full";
 
 use DBI;
 use Text::CSV_XS;
-use Encode qw( decode encode );
+use Encode qw( encode );
 
 use Test::More tests => 36;
 
