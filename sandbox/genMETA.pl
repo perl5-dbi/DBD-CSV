@@ -112,7 +112,7 @@ build_requires:
     charnames:           0
 recommends:     
     perl:                5.012000
-    Text::CSV_XS:        0.72
+    Text::CSV_XS:        0.73
     SQL::Statement:      1.26
     DBI:                 1.611
 installdirs:             site
