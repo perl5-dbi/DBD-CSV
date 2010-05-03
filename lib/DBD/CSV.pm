@@ -303,35 +303,39 @@ DBD::CSV - DBI driver for CSV files
 =head1 SYNOPSIS
 
     use DBI;
-    $dbh = DBI->connect ("DBI:CSV:f_dir=/home/joe/csvdb") or
+    # See "Creating database handle" below
+    $dbh = DBI->connect ("dbi:CSV:") or
         die "Cannot connect: $DBI::errstr";
-    $sth = $dbh->prepare ("CREATE TABLE a (id INTEGER, name CHAR(10))") or
+
+    # Simple statements
+    $dbh->do ("CREATE TABLE a (id INTEGER, name CHAR(10))") or
         die "Cannot prepare: " . $dbh->errstr ();
-    $sth->execute or die "Cannot execute: " . $sth->errstr ();
+
+    # Selecting
+    $dbh->{RaiseError} = 1;
+    my $sth = $dbh->prepare ("select * from foo");
+    $sth->execute;
+    while (my @row = $sth->fetchrow_array) {
+        print "id: $row[0], name: $row[1]\n";
+        }
+
+    # Updates
+    my $sth = $dbh->prepare ("UPDATE a SET name = ? WHERE id = ?");
+    $sth->execute ("DBI rocks!", 1);
     $sth->finish;
+
     $dbh->disconnect;
-
-    # Read a CSV file with ";" as the separator, as exported by
-    # MS Excel. Note we need to escape the ";", otherwise it
-    # would be treated as an attribute separator.
-    $dbh = DBI->connect (qq{DBI:CSV:csv_sep_char=\\;});
-    $sth = $dbh->prepare ("SELECT * FROM info");
-
-    # Same example, this time reading "info.csv" as a table:
-    $dbh = DBI->connect (qq{DBI:CSV:csv_sep_char=\\;});
-    $dbh->{csv_tables}{info} = { file => "info.csv"};
-    $sth = $dbh->prepare ("SELECT * FROM info");
 
 =head1 DESCRIPTION
 
 The DBD::CSV module is yet another driver for the DBI (Database independent
 interface for Perl). This one is based on the SQL "engine" SQL::Statement
-and the abstract DBI driver DBD::File and implements access to
-so-called CSV files (Comma separated values). Such files are mostly used for
-exporting MS Access and MS Excel data.
+and the abstract DBI driver DBD::File and implements access to so-called
+CSV files (Comma Separated Values). Such files are often used for exporting
+MS Access and MS Excel data.
 
-See L<DBI(3)> for details on DBI, L<SQL::Statement(3)> for details on
-SQL::Statement and L<DBD::File(3)> for details on the base class DBD::File.
+See L<DBI> for details on DBI, L<SQL::Statement> for details on
+SQL::Statement and L<DBD::File> for details on the base class DBD::File.
 
 =head2 Prerequisites
 
@@ -341,11 +345,11 @@ a working C<flock ()>, in particular on all Unix machines and on Windows
 NT. Under Windows 95 and MacOS the use of C<flock ()> is disabled, thus
 the module should still be usable,
 
-Unlike other DBI drivers, you don't need an external SQL engine
-or a running server. All you need are the following Perl modules,
-available from any CPAN mirror, for example
+Unlike other DBI drivers, you don't need an external SQL engine or a
+running server. All you need are the following Perl modules, available
+from any CPAN mirror, for example
 
-  ftp://ftp.funet.fi/pub/languages/perl/CPAN/modules/by-module
+  http://search.cpan.org/
 
 =over 4
 
@@ -356,9 +360,9 @@ a later release
 
 =item DBD::File
 
-This is the base class for DBD::CSV, and it is included in the DBI
-distribution. As DBD::CSV requires version 0.37 or newer for DBD::File
-it effectively requires DBI version 1.609 or newer.
+This is the base class for DBD::CSV, and it is part of the DBI
+distribution. As DBD::CSV requires version 0.38 or newer for DBD::File
+it effectively requires DBI version 1.611 or newer.
 
 =item SQL::Statement
 
@@ -375,21 +379,33 @@ This module is used for writing rows to or reading rows from CSV files.
 =head2 Installation
 
 Installing this module (and the prerequisites from above) is quite simple.
-You just fetch the archive, extract it with
+The simplest way is to install the bundle:
 
-    gzip -cd DBD-CSV-0.1000.tar.gz | tar xf -
+    $ cpan Bundle::CSV
+
+Alternatively, you can name them all
+
+    $ cpan Text::CSV_XS DBI DBD::CSV
+
+or even trust C<cpan> to resolve all dependencies for you:
+
+    $ cpan DBD::CSV
+
+If you cannot, for whatever reason, use cpan, fetch all modules from
+CPAN, and build with a sequence like:
+
+    gzip -d < DBD-CSV-0.28.tgz | tar xf -
 
 (this is for Unix users, Windows users would prefer WinZip or something
 similar) and then enter the following:
 
-    cd DBD-CSV-0.1000
+    cd DBD-CSV-0.28
     perl Makefile.PL
-    make
     make test
 
-If any tests fail, let me know. Otherwise go on with
+If any tests fail, let us know. Otherwise go on with
 
-    make install
+    make install UNINST=1
 
 Note that you almost definitely need root or administrator permissions.
 If you don't have them, read the ExtUtils::MakeMaker man page for details
@@ -404,33 +420,72 @@ syntax supported in DBD::CSV.
 
 Table names are case insensitive unless quoted.
 
-=head1 Using DBD-CSV with DBI
+=head1 Using DBD::CSV with DBI
 
 For most things, DBD-CSV operates the same as any DBI driver.
 See L<DBI> for detailed usage.
 
-=head2 Creating a database handle
+=head2 Creating a database handle (connect)
 
 Creating a database handle usually implies connecting to a database server.
 Thus this command reads
 
     use DBI;
-    my $dbh = DBI->connect ("DBI:CSV:f_dir=$dir");
+    my $dbh = DBI->connect ("dbi:CSV:", "", "", {
+        f_dir => "/home/user/folder",
+        });
 
-The directory tells the driver where it should create or open tables
-(a.k.a. files). It defaults to the current directory, thus the following
-are equivalent:
+The directory tells the driver where it should create or open tables (a.k.a.
+files). It defaults to the current directory, so the following are equivalent:
 
-    $dbh = DBI->connect ("DBI:CSV:");
-    $dbh = DBI->connect ("DBI:CSV:f_dir=.");
+    $dbh = DBI->connect ("dbi:CSV:");
+    $dbh = DBI->connect ("dbi:CSV:", undef, undef, { f_dir => "." });
+    $dbh = DBI->connect ("dbi:CSV:f_dir=.");
 
-(I was told, that VMS requires
+We were told, that VMS might - for whatever reason - require:
 
-    $dbh = DBI->connect ("DBI:CSV:f_dir=");
+    $dbh = DBI->connect ("dbi:CSV:f_dir=");
 
-for whatever reasons.)
+The prefered way of passing the arguments is by driver attributes:
 
-You may set other attributes in the DSN string, separated by semicolons.
+    # specify most possible flags via driver flags
+    $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
+        f_schema         => undef,
+        f_dir            => "data",
+        f_ext            => ".csv/r",
+        f_lock           => 2,
+        f_encoding       => 'utf8',
+
+        csv_eol          => "\r\n",
+        csv_sep_char     => ",",
+        csv_quote_char   => '"',
+        csv_escape_char  => '"',
+        csv_class        => "Text::CSV_XS",
+        csv_null         => 1,
+        csv_tables       => {
+            info => { file => "info.csv" }
+            },
+
+        RaiseError       => 1,
+        PrintError       => 1,
+        FetchHashKeyName => "NAME_lc",
+        }) or die $DBI::errstr;
+
+but you may set these attributes in the DSN as well, separated by semicolons.
+Pay attention to the semi-colon for C<csv_sep_char> (as seen in many CSV
+exports from MS Excel) is being escaped in below example, as is would
+otherwise be seen as attribute separator:
+
+    $dbh = DBI->connect (
+        "dbi:CSV:f_dir=$ENV{HOME}/csvdb;f_ext=.csv;f_lock=2;" .
+        "f_encoding=utf8;csv_eol=\n;csv_sep_char=\\;;" .
+        "csv_quote_char=\";csv_escape_char=\\;csv_class=Text::CSV_XS;" .
+        "csv_null=1") or die $DBI::errstr;
+
+Using attributes in the DNS is easier to use when the DNS is derived from an
+outside source (environment variable, database entry, or configure file),
+whereas using all entries in the attribute hash is easier to read and to
+maintain.
 
 =head2 Creating and dropping tables
 
@@ -446,7 +501,7 @@ discarded. This may change in a later release.
 
 A drop just removes the file without any warning.
 
-See L<DBI(3)> for more details.
+See L<DBI> for more details.
 
 Table names cannot be arbitrary, due to restrictions of the SQL syntax.
 I recommend that table names are valid SQL identifiers: The first
@@ -515,7 +570,7 @@ for the third time:
         $sth->finish;
         }
 
-See L<DBI(3)> for details on these methods. See L<SQL::Statement(3)> for
+See L<DBI> for details on these methods. See L<SQL::Statement> for
 details on the WHERE clause.
 
 Data rows are modified with the UPDATE statement:
@@ -658,6 +713,31 @@ not possible to set (and remember) the encoding on a per-field basis, but
 DBD::File now allows to set the encoding of the underlying file. If this
 attribute is not set, or undef is passed, the file will be seen as binary.
 
+=item f_lock
+
+With this attribute, you can force locking mode (if locking is supported
+at all) for opening tables. By default, tables are opened with a shared
+lock for reading, and with an exclusive lock for writing. The supported
+modes are:
+
+=over 2
+
+=item 0
+
+Force no locking at all.
+
+=item 1
+
+Only shared locks will be used.
+
+=item 2
+
+Only exclusive locks will be used.
+
+=back
+
+But see L<DBD::File/"KNOWN BUGS">.
+
 =item csv_eol
 
 =item csv_sep_char
@@ -793,16 +873,22 @@ and the chances are high that the SQL statements will fail.
 
 =back
 
+It's strongly recommended to check the attributes supported by
+L<DBD::File/Metadata>.
+
 Example: Suggest you want to use F</etc/passwd> as a CSV file. :-)
 There simplest way is:
 
     use DBI;
-    my $dbh = DBI->connect ("DBI:CSV:f_dir=/etc;csv_eol=\n;".
-                            "csv_sep_char=:;csv_quote_char=;".
-                            "csv_escape_char=");
+    my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
+        f_dir           => "/etc",
+        csv_sep_char    => ":",
+        csv_quote_char  => undef,
+        csv_escape_char => undef,
+        });
     $dbh->{csv_tables}{passwd} = {
-        col_names => ["login", "password", "uid", "gid", "realname",
-                      "directory", "shell"];
+        col_names => [qw( login password uid gid realname
+                          directory shell )];
         };
     $sth = $dbh->prepare ("SELECT * FROM passwd");
 
@@ -810,7 +896,7 @@ Another possibility where you leave all the defaults as they are and
 overwrite them on a per table base:
 
     require DBI;
-    my $dbh = DBI->connect ("DBI:CSV:");
+    my $dbh = DBI->connect ("dbi:CSV:");
     $dbh->{csv_tables}{passwd} = {
         eol         => "\n",
         sep_char    => ":",
@@ -831,7 +917,7 @@ These methods are inherited from DBD::File:
 =item data_sources
 
 The C<data_sources> method returns a list of subdirectories of the current
-directory in the form "DBI:CSV:directory=$dirname".
+directory in the form "dbi:CSV:directory=$dirname".
 
 If you want to read the subdirectories of another directory, use
 
@@ -843,7 +929,7 @@ If you want to read the subdirectories of another directory, use
 This method returns a list of file names inside $dbh->{directory}.
 Example:
 
-    my $dbh  = DBI->connect ("DBI:CSV:directory=/usr/local/csv_data");
+    my $dbh  = DBI->connect ("dbi:CSV:directory=/usr/local/csv_data");
     my @list = $dbh->func ("list_tables");
 
 Note that the list includes all files contained in the directory, even
@@ -889,11 +975,6 @@ that is useful.
 
 Attack all open DBD::CSV bugs in RT
 
-Add 'sane_colnames' attribute to allow weird characters in col_names.
-Translate all illegal characters to '_' like mdb_tools does.
-
- s{[-\x00-\x20'":;.,/\\]}{_}g for @$row;
-
 =item CPAN::Forum
 
 Attack all items in http://www.cpanforum.com/dist/DBD-CSV
@@ -906,11 +987,6 @@ Use Text::CSV_XS::error_diag () wherever possible.
 =item Debugging
 
 Implement and document dbd_verbose.
-
-=item Encoding
-
-Test how well UTF-8 is supported, if not (yet), enable UTF-8, and maybe
-even more.
 
 =item Data dictionary
 
@@ -925,7 +1001,7 @@ Make more real-life examples from the docs in examples/
 
 =head1 SEE ALSO
 
-L<DBI(3)>, L<Text::CSV_XS(3)>, L<SQL::Statement(3)>
+L<DBI>, L<Text::CSV_XS>, L<SQL::Statement>
 
 For help on the use of DBD::CSV, see the DBI users mailing list:
 
