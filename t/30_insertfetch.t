@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use strict;
-use Test::More tests => 25;
+use Test::More tests => 33;
 
 # Test row insertion and retrieval
 $^W = 1;
@@ -28,12 +28,18 @@ eval {
 like (my $def = TableDefinition ($tbl, @tbl_def),
 	qr{^create table $tbl}i,	"table definition");
 
+my $sz = 0;
 ok ($dbh->do ($def),			"create table");
 my $tbl_file = DbFile ($tbl);
-ok (my $sz = -s $tbl_file,		"file exists");
+ok ($sz = -s $tbl_file,			"file exists");
 
 ok ($dbh->do ("insert into $tbl values ".
 	      "(1, 'Alligator Descartes', 1111, 'Some Text')"), "insert");
+ok ($sz < -s $tbl_file,			"file grew");
+$sz = -s $tbl_file;
+
+ok ($dbh->do ("insert into $tbl (id, name, val, txt) values ".
+	      "(2, 'Crocodile Dundee',    2222, 'Down Under')"), "insert with field names");
 ok ($sz < -s $tbl_file,			"file grew");
 
 ok (my $sth = $dbh->prepare ("select * from $tbl where id = 1"), "prepare");
@@ -61,6 +67,16 @@ ok ($sth->execute,			"execute");
 is ($sth->fetch,  undef,		"fetch");
 is ($sth->errstr, undef,		"error");	# ???
 
+ok ($sth->finish,			"finish");
+undef $sth;
+
+ok ($sth = $dbh->prepare ("insert into $tbl values (?, ?, ?, ?)"), "prepare insert");
+ok ($sth->execute (3, "Babar", 3333, "Elephant"), "insert prepared");
+ok ($sth->finish,			"finish");
+undef $sth;
+
+ok ($sth = $dbh->prepare ("insert into $tbl (id, name, val, txt) values (?, ?, ?, ?)"), "prepare insert with field names");
+ok ($sth->execute (4, "Vischje", 33, "in het riet"), "insert prepared");
 ok ($sth->finish,			"finish");
 undef $sth;
 
