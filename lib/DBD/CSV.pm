@@ -216,7 +216,7 @@ sub open_table
 	    $tbl->{types} = $t;
 	    }
 	if ( !$createMode and
-	     !$self->{ignore_missing_table} and $self->command ne "DROP") {
+	     !$self->{ignore_missing_table} and $self->{command} ne "DROP") {
 	    my $array;
 	    my $skipRows = exists $meta->{skip_rows}
 		? $meta->{skip_rows}
