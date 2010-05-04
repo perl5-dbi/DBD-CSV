@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.29";
+$VERSION  = "0.30";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -454,7 +454,7 @@ The prefered way of passing the arguments is by driver attributes:
         f_dir            => "data",
         f_ext            => ".csv/r",
         f_lock           => 2,
-        f_encoding       => 'utf8',
+        f_encoding       => "utf8",
 
         csv_eol          => "\r\n",
         csv_sep_char     => ",",
@@ -507,7 +507,7 @@ Table names cannot be arbitrary, due to restrictions of the SQL syntax.
 I recommend that table names are valid SQL identifiers: The first
 character is alphabetic, followed by an arbitrary number of alphanumeric
 characters. If you want to use other files, the file names must start
-with '/', './' or '../' and they must not contain white space.
+with "/", "./" or "../" and they must not contain white space.
 
 =head2 Inserting, fetching and modifying data
 
@@ -517,7 +517,7 @@ First all data in the string:
     $dbh->do ("INSERT INTO $table VALUES (1, ".
                $dbh->quote ("foobar") . ")");
 
-Note the use of the quote method for escaping the word 'foobar'. Any
+Note the use of the quote method for escaping the word "foobar". Any
 string must be escaped, even if it doesn't contain binary data.
 
 Next an example using parameters:
