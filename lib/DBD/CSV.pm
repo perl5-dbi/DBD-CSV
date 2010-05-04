@@ -1017,6 +1017,10 @@ This module is currently maintained by
 
     H.Merijn Brand <h.m.brand@xs4all.nl>
 
+in close cooperation with and help from
+
+    Jens Rehsack <sno@NetBSD.org>
+
 The original author is Jochen Wiedmann.
 Previous maintainer was Jeff Zucker
 
