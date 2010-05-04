@@ -4,7 +4,7 @@
     * Add empty CLONE method to prevent warning when cloning threads
     * Minimum perl 5.8.1
     * Minimum Text::CSV_XS 0.71
-    * Support for f_encoding (needs DBD::File 0.38)
+    * Support for f_encoding (requires DBI-1.611)
     * Documentation updates
 
 2010-03-16  0.28  H.Merijn Brand
