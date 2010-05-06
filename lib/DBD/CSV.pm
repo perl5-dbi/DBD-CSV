@@ -39,7 +39,7 @@ $VERSION  = "0.30";
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
 $sqlstate = "";         # holds error state  for DBI::state
-$drh      = undef;	# holds driver handle once initialised
+$drh      = undef;	# holds driver handle once initialized
 
 sub CLONE		# empty method: prevent warnings when threads are cloned
 {
@@ -369,6 +369,11 @@ it effectively requires DBI version 1.611 or newer.
 A simple SQL engine. This module defines all of the SQL syntax for
 DBD::CSV, new SQL support is added with each release so you should
 look for updates to SQL::Statement regularly.
+
+It is possible to run C<DBD::CSV> without this module if you define
+the environment variable C<$DBI_SQL_NANO> to 1. This will reduce the
+SQL support a lot though. See L<DBI::SQL::Nano> for more details. Note
+that the test suite does not test in this mode!
 
 =item Text::CSV_XS
 
@@ -1001,7 +1006,7 @@ Make more real-life examples from the docs in examples/
 
 =head1 SEE ALSO
 
-L<DBI>, L<Text::CSV_XS>, L<SQL::Statement>
+L<DBI>, L<Text::CSV_XS>, L<SQL::Statement>, L<DBI::SQL::Nano>
 
 For help on the use of DBD::CSV, see the DBI users mailing list:
 
