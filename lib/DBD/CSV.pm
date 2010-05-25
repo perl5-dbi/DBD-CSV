@@ -153,13 +153,17 @@ sub FETCH
 package DBD::CSV::Statement;
 
 use strict;
+use DBD::File;
 use Carp;
 
 @DBD::CSV::Statement::ISA = qw(DBD::File::Statement);
 
-sub open_table
-{
+# open_table (0 is used up to and including DBI-1.1611
+# Later versions use open_file (see DBD::CSV::Table)
+
+$DBD::File::VERSION <= 0.38 and *open_table = sub {
     my ($self, $data, $table, $createMode, $lockMode) = @_;
+
     my $dbh    = $data->{Database};
     my $tables = $dbh->{csv_tables};
        $tables->{$table} ||= {};
@@ -246,14 +250,115 @@ sub open_table
 	    }
 	}
     $tbl;
-    } # open_table
+    }; # open_table
 
 package DBD::CSV::Table;
 
 use strict;
+use DBD::File;
 use Carp;
 
 @DBD::CSV::Table::ISA = qw(DBD::File::Table);
+
+sub init_table_meta
+{
+    my ($self, $dbh, $table, $file_is_table, $quoted) = @_;
+    defined $dbh->{f_meta}{$table} and ref $dbh->{f_meta}->{$table} eq "HASH" or
+	$dbh->{f_meta}{$table} = {};
+    my $meta = $dbh->{f_meta}{$table};
+
+    my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
+    unless ($csv_in) {
+	my %opts  = ( binary => 1 );
+
+	# Allow specific Text::CSV_XS options
+	foreach my $key (grep m/^csv_/ => keys %$dbh) {
+	    (my $attr = $key) =~ s/csv_//;
+	    $attr =~ m{^(?: eol | sep | quote | escape	# Handled below
+			  | tables | sql_parser_object	# Not for Text::CSV_XS
+			  | sponge_driver		# internal
+			  )$}x and next;
+	    $opts{$attr} = $dbh->{$key};
+	    }
+	delete $opts{null} and
+	    $opts{blank_is_undef} = $opts{always_quote} = 1;
+
+	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
+	my $eol   = $meta->{eol}   || $dbh->{csv_eol}   || "\r\n";
+	$eol =~ m/^\A(?:[\r\n]|\r\n)\Z/ or $opts{eol} = $eol;
+	for ([ "sep",    ',' ],
+	     [ "quote",  '"' ],
+	     [ "escape", '"' ],
+	     ) {
+	    my ($attr, $def) = ($_->[0]."_char", $_->[1]);
+	    $opts{$attr} =
+		exists $meta->{$attr} ? $meta->{$attr} :
+		    exists $dbh->{"csv_$attr"} ? $dbh->{"csv_$attr"} : $def;
+	    }
+	$meta->{csv_in}  = $class->new (\%opts) or
+	    $class->error_diag;
+	$opts{eol} = $eol;
+	$meta->{csv_out} = $class->new (\%opts) or
+	    $class->error_diag;
+	}
+    $self->SUPER::init_table_meta ($dbh, $table, $file_is_table, $quoted);
+    } # init_table_meta
+
+$DBD::File::VERSION > 0.38 and *open_file = sub {
+    my ($self, $meta, $attrs, $flags) = @_;
+    $self->SUPER::open_file ($meta, $attrs, $flags);
+
+    use DP; DDumper { flags => $flags, meta => $meta };
+
+    my $tbl = $meta;
+    if ($tbl && $tbl->{fh}) {
+	$tbl->{csv_csv_in}  = $meta->{csv_in};
+	$tbl->{csv_csv_out} = $meta->{csv_out};
+	if (my $types = $meta->{types}) {
+	    # The 'types' array contains DBI types, but we need types
+	    # suitable for Text::CSV_XS.
+	    my $t = [];
+	    for (@{$types}) {
+		$_ = $_
+		    ? $DBD::CSV::dr::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
+		    : Text::CSV_XS::PV();
+		push @$t, $_;
+		}
+	    $tbl->{types} = $t;
+	    }
+	if ( !$flags->{createMode} and
+	     !$self->{ignore_missing_table} and $self->{command} ne "DROP") {
+	    my $array;
+	    my $skipRows = exists $meta->{skip_rows}
+		? $meta->{skip_rows}
+		: exists $meta->{col_names} ? 0 : 1;
+	    if ($skipRows--) {
+		$array = $tbl->{csv_csv_in}->getline ($tbl->{fh}) or
+		    croak "Missing first row";
+		unless ($self->{raw_header}) {
+		    s/\W/_/g for @$array;
+		    }
+		$tbl->{col_names} = $array;
+		while ($skipRows--) {
+		    $tbl->{csv_csv_in}->getline ($tbl->{fh});
+		    }
+		}
+	    $tbl->{first_row_pos} = $tbl->{fh}->tell ();
+	    exists $meta->{col_names} and
+		$array = $tbl->{col_names} = $meta->{col_names};
+            if (!$tbl->{col_names} || !@{$tbl->{col_names}}) {
+		# No column names given; fetch first row and create default
+		# names.
+		my $ar = $tbl->{cached_row} =
+		    $tbl->{csv_csv_in}->getline ($tbl->{fh});
+		$array = $tbl->{col_names};
+		push @$array, map { "col$_" } 0 .. $#$ar;
+		}
+	    my $i = 0;
+	    $tbl->{col_nums}{$_} = $i++ for @$array;
+	    }
+	}
+    }; # open_file
 
 sub fetch_row
 {
