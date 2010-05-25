@@ -14,6 +14,12 @@ ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION"
 
 do "t/lib.pl";
 
+diag ("Showing relevant versions");
+diag ("Using DBI            version $DBI::VERSION");
+diag ("Using DBD::File      version $DBD::File::VERSION");
+diag ("Using SQL::Statement version $SQL::Statement::VERSION");
+diag ("Using Text::CSV_XS   version $Text::CSV_XS::VERSION");
+
 ok (my $switch = DBI->internal, "DBI->internal");
 is (ref $switch, "DBI::dr", "Driver class");
 
