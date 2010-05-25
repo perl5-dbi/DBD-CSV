@@ -308,7 +308,7 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
     my ($self, $meta, $attrs, $flags) = @_;
     $self->SUPER::open_file ($meta, $attrs, $flags);
 
-    use DP; DDumper { flags => $flags, meta => $meta };
+#   use DP; print STDERR DDumper { flags => $flags, meta => $meta, self => $self };
 
     my $tbl = $meta;
     if ($tbl && $tbl->{fh}) {
@@ -326,8 +326,7 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
 		}
 	    $tbl->{types} = $t;
 	    }
-	if ( !$flags->{createMode} and
-	     !$self->{ignore_missing_table} and $self->{command} ne "DROP") {
+	if (!$flags->{createMode}) {
 	    my $array;
 	    my $skipRows = exists $meta->{skip_rows}
 		? $meta->{skip_rows}
@@ -335,7 +334,7 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
 	    if ($skipRows--) {
 		$array = $tbl->{csv_csv_in}->getline ($tbl->{fh}) or
 		    croak "Missing first row";
-		unless ($self->{raw_header}) {
+		unless ($meta->{raw_header}) {
 		    s/\W/_/g for @$array;
 		    }
 		$tbl->{col_names} = $array;
@@ -364,34 +363,38 @@ sub fetch_row
 {
     my ($self, $data) = @_;
 
+#   use DP; print STDERR DDumper [ keys %$self ];
     exists $self->{cached_row} and
 	return $self->{row} = delete $self->{cached_row};
 
-    my $csv = $self->{csv_csv_in} or
+    my $tbl = $DBD::File::VERSION <= 0.38 ? $self : $self->{meta};
+
+    my $csv = $tbl->{csv_csv_in} or
 	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
 
     my $fields;
-    eval { $fields = $csv->getline ($self->{fh}) };
+    eval { $fields = $csv->getline ($tbl->{fh}) };
     unless ($fields) {
 	$csv->eof and return;
 
 	my @diag = $csv->error_diag;
-	croak "Error $diag[0] while reading file $self->{file}: $diag[1]";
+	croak "Error $diag[0] while reading file $tbl->{file}: $diag[1]";
 	}
-    @$fields < @{$self->{col_names}} and
-	push @$fields, (undef) x (@{$self->{col_names}} - @$fields);
-    $self->{row} = (@$fields ? $fields : undef);
+    @$fields < @{$tbl->{col_names}} and
+	push @$fields, (undef) x (@{$tbl->{col_names}} - @$fields);
+    $tbl->{row} = (@$fields ? $fields : undef);
     } # fetch_row
 
 sub push_row
 {
     my ($self, $data, $fields) = @_;
-    my $csv = $self->{csv_csv_out};
-    my $fh  = $self->{fh};
+    my $tbl = $DBD::File::VERSION <= 0.38 ? $self : $self->{meta};
+    my $csv = $tbl->{csv_csv_out};
+    my $fh  = $tbl->{fh};
 
     unless ($csv->print ($fh, $fields)) {
 	my @diag = $csv->error_diag;
-	croak "Error $diag[0] while writing file $self->{file}: $diag[1]";
+	croak "Error $diag[0] while writing file $tbl->{file}: $diag[1]";
 	}
     1;
     } # push_row
