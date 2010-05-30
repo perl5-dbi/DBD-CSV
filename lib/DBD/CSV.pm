@@ -83,8 +83,8 @@ sub connect
 {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
-    $dbh->{csv_tables} ||= {};
-    $dbh->{Active}       = 1;
+    $dbh->{f_meta} ||= {};
+    $dbh->{Active}   = 1;
     $dbh;
     } # connect
 
@@ -122,16 +122,17 @@ sub set_versions
 sub STORE
 {
     my ($self, @attr) = @_;
-    if (@attr && $DBD::File::VERSION > 0.38) {	# Backward compatibility
-	#use DP;print STDERR DDumper \@attr;
-	if ($attr[0] eq "csv_tables" && $attr[1] && ref $attr[1] eq "HASH") {
-	    $self->SUPER::STORE ("f_meta", { $_ => $attr[1]{$_} }) for keys %{$attr[1]};
-	    return;
-	    }
-	}
-
+    @attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
     $self->SUPER::STORE (@attr);
     } # STORE
+
+sub FETCH
+{
+    my ($self, @attr) = @_;
+    use DP;
+    @attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
+    $self->SUPER::FETCH (@attr);
+    } # FETCH
 
 # --- STATEMENT ----------------------------------------------------------------
 
@@ -185,7 +186,7 @@ $DBD::File::VERSION <= 0.38 and *open_table = sub {
     my ($self, $data, $table, $createMode, $lockMode) = @_;
 
     my $dbh    = $data->{Database};
-    my $tables = $dbh->{csv_tables};
+    my $tables = $dbh->{f_meta};
        $tables->{$table} ||= {};
     my $meta   = $tables->{$table} || {};
     my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
@@ -284,12 +285,6 @@ sub bootstrap_table_meta
 {
     my ($self, $dbh, $meta, $table) = @_;
 
-    if (defined $dbh->{csv_tables}{$table}) {
-	my $old_meta = $dbh->{csv_tables}{$table};
-	defined $old_meta->{file} and
-	    $meta->{f_fqfn} = $old_meta->{file};
-	}
-
     $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
     } # bootstrap_table_meta
 
@@ -299,16 +294,9 @@ sub init_table_meta
 
     $self->SUPER::init_table_meta ($dbh, $table, $meta);
 
-    if (defined $dbh->{csv_tables}{$table}) {
-	my $old_meta = $dbh->{csv_tables}{$table};
-	defined $old_meta->{file} and
-	    $meta->{f_fqfn} = $old_meta->{file};
-	# merge hash?
-	}
-
     my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
     unless ($csv_in) {
-	my %opts  = ( binary => 1 );
+	my %opts = ( binary => 1 );
 
 	# Allow specific Text::CSV_XS options
 	foreach my $key (grep m/^csv_/ => keys %$dbh) {
