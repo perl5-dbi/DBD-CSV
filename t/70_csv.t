@@ -2,6 +2,7 @@
 
 use strict;
 use Test::More tests => 67;
+use Cwd;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
@@ -15,10 +16,12 @@ my @tbl_def = (
 sub DbFile;
 
 my $dir = DbDir () || "output";
+my $fqd = Cwd::abs_path $dir;
 
 ok (my $dbh = Connect (),			"connect");
 
-is ($dbh->{f_dir},  $dir,			"default dir");
+ok ($dbh->{f_dir} eq $dir ||
+    $dbh->{f_dir} eq $fqd,			"default dir");
 ok ($dbh->{f_dir} = $dir,			"set f_dir");
 
 ok (my $tbl  = FindNewTable ($dbh),		"find new test table");
