@@ -1,0 +1,2 @@
+setenv PERL5LIB /pro/3gl/CPAN/DBI-svn/blib/lib:/pro/3gl/CPAN/DBI-svn/blib/arch
+setenv PERL5LIB $PERL5LIB":"/pro/3gl/CPAN/SS-svn/blib/lib:/pro/3gl/CPAN/SS-svn/blib/arch
