@@ -161,7 +161,7 @@ sub DbDir
 {
     @_ and $test_dir = File::Spec->catdir (File::Spec->curdir (), shift);
     $test_dir;
-    } # DbFile
+    } # DbDir
 
 sub DbFile
 {
