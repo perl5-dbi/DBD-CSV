@@ -109,11 +109,12 @@ build_requires:
     Test::Harness:       0
     Test::More:          0
     Encode:              0
+    Cwd:                 0
     charnames:           0
 recommends:     
-    perl:                5.012000
+    perl:                5.012001
     Text::CSV_XS:        0.73
-    SQL::Statement:      1.26
+    SQL::Statement:      1.27
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
