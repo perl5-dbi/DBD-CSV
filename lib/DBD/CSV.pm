@@ -285,6 +285,7 @@ sub bootstrap_table_meta
 {
     my ($self, $dbh, $meta, $table) = @_;
 
+    $dbh->{f_meta}{$table}{file} and $meta->{f_fqfn} = $dbh->{f_meta}{$table}{file};
     $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
     } # bootstrap_table_meta
 

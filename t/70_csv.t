@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 67;
+use Test::More tests => 73;
 use Cwd;
 
 BEGIN { use_ok ("DBI"); }
@@ -33,9 +33,15 @@ ok (!-f DbFile ($tbl2),				"does not exist");
 ok (my $tbl3 = FindNewTable ($dbh),		"find new test table");
 ok (!-f DbFile ($tbl3),				"does not exist");
 
+ok (my $tbl4 = FindNewTable ($dbh),		"find new test table");
+ok (!-f DbFile ($tbl4),				"does not exist");
+
 isnt ($tbl,  $tbl2,				"different 1 2");
 isnt ($tbl,  $tbl3,				"different 1 3");
+isnt ($tbl,  $tbl4,				"different 1 4");
 isnt ($tbl2, $tbl3,				"different 2 3");
+isnt ($tbl2, $tbl4,				"different 2 4");
+isnt ($tbl3, $tbl4,				"different 3 4");
 
 like (my $def = TableDefinition ($tbl, @tbl_def),
 	qr{^create table $tbl}i,		"table definition");
@@ -76,11 +82,13 @@ $dsn = "DBI:CSV:";
 ok ($dbh = Connect ($dsn),			"connect");
 
 # Check, whether the csv_tables->{$tbl}{file} attribute works
-ok ($dbh->{csv_tables}{$tbl}{file} = DbFile ($tbl), "set table/file");
-ok ($dbh->do ($def),				"create table");
-ok (-f DbFile ($tbl),				"does exists");
+like (my $def4 = TableDefinition ($tbl4, @tbl_def),
+	qr{^create table $tbl4}i,		"table definition");
+ok ($dbh->{csv_tables}{$tbl4}{file} = DbFile ($tbl4), "set table/file");
+ok ($dbh->do ($def4),				"create table");
+ok (-f DbFile ($tbl4),				"does exists");
 
-ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok ($dbh->do ("drop table $tbl4"),		"drop table");
 
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;

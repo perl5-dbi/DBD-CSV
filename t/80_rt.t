@@ -219,8 +219,8 @@ while (<DATA>) {
     close FILE;
 
     ok (my $dbh = Connect ({ f_lock => 0 }),					"connect");
-    ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
     $dbh->{csv_tables}{rt51090}{types} = [ @dbitp ];
+    ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
     is_deeply ($dbh->{csv_tables}{rt51090}{types}, \@dbitp,	"set types (@dbitp)");
 
     ok ($sth->execute (),					"execute");
