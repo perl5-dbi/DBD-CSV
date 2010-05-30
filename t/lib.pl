@@ -13,6 +13,9 @@ my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$test_dir";
 my $test_user = $ENV{DBI_USER} || "";
 my $test_pass = $ENV{DBI_PASS} || "";
 
+# Start each test clean
+unlink glob "$test_dir/*";
+
 sub COL_NULLABLE () { 1 }
 sub COL_KEY      () { 2 }
 
