@@ -1,2 +1,5 @@
-setenv PERL5LIB /pro/3gl/CPAN/DBI-svn/blib/lib:/pro/3gl/CPAN/DBI-svn/blib/arch
-setenv PERL5LIB $PERL5LIB":"/pro/3gl/CPAN/SS-svn/blib/lib:/pro/3gl/CPAN/SS-svn/blib/arch
+setenv PERL5LIB `perl \
+ -e '$a = "/pro/3gl/CPAN";' \
+ -e 'print join ":" => grep { -d } map { ( "$a/$_/blib/lib", "$a/$_/blib/arch" ) }' \
+ -e '    qw( DBI-svn Text-CSV_XS SS-svn )' \
+ `
