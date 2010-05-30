@@ -9,14 +9,15 @@ use DBI;
 use Text::CSV_XS;
 use Encode qw( encode );
 
-use Test::More tests => 36;
+use Test::More tests => 46;
 
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
 ok (my $dbh = Connect ({ f_ext => ".csv/r", f_schema => undef }), "connect");
 
-ok (my $tbl = FindNewTable ($dbh),		"find new test table");
+ok (my $tbl1 = FindNewTable ($dbh),		"find new test table");
+ok (my $tbl2 = FindNewTable ($dbh),		"find new test table");
 
 my @data = (
     "The \N{SNOWMAN} is melting",
@@ -25,7 +26,8 @@ my @data = (
     "Unicode makes me \N{WHITE SMILING FACE}",
     );
 ok ("Creating table with UTF-8 content");
-{   ok (my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }), "New csv");
+foreach my $tbl ($tbl1, $tbl2) {
+    ok (my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }), "New csv");
     ok (open (my $fh, ">:utf8", "output/$tbl.csv"), "Open CSV");
     ok ($csv->print ($fh, [ "id", "str" ]), "CSV print header");
     ok ($csv->print ($fh, [ $_, $data[$_ - 1] ]), "CSV row $_") for 1 .. scalar @data;
@@ -36,7 +38,7 @@ ok ("Creating table with UTF-8 content");
 
     my $row;
 
-    ok (my $sth = $dbh->prepare ("select * from $tbl"), "prepare");
+    ok (my $sth = $dbh->prepare ("select * from $tbl1"), "prepare");
     ok ($sth->execute,				"execute");
     foreach my $i (1 .. scalar @data) {
 	ok ($row = $sth->fetch,			"fetch $i");
@@ -50,7 +52,7 @@ ok ("Creating table with UTF-8 content");
 
     my $row;
 
-    ok (my $sth = $dbh->prepare ("select * from $tbl"), "prepare");
+    ok (my $sth = $dbh->prepare ("select * from $tbl2"), "prepare");
     ok ($sth->execute,				"execute");
     foreach my $i (1 .. scalar @data) {
 	ok ($row = $sth->fetch,			"fetch $i");
@@ -60,5 +62,6 @@ ok ("Creating table with UTF-8 content");
     undef $sth;
     }
 
-ok ($dbh->do ("drop table $tbl"),		"drop table");
+ok ($dbh->do ("drop table $tbl1"),		"drop table");
+ok ($dbh->do ("drop table $tbl2"),		"drop table");
 ok ($dbh->disconnect,				"disconnect");
