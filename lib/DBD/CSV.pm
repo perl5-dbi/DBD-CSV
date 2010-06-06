@@ -98,20 +98,6 @@ $DBD::CSV::db::imp_data_size = 0;
 
 @DBD::CSV::db::ISA = qw( DBD::File::db );
 
-$DBD::File::VERSION <= 0.38 and *csv_cache_sql_parser_object = sub {
-    my $dbh = shift;
-    my $parser = {
-	dialect    => "CSV",
-	RaiseError => $dbh->FETCH ("RaiseError"),
-	PrintError => $dbh->FETCH ("PrintError"),
-	};
-    my $sql_flags  =  $dbh->FETCH ("csv_sql") || {};
-    %$parser = (%$parser, %$sql_flags);
-     $parser = SQL::Parser->new ($parser->{dialect}, $parser);
-    $dbh->{csv_sql_parser_object} = $parser;
-    return $parser;
-    }; # csv_cache_sql_parser_object
-
 sub set_versions
 {
     my $this = shift;
@@ -285,7 +271,9 @@ sub bootstrap_table_meta
 {
     my ($self, $dbh, $meta, $table) = @_;
 
-    $dbh->{f_meta}{$table}{file} and $meta->{f_fqfn} = $dbh->{f_meta}{$table}{file};
+    my $fqfn;
+    exists $dbh->{f_meta}{$table} && ($fqfn = $dbh->{f_meta}{$table}{file}) and
+	$meta->{f_fqfn} = $fqfn;
     $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
     } # bootstrap_table_meta
 
