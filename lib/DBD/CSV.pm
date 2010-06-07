@@ -584,7 +584,7 @@ We were told, that VMS might - for whatever reason - require:
 
     $dbh = DBI->connect ("dbi:CSV:f_dir=");
 
-The prefered way of passing the arguments is by driver attributes:
+The preferred way of passing the arguments is by driver attributes:
 
     # specify most possible flags via driver flags
     $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
@@ -620,7 +620,7 @@ otherwise be seen as attribute separator:
 	"csv_quote_char=\";csv_escape_char=\\;csv_class=Text::CSV_XS;" .
 	"csv_null=1") or die $DBI::errstr;
 
-Using attributes in the DNS is easier to use when the DNS is derived from an
+Using attributes in the DSN is easier to use when the DSN is derived from an
 outside source (environment variable, database entry, or configure file),
 whereas using all entries in the attribute hash is easier to read and to
 maintain.
@@ -656,7 +656,7 @@ First all data in the string:
 	       $dbh->quote ("foobar") . ")");
 
 Note the use of the quote method for escaping the word "foobar". Any
-string must be escaped, even if it doesn't contain binary data.
+string must be escaped, even if it does not contain binary data.
 
 Next an example using parameters:
 
@@ -804,7 +804,7 @@ Valid after C<$sth-E<gt>execute>; undef for Non-Select statements.
 =item NULLABLE
 
 Not really working. Always returns an array ref of one's, as DBD::CSV
-doesn't verify input data. Valid after C<$sth-E<gt>execute>; undef for
+does not verify input data. Valid after C<$sth-E<gt>execute>; undef for
 non-Select statements.
 
 =back
@@ -835,8 +835,8 @@ This attribute is used for setting the file extension.
 
 =item f_schema
 
-This attribute allows you to set the database schema name. The default
-is to use the owner of C<f_dir>. C<undef> is allowed, but not in the DSN part.
+This attribute allows you to set the database schema name. The default is
+to use the owner of C<f_dir>. C<undef> is allowed, but not in the DSN part.
 
     my $dbh = DBI->connect ("dbi:CSV:", "", "", {
 	f_schema => undef,
@@ -1054,10 +1054,10 @@ These methods are inherited from DBD::File:
 
 =item data_sources
 
-The C<data_sources> method returns a list of subdirectories of the current
+The C<data_sources> method returns a list of sub-directories of the current
 directory in the form "dbi:CSV:directory=$dirname".
 
-If you want to read the subdirectories of another directory, use
+If you want to read the sub-directories of another directory, use
 
     my $drh  = DBI->install_driver ("CSV");
     my @list = $drh->data_sources (f_dir => "/usr/local/csv_data");
