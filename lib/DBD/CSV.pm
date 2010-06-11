@@ -105,20 +105,34 @@ sub set_versions
     return $this->SUPER::set_versions ();
     } # set_versions
 
-sub STORE
-{
-    my ($self, @attr) = @_;
-    @attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
-    $self->SUPER::STORE (@attr);
-    } # STORE
+if ($DBD::File::VERSION <= 0.38) {
+    # Map csv_tables to f_meta.
+    # Not absolutely needed, but otherwise I have to write two test suites
+    *STORE = sub {
+	my ($self, @attr) = @_;
+	@attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
+	$self->SUPER::STORE (@attr);
+	}; # STORE
 
-sub FETCH
+    *FETCH = sub {
+	my ($self, @attr) = @_;
+	use DP;
+	@attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
+	$self->SUPER::FETCH (@attr);
+	}; # FETCH
+    }
+
+sub init_valid_attributes
 {
-    my ($self, @attr) = @_;
-    use DP;
-    @attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
-    $self->SUPER::FETCH (@attr);
-    } # FETCH
+    my $dbh = shift;
+
+    # $dbh->{csv_valid_attrs} = {};
+    # $dbh->{csv_readonly_attrs} = {};
+
+    $dbh->{csv_meta} = "csv_tables";
+
+    return $dbh->SUPER::init_valid_attributes ();
+    } # init_valid_attributes
 
 # --- STATEMENT ----------------------------------------------------------------
 
@@ -221,7 +235,7 @@ $DBD::File::VERSION <= 0.38 and *open_table = sub {
 	    for (@{$types}) {
 		$_ = $_
 		    ? $DBD::CSV::dr::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
-		    : Text::CSV_XS::PV();
+		    : Text::CSV_XS::PV ();
 		push @$t, $_;
 		}
 	    $tbl->{types} = $t;
@@ -267,16 +281,6 @@ use Carp;
 
 @DBD::CSV::Table::ISA = qw(DBD::File::Table);
 
-sub bootstrap_table_meta
-{
-    my ($self, $dbh, $meta, $table) = @_;
-
-    my $fqfn;
-    exists $dbh->{f_meta}{$table} && ($fqfn = $dbh->{f_meta}{$table}{file}) and
-	$meta->{f_fqfn} = $fqfn;
-    $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
-    } # bootstrap_table_meta
-
 sub init_table_meta
 {
     my ($self, $dbh, $meta, $table) = @_;
@@ -291,7 +295,7 @@ sub init_table_meta
 	foreach my $key (grep m/^csv_/ => keys %$dbh) {
 	    (my $attr = $key) =~ s/csv_//;
 	    $attr =~ m{^(?: eol | sep | quote | escape	# Handled below
-			  | tables | sql_parser_object	# Not for Text::CSV_XS
+			  | tables | meta		# Not for Text::CSV_XS
 			  | sponge_driver | version	# internal
 			  )$}x and next;
 	    $opts{$attr} = $dbh->{$key};
@@ -299,8 +303,8 @@ sub init_table_meta
 	delete $opts{null} and
 	    $opts{blank_is_undef} = $opts{always_quote} = 1;
 
-	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
-	my $eol   = $meta->{eol}   || $dbh->{csv_eol}   || "\r\n";
+	my $class = $meta->{csv_class} || $dbh->{csv_class} || "Text::CSV_XS";
+	my $eol   = $meta->{csv_eol}   || $dbh->{csv_eol}   || "\r\n";
 	$eol =~ m/^\A(?:[\r\n]|\r\n)\Z/ or $opts{eol} = $eol;
 	for ([ "sep",    ',' ],
 	     [ "quote",  '"' ],
@@ -322,6 +326,28 @@ sub init_table_meta
 	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
     } # init_table_meta
 
+my %compat_map = (
+    file  => "f_file",
+    class => "csv_class",
+    eof   => "csv_eof",
+    );
+
+sub get_table_meta_attr
+{
+    my ($class, $meta, $attrib) = @_;
+    defined $compat_map{$attrib} and
+        return $class->SUPER::get_table_meta_attr ($meta, $compat_map{$attrib});
+    return $class->SUPER::get_table_meta_attr ($meta, $attrib);
+    } # get_table_meta_attr
+
+sub set_table_meta_attr
+{
+    my ($class, $meta, $attrib, $value) = @_;
+    defined $compat_map{$attrib} and
+        return $class->SUPER::set_table_meta_attr ($meta, $compat_map{$attrib}, $value);
+    return $class->SUPER::set_table_meta_attr ($meta, $attrib, $value);
+    } # set_table_meta_attr
+
 $DBD::File::VERSION > 0.38 and *open_file = sub {
     my ($self, $meta, $attrs, $flags) = @_;
     $self->SUPER::open_file ($meta, $attrs, $flags);
@@ -340,7 +366,7 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
 	    for (@{$types}) {
 		$_ = $_
 		    ? $DBD::CSV::dr::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
-		    : Text::CSV_XS::PV();
+		    : Text::CSV_XS::PV ();
 		push @$t, $_;
 		}
 	    $tbl->{types} = $t;
@@ -441,7 +467,7 @@ DBD::CSV - DBI driver for CSV files
 	die "Cannot connect: $DBI::errstr";
 
     # Simple statements
-    $dbh->do ("CREATE TABLE a (id INTEGER, name CHAR(10))") or
+    $dbh->do ("CREATE TABLE a (id INTEGER, name CHAR (10))") or
 	die "Cannot prepare: " . $dbh->errstr ();
 
     # Selecting
@@ -629,11 +655,11 @@ maintain.
 
 You can create and drop tables with commands like the following:
 
-    $dbh->do ("CREATE TABLE $table (id INTEGER, name CHAR(64))");
+    $dbh->do ("CREATE TABLE $table (id INTEGER, name CHAR (64))");
     $dbh->do ("DROP TABLE $table");
 
 Note that currently only the column names will be stored and no other data.
-Thus all other information including column type (INTEGER or CHAR(x), for
+Thus all other information including column type (INTEGER or CHAR (x), for
 example), column attributes (NOT NULL, PRIMARY KEY, ...) will silently be
 discarded. This may change in a later release.
 
