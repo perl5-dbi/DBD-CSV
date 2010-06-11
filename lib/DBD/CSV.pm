@@ -116,7 +116,6 @@ if ($DBD::File::VERSION <= 0.38) {
 
     *FETCH = sub {
 	my ($self, @attr) = @_;
-	use DP;
 	@attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
 	$self->SUPER::FETCH (@attr);
 	}; # FETCH
