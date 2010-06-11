@@ -1,4 +1,4 @@
-personal_ws-1.1 en 20 
+personal_ws-1.1 en 29 
 AutoCommit
 ChopBlanks
 cpan
@@ -11,11 +11,20 @@ DBI
 DSN
 eol
 Jochen
+Merijn
 metadata
 Metadata
 multi
 nullable
+overwritable
 PrintError
 RaiseError
+README
+SQL
+TODO
+toolchain
+unix
+VMS
 Wiedmann
+WinZip
 Zucker
