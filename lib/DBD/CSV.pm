@@ -154,7 +154,7 @@ sub get_csv_versions
 	$meta = {};
 	$class->bootstrap_table_meta ($dbh, $meta, $table);
 	}
-    my $dvsn  = $meta->{csv_class}->VERSION ();
+    my $dvsn  = eval { $meta->{csv_class}->VERSION (); };
     my $dtype = $meta->{csv_class};
     $dvsn and $dtype .= " ($dvsn)";
     return sprintf "%s using %s", $dbh->{csv_version}, $dtype;
