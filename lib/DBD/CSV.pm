@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.29_01";
+$VERSION  = "0.29_02";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -119,6 +119,15 @@ if ($DBD::File::VERSION <= 0.38) {
 	@attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
 	$self->SUPER::FETCH (@attr);
 	}; # FETCH
+
+    *DBI::db::csv_versions = *csv_versions = sub {
+	join "\n",
+	    "DBD::CSV     $DBD::CSV::VERSION using Text::CSV_XS-$Text::CSV_XS::VERSION",
+	    "  DBD::File  $DBD::File::VERSION",
+	    "DBI          $DBI::VERSION",
+	    "OS           $^O",
+	    "Perl         $]";
+	}; # csv_versions
     }
 
 sub init_valid_attributes
@@ -132,6 +141,24 @@ sub init_valid_attributes
 
     return $dbh->SUPER::init_valid_attributes ();
     } # init_valid_attributes
+
+sub get_csv_versions
+{
+    my ($dbh, $table) = @_;
+    $table ||= "";
+    my $class = $dbh->{ImplementorClass};
+    $class =~ s/::db$/::Table/;
+    my $meta;
+    $table and (undef, $meta) = $class->get_table_meta ($dbh, $table, 1);
+    unless ($meta) {
+	$meta = {};
+	$class->bootstrap_table_meta ($dbh, $meta, $table);
+	}
+    my $dvsn  = $meta->{csv_class}->VERSION ();
+    my $dtype = $meta->{csv_class};
+    $dvsn and $dtype .= " ($dvsn)";
+    return sprintf "%s using %s", $dbh->{csv_version}, $dtype;
+    } # get_csv_versions 
 
 # --- STATEMENT ----------------------------------------------------------------
 
@@ -147,11 +174,21 @@ sub FETCH
 {
     my ($sth, $attr) = @_;
 
-    # Being a bit dirty here, as SQL::Statement::Structure does not offer
-    # me an interface to the data I want
-    my $struct   = $sth->{f_stmt}{struct} || {};
-    my @coldefs  = @{ $struct->{column_defs} || [] };
-    my @colnames = map { $_->{name} || $_->{value} } @coldefs;
+    my ($struct, @coldefs, @colnames, $get_cn);
+
+    if (exists $sth->{ImplementorClass} &&
+        ref    $sth->{ImplementorClass} &&
+        ($get_cn = $sth->{ImplementorClass}->can ("sql_get_colnames"))) {
+	$struct   = $sth->{sql_stmt}{struct} || {};
+	@colnames = $get_cn->($sth);
+	}
+    else {
+	# Being a bit dirty here, as SQL::Statement::Structure does not offer
+	# me an interface to the data I want
+	$struct   = $sth->{f_stmt}{struct} || {};
+	@coldefs  = @{ $struct->{column_defs} || [] };
+	@colnames = map { $_->{name} || $_->{value} } @coldefs;
+	}
 
     $attr eq "TYPE"      and
 	return [ map { $struct->{table_defs}->{columns}{$_}{data_type}   || "CHAR" }
@@ -280,6 +317,16 @@ use Carp;
 
 @DBD::CSV::Table::ISA = qw(DBD::File::Table);
 
+sub bootstrap_table_meta
+{
+    my ($self, $dbh, $meta, $table) = @_;
+    $meta->{csv_class} ||= $dbh->{csv_class} || "Text::CSV_XS";
+    $meta->{csv_eol}   ||= $dbh->{csv_eol}   || "\r\n";
+    exists $meta->{csv_skip_first_row} or
+	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
+    $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
+    } # bootstrap_table_meta
+
 sub init_table_meta
 {
     my ($self, $dbh, $meta, $table) = @_;
@@ -302,8 +349,8 @@ sub init_table_meta
 	delete $opts{null} and
 	    $opts{blank_is_undef} = $opts{always_quote} = 1;
 
-	my $class = $meta->{csv_class} || $dbh->{csv_class} || "Text::CSV_XS";
-	my $eol   = $meta->{csv_eol}   || $dbh->{csv_eol}   || "\r\n";
+	my $class = $meta->{csv_class};
+	my $eol   = $meta->{csv_eol};
 	$eol =~ m/^\A(?:[\r\n]|\r\n)\Z/ or $opts{eol} = $eol;
 	for ([ "sep",    ',' ],
 	     [ "quote",  '"' ],
@@ -320,9 +367,6 @@ sub init_table_meta
 	$meta->{csv_out} = $class->new (\%opts) or
 	    $class->error_diag;
 	}
-
-    exists $meta->{csv_skip_first_row} or
-	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
     } # init_table_meta
 
 my %compat_map = (

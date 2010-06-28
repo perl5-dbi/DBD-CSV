@@ -3,7 +3,7 @@
 # Test whether the driver can be installed
 
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 BEGIN {
     use_ok ("DBI");
@@ -29,3 +29,8 @@ ok (my $drh = DBI->install_driver ("CSV"), "Install driver");
 is (ref $drh, "DBI::dr", "Driver class installed");
 
 ok ($drh->{Version}, "Driver version $drh->{Version}");
+
+my $dbh = DBI->connect ("dbi:CSV:");
+my $csv_version_info = $dbh->csv_versions ();
+ok ($csv_version_info, "csv_versions");
+diag ($csv_version_info);

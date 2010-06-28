@@ -149,7 +149,9 @@ while (<DATA>) {
     ok ($dbh = Connect ({ raw_headers => 1 }),			"connect");
     ok ($sth = $dbh->prepare ("select * from rt$rt"),		"prepare");
     # $sth is `empty' and should fail on all actions
-    is ($sth->{NAME_lc}, undef,					"field names");
+    $sth->{NAME_lc}	# this can return undef or an empty list
+	? is_deeply ($sth->{NAME_lc}, [],			"field names")
+	: is ($sth->{NAME_lc}, undef,				"field names");
     ok ($sth->finish,						"finish");
 
     ok ($dbh->do ("drop table rt$rt"),				"drop table");
