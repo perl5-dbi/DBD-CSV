@@ -170,42 +170,34 @@ $DBD::CSV::st::imp_data_size = 0;
 
 @DBD::CSV::st::ISA = qw(DBD::File::st);
 
-sub FETCH
-{
+$DBD::File::VERSION <= 0.38 and *FETCH = sub {
     my ($sth, $attr) = @_;
 
-    my ($struct, @coldefs, @colnames, $get_cn);
+    my ($stmt, @coldefs, @colnames);
 
-    if (exists $sth->{ImplementorClass} &&
-        ref    $sth->{ImplementorClass} &&
-        ($get_cn = $sth->{ImplementorClass}->can ("sql_get_colnames"))) {
-	$struct   = $sth->{sql_stmt}{struct} || {};
-	@colnames = $get_cn->($sth);
-	}
-    else {
-	# Being a bit dirty here, as SQL::Statement::Structure does not offer
-	# me an interface to the data I want
-	$struct   = $sth->{f_stmt}{struct} || {};
-	@coldefs  = @{ $struct->{column_defs} || [] };
-	@colnames = map { $_->{name} || $_->{value} } @coldefs;
-	}
+    # Being a bit dirty here, as SQL::Statement::Structure does not offer
+    # me an interface to the data I want
+    $stmt     = $sth->{f_stmt} || {};
+    @coldefs  = @{ $stmt->{column_defs} || [] };
+    @colnames = map { $_->{name} || $_->{value} } @coldefs;
 
+    # dangerous: this accesses the table_defs information from last CREATE TABLE statement
     $attr eq "TYPE"      and
-	return [ map { $struct->{table_defs}->{columns}{$_}{data_type}   || "CHAR" }
+	return [ map { $stmt->{struct}{table_defs}{columns}{$_}{data_type}   || "CHAR" }
 		    @colnames ];
 
     $attr eq "PRECISION" and
-	return [ map { $struct->{table_defs}->{columns}{$_}{data_length} || 0 }
+	return [ map { $stmt->{struct}{table_defs}{columns}{$_}{data_length} || 0 }
 		    @colnames ];
 
     $attr eq "NULLABLE"  and
 	return [ map { ( grep m/^NOT NULL$/ =>
-		    @{ $struct->{table_defs}->{columns}{$_}{constraints} || [] } )
+		    @{ $stmt->{struct}{table_defs}{columns}{$_}{constraints} || [] } )
 		       ? 0 : 1 }
 		    @colnames ];
 
     return $sth->SUPER::FETCH ($attr);
-    } # FETCH
+    }; # FETCH
 
 package DBD::CSV::Statement;
 
