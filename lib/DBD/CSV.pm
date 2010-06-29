@@ -173,26 +173,26 @@ $DBD::CSV::st::imp_data_size = 0;
 $DBD::File::VERSION <= 0.38 and *FETCH = sub {
     my ($sth, $attr) = @_;
 
-    my ($stmt, @coldefs, @colnames);
+    my ($struct, @coldefs, @colnames);
 
     # Being a bit dirty here, as SQL::Statement::Structure does not offer
     # me an interface to the data I want
-    $stmt     = $sth->{f_stmt} || {};
-    @coldefs  = @{ $stmt->{column_defs} || [] };
+    $struct   = $sth->{f_stmt}{struct} || {};
+    @coldefs  = @{ $struct->{column_defs} || [] };
     @colnames = map { $_->{name} || $_->{value} } @coldefs;
 
     # dangerous: this accesses the table_defs information from last CREATE TABLE statement
     $attr eq "TYPE"      and
-	return [ map { $stmt->{struct}{table_defs}{columns}{$_}{data_type}   || "CHAR" }
+	return [ map { $struct->{table_defs}{columns}{$_}{data_type}   || "CHAR" }
 		    @colnames ];
 
     $attr eq "PRECISION" and
-	return [ map { $stmt->{struct}{table_defs}{columns}{$_}{data_length} || 0 }
+	return [ map { $struct->{table_defs}{columns}{$_}{data_length} || 0 }
 		    @colnames ];
 
     $attr eq "NULLABLE"  and
 	return [ map { ( grep m/^NOT NULL$/ =>
-		    @{ $stmt->{struct}{table_defs}{columns}{$_}{constraints} || [] } )
+		    @{ $struct->{table_defs}{columns}{$_}{constraints} || [] } )
 		       ? 0 : 1 }
 		    @colnames ];
 
