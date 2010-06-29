@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 38;
+use Test::More tests => 65;
 
 # This driver should check if 'ChopBlanks' works.
 $^W = 1;
@@ -26,6 +26,9 @@ my @rows = (
     [ 1, "NULL",	],
     [ 2, " ",		],
     [ 3, " a b c ",	],
+    [ 4, " a \r ",	],
+    [ 5, " a \t ",	],
+    [ 6, " a \n ",	],
     );
 ok (my $sti = $dbh->prepare ("insert into $tbl (id, name) values (?, ?)"), "prepare ins");
 ok (my $sth = $dbh->prepare ("select id, name from $tbl where id = ?"),    "prepare sel");
@@ -42,6 +45,9 @@ foreach my $row (@rows) {
     ok (1,					"ChopBlanks 1");
     ok ($sth->execute ($row->[0]),		"execute");
     s/ +$// for @$row;
+    if ($DBD::File::VERSION <= 0.38) {
+	s/\s+$// for @$row;	# Bug fixed in new DBI
+	}
     ok ($r = $sth->fetch,			"fetch");
     is_deeply ($r, $row,			"content");
     }
