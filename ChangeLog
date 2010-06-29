@@ -1,4 +1,8 @@
-2010-05-30  0.30  H.Merijn Brand
+2010-06-29  0.29_02  H.Merijn Brand
+
+    * Better diagnostics for missing modules
+
+2010-06-11  0.29_01  H.Merijn Brand
 
     * Prepare for DBD::File-0.39 (DBI-1.612+)
       Should still work with older DBI versions

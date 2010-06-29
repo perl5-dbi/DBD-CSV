@@ -20,13 +20,16 @@ sub COL_NULLABLE () { 1 }
 sub COL_KEY      () { 2 }
 
 my %v;
-eval "require $_; \$v{'$_'} = \$_::VERSION;" for qw(
-    DBI SQL::Statement Text::CSV_XS DBD::CSV );
+{   my @req = qw( DBI SQL::Statement Text::CSV_XS DBD::CSV );
+    my $req = join ";\n" => map { qq{require $_;\n\$v{"$_"} = $_->VERSION ()} } @req;
+    eval $req;
 
-if ($@) {
-    my @missing = grep { exists $v{$_} } qw( DBI SQL CSV );
-    print STDERR "\n\nYOU ARE MISSING REQUIRED MODULES: [ @missing ]\n\n";
-    exit 0;
+    if ($@) {
+	use DP;DDumper\%v;
+	my @missing = grep { !exists $v{$_} } @req;
+	print STDERR "\n\nYOU ARE MISSING REQUIRED MODULES: [ @missing ]\n\n";
+	exit 0;
+	}
     }
 
 sub AnsiTypeToDb
