@@ -1,11 +1,20 @@
-2010-06-29  0.29_02  H.Merijn Brand
+2010-07-02  0.29_02  H.Merijn Brand
 
+    * More work to keep in sync with DBI development (Jens)
     * Better diagnostics for missing modules
+    * More spell-check fixes
+    * Tests for ChopBlanks (now fixed in DBD::File)
+    * Tests changed to accept old and new DBI
+    * Statement handle attributes handled in new DBD::File
 
 2010-06-11  0.29_01  H.Merijn Brand
 
     * Prepare for DBD::File-0.39 (DBI-1.612+)
       Should still work with older DBI versions
+    * Documentation updates (style, consistency, spell-checking)
+    * Test folder cleanup
+    * More tests for insert
+    * Tested RT#58039
 
 2010-05-03  0.29  H.Merijn Brand
 
