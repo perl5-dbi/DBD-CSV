@@ -25,7 +25,6 @@ my %v;
     eval $req;
 
     if ($@) {
-	use DP;DDumper\%v;
 	my @missing = grep { !exists $v{$_} } @req;
 	print STDERR "\n\nYOU ARE MISSING REQUIRED MODULES: [ @missing ]\n\n";
 	exit 0;

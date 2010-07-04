@@ -1,3 +1,7 @@
+2010-07-04  0.29_03  H.Merijn Brand
+
+    * Remove leftover debug. Causes fails
+
 2010-07-02  0.29_02  H.Merijn Brand
 
     * More work to keep in sync with DBI development (Jens)
