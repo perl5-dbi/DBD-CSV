@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.29_03";
+$VERSION  = "0.29_04";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -134,8 +134,25 @@ sub init_valid_attributes
 {
     my $dbh = shift;
 
-    # $dbh->{csv_valid_attrs} = {};
-    # $dbh->{csv_readonly_attrs} = {};
+    $dbh->{csv_valid_attrs} = { map {( "csv_$_" => 1 )} qw(
+
+	class version meta tables in csv_in out csv_out skip_first_row
+	valid_attrs readonly_attrs
+
+	null
+
+	allow_loose_escapes allow_loose_quotes allow_whitespace
+	always_quote auto_diag binary blank_is_undef empty_is_undef
+	eol escape_char keep_meta_info quote_char quote_null
+	quote_space sep_char types verbatim
+
+	)};
+
+    $dbh->{csv_readonly_attrs} = { map { ( "csv_$_" => 1 ) } qw(
+
+	version valid_attrs readonly_attrs
+
+	)};
 
     $dbh->{csv_meta} = "csv_tables";
 
@@ -335,6 +352,7 @@ sub init_table_meta
 	    $attr =~ m{^(?: eol | sep | quote | escape	# Handled below
 			  | tables | meta		# Not for Text::CSV_XS
 			  | sponge_driver | version	# internal
+			  | (?:readonly|valid)_attrs
 			  )$}x and next;
 	    $opts{$attr} = $dbh->{$key};
 	    }
@@ -386,8 +404,6 @@ sub set_table_meta_attr
 $DBD::File::VERSION > 0.38 and *open_file = sub {
     my ($self, $meta, $attrs, $flags) = @_;
     $self->SUPER::open_file ($meta, $attrs, $flags);
-
-#   use DP; print STDERR DDumper { flags => $flags, meta => $meta, self => $self };
 
     my $tbl = $meta;
     if ($tbl && $tbl->{fh}) {
@@ -447,7 +463,6 @@ sub fetch_row
 {
     my ($self, $data) = @_;
 
-#   use DP; print STDERR DDumper [ keys %$self ];
     exists $self->{cached_row} and
 	return $self->{row} = delete $self->{cached_row};
 
