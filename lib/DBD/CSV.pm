@@ -134,7 +134,7 @@ sub init_valid_attributes
 {
     my $dbh = shift;
 
-    my @xs_attr = map { "csv_$_" } qw(
+    my @xs_attr = qw(
 	allow_loose_escapes allow_loose_quotes allow_whitespace
 	always_quote auto_diag binary blank_is_undef empty_is_undef
 	eol escape_char keep_meta_info quote_char quote_null
@@ -142,17 +142,14 @@ sub init_valid_attributes
 
     $dbh->{csv_xs_valid_attrs} = [ @xs_attr ];
 
-    $dbh->{csv_valid_attrs} = { map {( $_ => 1 )} @xs_attr, map { "csv_$_" } qw(
+    $dbh->{csv_valid_attrs} = { map {("csv_$_" => 1 )} @xs_attr, qw(
 
-	class version meta tables in csv_in out csv_out skip_first_row
-	valid_attrs readonly_attrs
+	class tables in csv_in out csv_out skip_first_row
 
 	null sep quote escape
 	)};
 
-    $dbh->{csv_readonly_attrs} = { map { ( "csv_$_" => 1 ) } qw(
-	version valid_attrs readonly_attrs
-	)};
+    $dbh->{csv_readonly_attrs} = { };
 
     $dbh->{csv_meta} = "csv_tables";
 
@@ -347,10 +344,9 @@ sub init_table_meta
 	my %opts = ( binary => 1, auto_diag => 1 );
 
 	# Allow specific Text::CSV_XS options
-	foreach my $key (@{$dbh->{csv_xs_valid_attrs}}) {
-	    (my $attr = $key) =~ s/csv_//;
+	foreach my $attr (@{$dbh->{csv_xs_valid_attrs}}) {
 	    $attr eq "eol" and next; # Handles below
-	    exists $dbh->{$key} and $opts{$attr} = $dbh->{$key};
+	    exists $dbh->{"csv_$attr"} and $opts{$attr} = $dbh->{"csv_$attr"};
 	    }
 	$dbh->{csv_null} || $meta->{csv_null} and
 	    $opts{blank_is_undef} = $opts{always_quote} = 1;
