@@ -1,3 +1,8 @@
+2010-07-06  0.30  H.Merijn Brand
+
+    * Text::CSV_XS now called with auto_diag
+    * Implement valid_attrs
+
 2010-07-04  0.29_03  H.Merijn Brand
 
     * Remove leftover debug. Causes fails

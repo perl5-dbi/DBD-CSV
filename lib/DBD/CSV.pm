@@ -134,24 +134,24 @@ sub init_valid_attributes
 {
     my $dbh = shift;
 
-    $dbh->{csv_valid_attrs} = { map {( "csv_$_" => 1 )} qw(
+    my @xs_attr = map { "csv_$_" } qw(
+	allow_loose_escapes allow_loose_quotes allow_whitespace
+	always_quote auto_diag binary blank_is_undef empty_is_undef
+	eol escape_char keep_meta_info quote_char quote_null
+	quote_space sep_char types verbatim );
+
+    $dbh->{csv_xs_valid_attrs} = [ @xs_attr ];
+
+    $dbh->{csv_valid_attrs} = { map {( $_ => 1 )} @xs_attr, map { "csv_$_" } qw(
 
 	class version meta tables in csv_in out csv_out skip_first_row
 	valid_attrs readonly_attrs
 
-	null
-
-	allow_loose_escapes allow_loose_quotes allow_whitespace
-	always_quote auto_diag binary blank_is_undef empty_is_undef
-	eol escape_char keep_meta_info quote_char quote_null
-	quote_space sep_char types verbatim
-
+	null sep quote escape
 	)};
 
     $dbh->{csv_readonly_attrs} = { map { ( "csv_$_" => 1 ) } qw(
-
 	version valid_attrs readonly_attrs
-
 	)};
 
     $dbh->{csv_meta} = "csv_tables";
@@ -236,7 +236,7 @@ $DBD::File::VERSION <= 0.38 and *open_table = sub {
     my $meta   = $tables->{$table} || {};
     my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
     unless ($csv_in) {
-	my %opts  = ( binary => 1 );
+	my %opts  = ( binary => 1, auto_diag => 1 );
 
 	# Allow specific Text::CSV_XS options
 	foreach my $key (grep m/^csv_/ => keys %$dbh) {
@@ -344,19 +344,15 @@ sub init_table_meta
 
     my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
     unless ($csv_in) {
-	my %opts = ( binary => 1 );
+	my %opts = ( binary => 1, auto_diag => 1 );
 
 	# Allow specific Text::CSV_XS options
-	foreach my $key (grep m/^csv_/ => keys %$dbh) {
+	foreach my $key (@{$dbh->{csv_xs_valid_attrs}}) {
 	    (my $attr = $key) =~ s/csv_//;
-	    $attr =~ m{^(?: eol | sep | quote | escape	# Handled below
-			  | tables | meta		# Not for Text::CSV_XS
-			  | sponge_driver | version	# internal
-			  | (?:readonly|valid)_attrs
-			  )$}x and next;
-	    $opts{$attr} = $dbh->{$key};
+	    $attr eq "eol" and next; # Handles below
+	    exists $dbh->{$key} and $opts{$attr} = $dbh->{$key};
 	    }
-	delete $opts{null} and
+	$dbh->{csv_null} || $meta->{csv_null} and
 	    $opts{blank_is_undef} = $opts{always_quote} = 1;
 
 	my $class = $meta->{csv_class};
