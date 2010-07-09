@@ -2,6 +2,8 @@
 
     * Text::CSV_XS now called with auto_diag
     * Implement valid_attrs
+    * Next version will require DBI-1.612 or higher
+      This is a transition release
 
 2010-07-04  0.29_03  H.Merijn Brand
 

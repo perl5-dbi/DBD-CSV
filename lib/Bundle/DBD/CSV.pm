@@ -2,7 +2,7 @@
 
 package Bundle::DBD::CSV;
 
-$VERSION = "1.04";
+$VERSION = "1.05";
 
 1;
 
@@ -18,15 +18,15 @@ Bundle::DBD::CSV - A bundle to install the DBD::CSV driver
 
 =head1 CONTENTS
 
-DBI 1.611
+DBI 1.612
 
 Text::CSV_XS 0.73
 
-SQL::Statement 1.27
+SQL::Statement 1.28
 
-DBD::File 0.38
+DBD::File 0.39
 
-DBD::CSV 0.29_01
+DBD::CSV 0.30
 
 =head1 DESCRIPTION
 
