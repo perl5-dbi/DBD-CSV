@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.30";
+$VERSION  = "0.31";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -544,7 +544,7 @@ The only system dependent feature that DBD::File uses, is the C<flock ()>
 function. Thus the module should run (in theory) on any system with
 a working C<flock ()>, in particular on all Unix machines and on Windows
 NT. Under Windows 95 and MacOS the use of C<flock ()> is disabled, thus
-the module should still be usable,
+the module should still be usable.
 
 Unlike other DBI drivers, you don't need an external SQL engine or a
 running server. All you need are the following Perl modules, available
