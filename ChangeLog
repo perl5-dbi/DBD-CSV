@@ -1,5 +1,6 @@
 2010-07-09  0.31  H.Merijn Brand
 
+    * Require 5.8.1 (effectively already doing so by requiring DBI-1.1611)
     *
 
 2010-07-09  0.30  H.Merijn Brand

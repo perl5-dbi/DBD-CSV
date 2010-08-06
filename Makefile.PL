@@ -2,7 +2,7 @@
 
 # Copyright (c) 2009-2010 H.Merijn Brand
 
-require 5.005003;
+require 5.008001;
 
 use strict;
 
