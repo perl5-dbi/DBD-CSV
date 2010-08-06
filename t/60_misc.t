@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
-use Test::More tests => 40;
-
 # Misc tests
-$^W = 1;
+
+use strict;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
@@ -65,3 +65,5 @@ is_deeply ($all, [ map { [ $_, "Code $_" ] } 1 .. 9 ],	"content");
 
 ok ($dbh->do ("drop table $tbl"),			"drop table");
 ok ($dbh->disconnect,					"disconnect");
+
+done_testing ();

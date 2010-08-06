@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
-use Test::More tests => 25;
-
 # This tests, whether the number of rows can be retrieved.
-$^W = 1;
+
+use strict;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 require "t/lib.pl";
@@ -70,3 +70,5 @@ undef $sth;
 
 ok ($dbh->do ("DROP TABLE $tbl"),	"drop");
 ok ($dbh->disconnect,			"disconnect");
+
+done_testing ();

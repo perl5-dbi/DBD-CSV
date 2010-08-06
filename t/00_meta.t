@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
 # Test that our META.yml file matches the specification
+
 use strict;
-$^W = 1;
+use warnings;
 
 my @MODULES = ( "Test::CPAN::Meta 0.12" );
 

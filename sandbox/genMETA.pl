@@ -98,9 +98,9 @@ provides:
         version:         VERSION
 requires:     
     perl:                5.008001
-    DBI:                 1.611
+    DBI:                 1.613
     DBD::File:           0.38
-    SQL::Statement:      1.25
+    SQL::Statement:      1.30
     Text::CSV_XS:        0.71
 configure_requires:
     ExtUtils::MakeMaker: 0
@@ -108,14 +108,14 @@ build_requires:
     perl:                5.008001
     Config:              0
     Test::Harness:       0
-    Test::More:          0
+    Test::More:          0.90
     Encode:              0
     Cwd:                 0
     charnames:           0
 recommends:     
     perl:                5.012001
     Text::CSV_XS:        0.73
-    SQL::Statement:      1.27
+    SQL::Statement:      1.30
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

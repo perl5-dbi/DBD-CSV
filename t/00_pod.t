@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
 # Test that the documentation syntax is correct
+
 use strict;
-$^W = 1;
+use warnings;
 
 use Test::More;
 

@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 73;
+use warnings;
+use Test::More;
 use Cwd;
 
 BEGIN { use_ok ("DBI"); }
@@ -130,3 +131,5 @@ ok (!-f DbFile ($tbl).".csv",			"does not exist");
 
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;
+
+done_testing ();

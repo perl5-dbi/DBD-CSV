@@ -1,7 +1,8 @@
-2010-07-09  0.31  H.Merijn Brand
+2010-08-06  0.31  H.Merijn Brand
 
     * Require 5.8.1 (effectively already doing so by requiring DBI-1.1611)
-    *
+    * Update tests to use warnings and done_testing ()
+      requires Test::More-0.90, which is also required for DBI
 
 2010-07-09  0.30  H.Merijn Brand
 

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
-$^W = 1;
+use warnings;
 
-use Test::More "no_plan";
+use Test::More;
 use DBI qw(:sql_types);
 do "t/lib.pl";
 
@@ -231,6 +231,8 @@ while (<DATA>) {
     ok ($dbh->do ("drop table RT$rt"),		"drop");
     ok ($dbh->disconnect,			"disconnect");
     }
+
+done_testing ();
 
 __END__
 «357»	- build failure of DBD::CSV

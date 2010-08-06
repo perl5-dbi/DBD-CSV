@@ -1,9 +1,10 @@
 #!/usr/bin/perl
-#
+
 # Test whether data_sources () returns something useful
 
 use strict;
-use Test::More tests => 15;
+use warnings;
+use Test::More;
 
 # Include lib.pl
 BEGIN { use_ok ("DBI") }
@@ -27,3 +28,5 @@ foreach my $d (qw( . example lib t )) {
     ok (my $dns = Connect ("dbi:CSV:f_dir=$d"),	"use $d as f_dir");
     ok ($dbh->disconnect,			"disconnect");
     }
+
+done_testing ();

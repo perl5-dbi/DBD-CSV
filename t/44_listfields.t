@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
-use Test::More "no_plan";
-
 # This is a test for statement attributes being present appropriately.
-$^W = 1;
+
+use strict;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
@@ -48,3 +48,5 @@ undef $sth;
 
 ok ($dbh->do ("drop table $tbl"),		"drop table");
 ok ($dbh->disconnect,				"disconnect");
+
+done_testing ();

@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 12;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
@@ -47,3 +48,5 @@ ok ($dbh->disconnect,				"disconnect");
 undef $dbh;
 
 ok (rmdir $dir,					"no files left");
+
+done_testing ();

@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 # This is a test for correctly handling UTF-8 content
+
 use strict;
 use warnings;
 use charnames ":full";
@@ -9,7 +10,7 @@ use DBI;
 use Text::CSV_XS;
 use Encode qw( encode );
 
-use Test::More tests => 46;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
@@ -65,3 +66,5 @@ foreach my $tbl ($tbl1, $tbl2) {
 ok ($dbh->do ("drop table $tbl1"),		"drop table");
 ok ($dbh->do ("drop table $tbl2"),		"drop table");
 ok ($dbh->disconnect,				"disconnect");
+
+done_testing ();

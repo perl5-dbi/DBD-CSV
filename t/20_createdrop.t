@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 
 # Test if a table can be created and dropped
+
 use strict;
-use Test::More tests => 9;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
@@ -26,3 +28,5 @@ ok (-s $tbl_file,			"file exists");
 ok ($dbh->do ("drop table $tbl"),	"drop table");
 ok ($dbh->disconnect,			"disconnect");
 ok (!-f $tbl_file,			"file removed");
+
+done_testing ();

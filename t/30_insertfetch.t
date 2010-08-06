@@ -1,10 +1,10 @@
 #!/usr/local/bin/perl
 
-use strict;
-use Test::More tests => 33;
-
 # Test row insertion and retrieval
-$^W = 1;
+
+use strict;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
@@ -82,3 +82,5 @@ undef $sth;
 
 ok ($dbh->do ("drop table $tbl"),	"drop");
 ok ($dbh->disconnect,			"disconnect");
+
+done_testing ();

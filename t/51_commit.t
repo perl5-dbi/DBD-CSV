@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
-use Test::More tests => 24;
+# Check commit, rollback and "AutoCommit" attribute
 
-# Chack commit, rollback and "AutoCommit" attribute
-$^W = 1;
+use strict;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
@@ -71,3 +71,5 @@ is ($dbh->{AutoCommit}, 1,			"AutoCommit on");
 
 ok ($dbh->do ("drop table $tbl"),		"drop table");
 ok ($dbh->disconnect,				"disconnect");
+
+done_testing ();

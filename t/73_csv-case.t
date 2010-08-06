@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More "no_plan"; #tests => 66;
+use warnings;
+use Test::More;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
@@ -58,3 +59,5 @@ ok ($dbh->do ("drop table $tbl"),		"drop table");
 
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;
+
+done_testing ();

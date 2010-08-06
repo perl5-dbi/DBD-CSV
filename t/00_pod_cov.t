@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
 # Test that all methods are documented
+
 use strict;
-$^W = 1;
+use warnings;
 
 use Test::More;
 
