@@ -115,6 +115,9 @@ build_requires:
 recommends:     
     perl:                5.012001
     Text::CSV_XS:        0.73
+    DBI:                 1.614
+    DBD::File:           0.39
+    Test::More:          0.96
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
