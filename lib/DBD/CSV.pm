@@ -425,7 +425,7 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
 		$meta->{skip_rows} = $skipRows;
 	    if ($skipRows--) {
 		$array = $attrs->{csv_csv_in}->getline ($tbl->{fh}) or
-		    croak "Missing first row";
+		    croak "Missing first row due to ".$attrs->{csv_csv_in}->error_diag;
 		unless ($meta->{raw_header}) {
 		    s/\W/_/g for @$array;
 		    }
