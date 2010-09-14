@@ -130,6 +130,8 @@ if ($DBD::File::VERSION <= 0.38) {
 	}; # csv_versions
     }
 
+my %csv_xs_attr;
+
 sub init_valid_attributes
 {
     my $dbh = shift;
@@ -139,6 +141,7 @@ sub init_valid_attributes
 	always_quote auto_diag binary blank_is_undef empty_is_undef
 	eol escape_char keep_meta_info quote_char quote_null
 	quote_space sep_char types verbatim );
+    @csv_xs_attr{@xs_attr} = ();
 
     $dbh->{csv_xs_valid_attrs} = [ @xs_attr ];
 
@@ -373,24 +376,32 @@ sub init_table_meta
 
 my %compat_map = (
     file  => "f_file",
-    class => "csv_class",
-    eof   => "csv_eof",
+    map { $_ => "csv_$_" } qw( class eof  eol quote_char sep_char escape_char )
     );
 
 sub get_table_meta_attr
 {
-    my ($class, $meta, $attrib) = @_;
-    defined $compat_map{$attrib} and
-        return $class->SUPER::get_table_meta_attr ($meta, $compat_map{$attrib});
-    return $class->SUPER::get_table_meta_attr ($meta, $attrib);
+    my ($class, $meta, $attr) = @_;
+    defined $compat_map{$attr} and
+        return $class->SUPER::get_table_meta_attr ($meta, $compat_map{$attr});
+    return $class->SUPER::get_table_meta_attr ($meta, $attr);
     } # get_table_meta_attr
 
 sub set_table_meta_attr
 {
-    my ($class, $meta, $attrib, $value) = @_;
-    defined $compat_map{$attrib} and
-        return $class->SUPER::set_table_meta_attr ($meta, $compat_map{$attrib}, $value);
-    return $class->SUPER::set_table_meta_attr ($meta, $attrib, $value);
+    my ($class, $meta, $attr, $value) = @_;
+    defined $compat_map{$attr} and
+        return $class->SUPER::set_table_meta_attr ($meta, $compat_map{$attr}, $value);
+
+    (my $csv_attr = $attr) =~ s/^csv_//;
+    if (exists $csv_xs_attr{$csv_attr}) {
+	for ("csv_in", "csv_out") {
+	    exists $meta->{$_} && exists $meta->{$_}{$csv_attr} and
+		$meta->{$_}{$csv_attr} = $value;
+	    }
+	}
+
+    return $class->SUPER::set_table_meta_attr ($meta, $attr, $value);
     } # set_table_meta_attr
 
 $DBD::File::VERSION > 0.38 and *open_file = sub {
