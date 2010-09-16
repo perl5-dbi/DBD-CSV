@@ -24,9 +24,9 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open  FILE, ">output/rt$rt";
-    print FILE @lines;
-    close FILE;
+    open  my $fh, ">", "output/rt$rt";
+    print $fh @lines;
+    close $fh;
 
     ok (my $dbh = Connect (),					"connect");
     ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
@@ -61,9 +61,9 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open  FILE, ">output/rt$rt";
-    print FILE @lines;
-    close FILE;
+    open my $fh, ">", "output/rt$rt";
+    print $fh @lines;
+    close $fh;
 
     ok (my $dbh = Connect (),					"connect");
     ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
@@ -127,9 +127,9 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open  FILE, ">output/rt$rt";
-    print FILE @lines;
-    close FILE;
+    open my $fh, ">", "output/rt$rt";
+    print $fh @lines;
+    close $fh;
 
     ok (my $dbh = Connect (),					"connect");
     ok (my $sth = $dbh->prepare ("select * from rt$rt"),	"prepare");
@@ -196,7 +196,7 @@ while (<DATA>) {
     -f $rtfn or $rtfn = DbFile ("rt$rt.csv");
     ok (-f $rtfn,				"file $rtfn exists");
     ok (-s $rtfn,				"file is not empty");
-    open my $fh, "< $rtfn";
+    open my $fh, "<", $rtfn;
     ok ($fh,					"open file");
     binmode $fh;
     is (scalar <$fh>, qq{name,id\r\n},		"Field names");
@@ -216,9 +216,9 @@ while (<DATA>) {
     my @dbitp = ( SQL_INTEGER, SQL_LONGVARCHAR, SQL_NUMERIC );
     my @csvtp = ( 1, 0, 2 );
 
-    open  FILE, ">output/rt$rt";
-    print FILE @lines;
-    close FILE;
+    open my $fh, ">", "output/rt$rt";
+    print $fh @lines;
+    close $fh;
 
     ok (my $dbh = Connect ({ f_lock => 0 }),					"connect");
     $dbh->{csv_tables}{rt51090}{types} = [ @dbitp ];
@@ -236,25 +236,23 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open  FILE, ">output/rt$rt";
-    print FILE @lines;
-    close FILE;
+    open my $fh, ">", "output/rt$rt";
+    print $fh @lines;
+    close $fh;
 
     ok (my $dbh = Connect ({ f_lock => 0 }),				"connect");
-    $dbh->{csv_tables}{rt61168}{sep_char} = ';';
-    cmp_ok ($dbh->{csv_tables}{rt61168}{csv_in}{sep_char}, "eq", ";",	"cvs_in adjusted");
+    $dbh->{csv_tables}{rt61168}{sep_char} = ";";
+    cmp_ok ($dbh->{csv_tables}{rt61168}{csv_in} {sep_char}, "eq", ";",	"cvs_in adjusted");
     cmp_ok ($dbh->{csv_tables}{rt61168}{csv_out}{sep_char}, "eq", ";",	"cvs_out adjusted");
     ok (my $sth = $dbh->prepare ("select * from rt$rt"),		"prepare");
 
     ok ($sth->execute (),						"execute");
     ok (my $all_rows = $sth->fetchall_arrayref({}),			"fetch");
     my $wanted_rows = [
-	{
-	    header1 => "Volki",
+	{   header1 => "Volki",
 	    header2 => "Bolki",
 	    },
-	{
-	    header1 => "Zolki",
+	{   header1 => "Zolki",
 	    header2 => "Solki",
 	    },
 	];
