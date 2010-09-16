@@ -374,24 +374,14 @@ sub init_table_meta
 	}
     } # init_table_meta
 
-my %compat_map = (
-    file  => "f_file",
-    map { $_ => "csv_$_" } qw( class eof  eol quote_char sep_char escape_char )
-    );
+my %compat_map = map { $_ => "csv_$_" }
+    qw( class eof  eol quote_char sep_char escape_char );
 
-sub get_table_meta_attr
-{
-    my ($class, $meta, $attr) = @_;
-    defined $compat_map{$attr} and
-        return $class->SUPER::get_table_meta_attr ($meta, $compat_map{$attr});
-    return $class->SUPER::get_table_meta_attr ($meta, $attr);
-    } # get_table_meta_attr
+__PACKAGE__->register_compat_map (\%compat_map);
 
-sub set_table_meta_attr
+sub table_meta_attr_changed
 {
     my ($class, $meta, $attr, $value) = @_;
-    defined $compat_map{$attr} and
-        return $class->SUPER::set_table_meta_attr ($meta, $compat_map{$attr}, $value);
 
     (my $csv_attr = $attr) =~ s/^csv_//;
     if (exists $csv_xs_attr{$csv_attr}) {
@@ -401,8 +391,8 @@ sub set_table_meta_attr
 	    }
 	}
 
-    return $class->SUPER::set_table_meta_attr ($meta, $attr, $value);
-    } # set_table_meta_attr
+    $class->SUPER::table_meta_attr_changed ($meta, $attr, $value);
+    } # table_meta_attr_changed
 
 $DBD::File::VERSION > 0.38 and *open_file = sub {
     my ($self, $meta, $attrs, $flags) = @_;
