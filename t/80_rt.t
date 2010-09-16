@@ -232,6 +232,37 @@ while (<DATA>) {
     ok ($dbh->disconnect,			"disconnect");
     }
 
+{   $rt = 61168;
+    ok ($rt, "RT-$rt - $desc{$rt}");
+    my @lines = @{$input{$rt}};
+
+    open  FILE, ">output/rt$rt";
+    print FILE @lines;
+    close FILE;
+
+    ok (my $dbh = Connect ({ f_lock => 0 }),				"connect");
+    $dbh->{csv_tables}{rt61168}{sep_char} = ';';
+    cmp_ok ($dbh->{csv_tables}{rt61168}{csv_in}{sep_char}, "eq", ";",	"cvs_in adjusted");
+    cmp_ok ($dbh->{csv_tables}{rt61168}{csv_out}{sep_char}, "eq", ";",	"cvs_out adjusted");
+    ok (my $sth = $dbh->prepare ("select * from rt$rt"),		"prepare");
+
+    ok ($sth->execute (),						"execute");
+    ok (my $all_rows = $sth->fetchall_arrayref({}),			"fetch");
+    my $wanted_rows = [
+	{
+	    header1 => "Volki",
+	    header2 => "Bolki",
+	    },
+	{
+	    header1 => "Zolki",
+	    header2 => "Solki",
+	    },
+	];
+    is_deeply ($all_rows, $wanted_rows,		"records");
+
+    ok ($dbh->do ("drop table RT$rt"),		"drop");
+    ok ($dbh->disconnect,			"disconnect");
+    }
 done_testing ();
 
 __END__
@@ -266,3 +297,7 @@ c.tab,"s,tab"
 «46627» - DBD::File is damaged now
 «51090» - Report a bug in DBD-CSV
 integer,longvarchar,numeric
+«61168» - Specifying seperation character per table does not work
+"HEADER1";"HEADER2"
+Volki;Bolki
+Zolki;Solki
