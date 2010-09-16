@@ -98,9 +98,9 @@ provides:
         version:         VERSION
 requires:     
     perl:                5.008001
-    DBI:                 1.613
-    DBD::File:           0.38
-    SQL::Statement:      1.31
+    DBI:                 1.614
+    DBD::File:           0.40
+    SQL::Statement:      1.32
     Text::CSV_XS:        0.71
 configure_requires:
     ExtUtils::MakeMaker: 0
@@ -115,8 +115,6 @@ build_requires:
 recommends:     
     perl:                5.012001
     Text::CSV_XS:        0.73
-    DBI:                 1.614
-    DBD::File:           0.39
     Test::More:          0.96
 installdirs:             site
 resources:

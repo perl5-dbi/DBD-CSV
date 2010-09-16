@@ -1,10 +1,10 @@
-2010-09-14  0.31  H.Merijn Brand
+2010-09-16  0.31  H.Merijn Brand
 
-    * Require 5.8.1 (effectively already doing so by requiring DBI-1.1611)
+    * Require 5.8.1 (effectively already doing so by requiring DBI-1.614)
     * Update tests to use warnings and done_testing ()
       requires Test::More-0.90, which is also required for DBI
     * Better diagnostics for empty files
-    * Allow late setting of attributes (RT#61168)
+    * Allow late setting of attributes (RT#61168) - requires DBI-1.614
 
 2010-07-09  0.30  H.Merijn Brand
 
