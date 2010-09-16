@@ -13,8 +13,6 @@ my $has_meta = -f "META.yml";
 
 # Don't run tests during end-user installs
 use Test::More;
-$ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING} || !$has_meta or
-    plan skip_all => "Author tests not required for installation";
 
 # Load the testing modules
 foreach my $MODULE (@MODULES) {
