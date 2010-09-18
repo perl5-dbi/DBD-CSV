@@ -22,7 +22,7 @@ DBI 1.614
 
 Text::CSV_XS 0.73
 
-SQL::Statement 1.32
+SQL::Statement 1.31
 
 DBD::File 0.40
 

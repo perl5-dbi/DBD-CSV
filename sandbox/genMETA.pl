@@ -100,7 +100,7 @@ requires:
     perl:                5.008001
     DBI:                 1.614
     DBD::File:           0.40
-    SQL::Statement:      1.32
+    SQL::Statement:      1.31
     Text::CSV_XS:        0.71
 configure_requires:
     ExtUtils::MakeMaker: 0
