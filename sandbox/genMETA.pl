@@ -114,7 +114,8 @@ build_requires:
     charnames:           0
 recommends:     
     perl:                5.012001
-    Text::CSV_XS:        0.73
+    DBI:                 1.615
+    Text::CSV_XS:        0.76
     Test::More:          0.96
 installdirs:             site
 resources:

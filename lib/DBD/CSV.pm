@@ -34,7 +34,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.31";
+$VERSION  = "0.32";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
