@@ -199,18 +199,18 @@ $DBD::File::VERSION <= 0.38 and *FETCH = sub {
     @colnames = map { $_->{name} || $_->{value} } @coldefs;
 
     # dangerous: this accesses the table_defs information from last CREATE TABLE statement
-    $attr eq "TYPE"      and
-	return [ map { $struct->{table_defs}{columns}{$_}{data_type}   || "CHAR" }
+    $attr eq "TYPE"      and	# 12 = VARCHAR, TYPE should be numeric
+	return [ map { $struct->{table_defs}{columns}{$_}{data_type}   || 12 }
 		    @colnames ];
 
     $attr eq "PRECISION" and
-	return [ map { $struct->{table_defs}{columns}{$_}{data_length} || 0 }
+	return [ map { $struct->{table_defs}{columns}{$_}{data_length} ||  0 }
 		    @colnames ];
 
     $attr eq "NULLABLE"  and
 	return [ map { ( grep m/^NOT NULL$/ =>
-		    @{ $struct->{table_defs}{columns}{$_}{constraints} || [] } )
-		       ? 0 : 1 }
+		    @{ $struct->{table_defs}{columns}{$_}{constraints} || [] }
+		       ) ? 0 : 1 }
 		    @colnames ];
 
     return $sth->SUPER::FETCH ($attr);
