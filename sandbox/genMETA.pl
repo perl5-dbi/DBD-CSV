@@ -105,17 +105,17 @@ requires:
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
-    perl:                5.008001
     Config:              0
+test_requires:
     Test::Harness:       0
     Test::More:          0.90
     Encode:              0
     Cwd:                 0
     charnames:           0
 recommends:     
-    perl:                5.012001
-    DBI:                 1.615
-    Text::CSV_XS:        0.76
+    perl:                5.014001
+    DBI:                 1.616
+    Text::CSV_XS:        0.81
     Test::More:          0.96
 installdirs:             site
 resources:
