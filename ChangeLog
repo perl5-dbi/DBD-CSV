@@ -2,6 +2,7 @@
 
     * TYPE should be numeric
     * Added tests for return count of delete statements in do
+    * Upped copyright to 2011
 
 2010-09-18  0.31  H.Merijn Brand
 
