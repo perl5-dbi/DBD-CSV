@@ -37,6 +37,14 @@ $sz = -s $tbl_file;
 ok ($dbh->do ("insert into $tbl (id) values ($_)"),	"insert $_") for 1 .. 10;
 ok ($sz < -s $tbl_file,					"file grew");
 
+{   local $dbh->{PrintWarn}  = 0;
+    local $dbh->{PrintError} = 0;
+    is ($dbh->do ("delete from wxyz where id = 99"), undef,	"delete non-existing tbl");
+    }
+cmp_ok ($dbh->do ("delete from $tbl where id = 99"), "==", 0,	"delete non-existing row");
+is ($dbh->do ("delete from $tbl where id =  9"), 1,	"delete single (count)");
+is ($dbh->do ("delete from $tbl where id >  7"), 2,	"delete more (count)");
+
 ok ($dbh->do ("delete from $tbl"),			"delete all");
 is (-s $tbl_file, $sz,					"file reflects empty table");
 
