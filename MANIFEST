@@ -13,6 +13,7 @@ t/11_dsnlist.t
 t/20_createdrop.t
 t/30_insertfetch.t
 t/31_delete.t
+t/32_update.t
 t/40_numrows.t
 t/41_nulls.t
 t/42_bindparam.t
