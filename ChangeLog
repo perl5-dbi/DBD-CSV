@@ -1,9 +1,10 @@
-2011-08-12  0.32  H.Merijn Brand
+2011-08-30  0.32  H.Merijn Brand
 
     * TYPE should be numeric
     * Added tests for return count of delete statements in do
     * Upped copyright to 2011
     * Added tests for return count of update statements (Peter Rabbitson)
+    * Try to catch (more) usernames on Windows as schema names
 
 2010-09-18  0.31  H.Merijn Brand
 
