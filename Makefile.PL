@@ -27,7 +27,8 @@ MSG
 use vars qw( $DBI_INC_DIR );
 
 my %wm = (
-    NAME         => "DBD-CSV",
+    NAME         => "DBD::CSV",
+    DISTNAME     => "DBD-CSV",
     ABSTRACT     => "DBI driver for CSV and similar structured files",
     AUTHOR       => "H.Merijn Brand <h.merijn\@xs4all.nl>",
     VERSION_FROM => "lib/DBD/CSV.pm",
