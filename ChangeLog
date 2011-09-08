@@ -1,9 +1,10 @@
-2011-09-07  0.33  H.Merijn Brand
+0.34	- 2011-09-08, H.Merijn Brand
+    * 
 
+0.33	- 2011-09-07, H.Merijn Brand
     * NAME / DISTNAME in Makefile.PL
 
-2011-09-07  0.32  H.Merijn Brand
-
+0.32	- 2011-09-07, H.Merijn Brand
     * TYPE should be numeric
     * Added tests for return count of delete statements in do
     * Upped copyright to 2011
@@ -11,27 +12,23 @@
     * Try to catch (more) usernames on Windows as schema names
     * More cross-checks for META data
 
-2010-09-18  0.31  H.Merijn Brand
-
+0.31	- 2010-09-18, H.Merijn Brand
     * Require 5.8.1 (effectively already doing so by requiring DBI-1.614)
     * Update tests to use warnings and done_testing ()
       requires Test::More-0.90, which is also required for DBI
     * Better diagnostics for empty files
     * Allow late setting of attributes (RT#61168) - requires DBI-1.614
 
-2010-07-09  0.30  H.Merijn Brand
-
+0.30	- 2010-07-09, H.Merijn Brand
     * Text::CSV_XS now called with auto_diag
     * Implement valid_attrs
     * Next version will require DBI-1.612 or higher
       This is a transition release
 
-2010-07-04  0.29_03  H.Merijn Brand
-
+0.29_03	- 2010-07-04, H.Merijn Brand
     * Remove leftover debug. Causes fails
 
-2010-07-02  0.29_02  H.Merijn Brand
-
+0.29_02	- 2010-07-02, H.Merijn Brand
     * More work to keep in sync with DBI development (Jens)
     * Better diagnostics for missing modules
     * More spell-check fixes
@@ -39,8 +36,7 @@
     * Tests changed to accept old and new DBI
     * Statement handle attributes handled in new DBD::File
 
-2010-06-11  0.29_01  H.Merijn Brand
-
+0.29_01	- 2010-06-11, H.Merijn Brand
     * Prepare for DBD::File-0.39 (DBI-1.612+)
       Should still work with older DBI versions
     * Documentation updates (style, consistency, spell-checking)
@@ -48,8 +44,7 @@
     * More tests for insert
     * Tested RT#58039
 
-2010-05-03  0.29  H.Merijn Brand
-
+0.29	- 2010-05-03, H.Merijn Brand
     * Fix git URL in META.yml
     * Add empty CLONE method to prevent warning when cloning threads
     * Minimum perl 5.8.1
@@ -57,29 +52,25 @@
     * Support for f_encoding (requires DBI-1.611)
     * Documentation updates
 
-2010-03-16  0.28  H.Merijn Brand
-
+0.28	- 2010-03-16, H.Merijn Brand
     * Remove t/00_minimumversion.t from distribution
     * Dropped YAML spec to 1.0
     * Sync up with SQL::Statement 1.25
       NOTE: Internals of both modules changed. They will change again for
             SQL::Statement 2.0
 
-2010-02-17  0.27  H.Merijn Brand
-
+0.27	- 2010-02-17, H.Merijn Brand
     * Upped copyright to 2010
     * Doc-fix typo in link (Detlef Pilzecker)
     * Doc-fix small typo's
 
-2009-11-10  0.26  H.Merijn Brand
-
+0.26	- 2009-11-10, H.Merijn Brand
     * Adjustments for windows (RT#50544)
     * Mark all non-\w chars illegal in field and table names
     * Fix field types after execute (RT#51090, vgdoqd)
     * Fix for NULL joins. Requires SQL::Statement 1.23 (RT#43010, JBAZIK)
 
-2009-10-15  0.25  H.Merijn Brand
-
+0.25	- 2009-10-15, H.Merijn Brand
     * Raised minimum perl version to 5.005_03
     * Requires Text::CSV_XS 0.43 (needs eof () method and
       error_diag ()) (RT#33764)
@@ -100,8 +91,7 @@
     * Table names case sensitiveness
     * Implemented raw_header (RT#44583)
 
-2005-08-10  0.23  Jeff Zucker <jzuckerATcpan.org>
-
+0.23	- 2005-08-10, Jeff Zucker <jzuckerATcpan.org>
     * fixed bug in automatic column generation, defining
       col_names => [] will auto generate col1, col2, etc.
       thanks for bug report, harleypig on AnnoCPAN
@@ -109,14 +99,14 @@
     * added support for multi-character end-of-line separators
       thanks for suggestion, harleypig on AnnoCPAN
 
-2005-04-01  0.22  Jeff Zucker <jzuckerATcpan.org>
+0.22	- 2005-04-01, Jeff Zucker <jzuckerATcpan.org>
 
     * removed DESTROY and disconnect - use DBD File's instead
 
     * added ignore_missing_table flag to avoid warnings with
       DROP TABLE IF EXISTS
 
-2004-04-18  0.21  Jeff Zucker <jzuckerATcpan.org>
+0.21	- 2004-04-18, Jeff Zucker <jzuckerATcpan.org>
 
     * added support for $dbh->{Active}, should now work
       well with Class::DBI and other caching systems
@@ -127,7 +117,7 @@
     * removed DBD::File from the distribution - it's now
       distributed with DBI 1.42 and higher
 
-2002-03-01  0.2002  Jeff Zucker <jzuckerATcpan.org>
+0.2002	- 2002-03-01, Jeff Zucker <jzuckerATcpan.org>
 
     * added parser-caching for speedier operation,
       see File.pm prepare()
@@ -136,7 +126,7 @@
       prototypes to make it perl 5.8 compatible
 
 
-2002-01-21  0.2001  Jeff Zucker <jzuckerATcpan.org>
+0.2001	- 2002-01-21, Jeff Zucker <jzuckerATcpan.org>
 
     * adjusted docs to show Jeff as the new maintainer.
 
@@ -146,7 +136,7 @@
     * adjusted tests blobs.t, chopblanks.t, and ak-dbd.t
       to work with all versions of SQL::Statement.
 
-2002-12-20  0.1030  Jochen Wiedmann  <joe@ispsoft.de>
+0.1030	- 2002-12-20, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm: Locking is now suppressed under
       VMS. David Webb <d.webb@mdx.ac.uk>
@@ -155,22 +145,22 @@
       on VMS and not "f_dir=.". David Webb
       <d.webb@mdx.ac.uk>
 
-2001-11-28  0.1029  Jochen Wiedmann  <joe@ispsoft.de>
+0.1029	- 2001-11-28, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/CSV.pm (fetch_row): A numeric value
       must be assigned to $!.
 
-2001-11-20  0.1028  Jochen Wiedmann  <joe@ispsoft.de>
+0.1028	- 2001-11-20, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/CSV.pm (fetch_row): Changed "undef $!"
       to "$! = ''". David Arnold <arnoldd@aecl.ca>
 
-2001-05-04  0.1026  Jochen Wiedmann  <joe@ispsoft.de>
+0.1026	- 2001-05-04, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm (table_info): Added closedir().
       Alex Hornby <alex@anvil.co.uk>
 
-2000-12-22  0.1025  Jochen Wiedmann  <joe@ispsoft.de>
+0.1025	- 2000-12-22, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/CSV.pm (fetch_row): Now cleaning $! before
       calling $csv->getline(). Seems to return false errors
@@ -180,19 +170,19 @@
     * Removed unnecessary stuff in Makefile.PL which verified
       the DBI installation.
 
-2000-07-31  0.1023  Jochen Wiedmann  <joe@ispsoft.de>
+0.1023	- 2000-07-31, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm (STORE): Changed croak to die.
       Guido Flohr <guido@imperia.westend.com>
 
-2000-07-31  0.1023  Jochen Wiedmann  <joe@ispsoft.de>
+0.1023	- 2000-07-31, Jochen Wiedmann  <joe@ispsoft.de>
 
     * Minor fix in the docs, thanks to Andreas Grupp,
       grupp@elektronikschule.de.
     * Minor compatibility fixes in the test suite for
       Perl 5.6.
 
-1999-10-07  0.1022  Jochen Wiedmann  <joe@ispsoft.de>
+0.1022	- 1999-10-07, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm (connect): In the DSN, \ was removed in
       all cases. It is now possible to use \\ for a DSN
@@ -203,7 +193,7 @@
     * lib/DBD/CSV.pm: More POD patches, thanks to
       Timothy F Armbruster <tfarmbruster@notes.west.raytheon.com>.
 
-1999-05-10  0.1021  Jochen Wiedmann  <joe@ispsoft.de>
+0.1021	- 1999-05-10, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/CSV.pm (push_row): Fixed typo in docs where DBI:File:
       was used instead of DBI:CSV: (Mitra <mitra@earth.path.net>)
@@ -212,36 +202,36 @@
       <smnayeem@dhaka.agni.com>.
     * lib/DBD/File.pm: Removed use of flock under Win95.
 
-1999-03-17  0.1020  Jochen Wiedmann  <joe@ispsoft.de>
+0.1020	- 1999-03-17, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm (FETCH): Simplified handling of $sth->{'NAME'}
       due to a change in SQL::Statement 0.1011. (Teun Burgers,
       Teun Burgers <burgers@ecn.nl>)
 
-1999-02-11  0.1019  Jochen Wiedmann  <joe@ispsoft.de>
+0.1019	- 1999-02-11, Jochen Wiedmann  <joe@ispsoft.de>
 
     * Makefile.PL (CheckModule): Now requires Text::CSV_XS 0.16, due
       to an imcompatible change.
 
-1998-12-30  0.1018  Jochen Wiedmann  <joe@ispsoft.de>
+0.1018	- 1998-12-30, Jochen Wiedmann  <joe@ispsoft.de>
 
     * t/lib.pl: Fixed a bug in the test suite. (File::Spec wasn't
       loaded)
 
-1998-10-26  0.1017  Jochen Wiedmann  <joe@ispsoft.de>
+0.1017	- 1998-10-26, Jochen Wiedmann  <joe@ispsoft.de>
 
   * lib/DBD/CSV.pm: Fixed some examples in the docs. (Brian
     Millett, bpm@ec-group.com)
   * Now using File::Spec, if available, for Mac portability.
     (Chris Nandor, pudge@pobox.com)
 
-1998-10-20  0.1016  Jochen Wiedmann  <joe@ispsoft.de>
+0.1016	- 1998-10-20, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/Bundle/DBD/CSV.pm: Added lib/Bundle/DBD/CSV.pm
     * lib/DBD/File.pm: Added $dbh->table_info(). Added
       $dbh->type_info_all(). Added $dbh->quote($str, $type).
 
-1998-09-17  0.1015  Jochen Wiedmann  <joe@ispsoft.de>
+0.1015	- 1998-09-17, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/CSV.pm: Fixed bug in the docs, the "undef" argument
       was missing in conjunction with parameters,
@@ -249,18 +239,18 @@
     * lib/DBD/CSV.pm: Added csv_eol, csv_sep_char, csv_quote_char
       and csv_escape_char to DSN.
 
-1998-08-31  0.1014  Jochen Wiedmann  <joe@ispsoft.de>
+0.1014	- 1998-08-31, Jochen Wiedmann  <joe@ispsoft.de>
 
     * Makefile.PL: Added AUTHOR, ABSTRACT_FROM and PREREQ_PM.
     * Makefile.PL: Fixed error handling by using DBI::set_err.
 
-1998-08-17  0.1013  Jochen Wiedmann  <joe@ispsoft.de>
+0.1013	- 1998-08-17, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm (drop): $self->{'fh'} is now closed before
       unlinking it. This makes DROP TABLE work under Win32 and
       other Non-Unixes.
 
-1998-08-17  0.1012  Jochen Wiedmann  <joe@ispsoft.de>
+0.1012	- 1998-08-17, Jochen Wiedmann  <joe@ispsoft.de>
 
     * lib/DBD/File.pm (open_table): Added binmode.
     * Added Gerald Richter's modifications for DBD::ConfFile to the
@@ -274,24 +264,24 @@
     * DBD-File/File.pm: Fixed some $sth->{attr}'s to $sth->FETCH|STORE,
       my thanks to Gerald Richter.
 
-1998-06-25  0.1011  Jochen Wiedmann  <joe@ispsoft.de>
+0.1011	- 1998-06-25, Jochen Wiedmann  <joe@ispsoft.de>
 
     * DBD-File/File.pm (execute): Added missing eval around
       $stmt->execute();
     * DBD-File/File.pm (FETCH): $sth->{TYPE} is now returning
       undef (workaround for a bug in DBI 0.93).
 
-1998-06-11  0.1010  Jochen Wiedmann  <joe@ispsoft.de>
+0.1010	- 1998-06-11, Jochen Wiedmann  <joe@ispsoft.de>
 
     * Added DBD::File, DBD::CSV is derived from it.
 
     * CSV.pm (open_table): Added $dbh->{tables}->{$table}->{file}.
 
-1998-05-21  0.1002  Jochen Wiedmann  <joe@ispsoft.de>
+0.1002	- 1998-05-21, Jochen Wiedmann  <joe@ispsoft.de>
 
     * CSV.pm: Now using the misc.files_as_tables feature
       of SQL::Statement
 
-1998-05-05  0.1000  Jochen Wiedmann  <joe@ispsoft.de>
+0.1000	- 1998-05-05, Jochen Wiedmann  <joe@ispsoft.de>
 
     * Initial version
