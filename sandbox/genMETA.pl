@@ -66,9 +66,9 @@ test_requires:
     Cwd:                 0
     charnames:           0
 recommends:
-    perl:                5.014001
-    DBI:                 1.616
-    Text::CSV_XS:        0.83
+    perl:                5.014002
+    DBI:                 1.617
+    Text::CSV_XS:        0.85
     Test::More:          0.98
 installdirs:             site
 resources:
