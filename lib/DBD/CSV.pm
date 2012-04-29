@@ -8,8 +8,8 @@
 #
 #   See for full acknowledgements the last two pod sections in this file
 
-require 5.005003;
 use strict;
+use warnings;
 
 require DynaLoader;
 require DBD::File;

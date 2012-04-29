@@ -1,8 +1,11 @@
-# -*- perl -*-
+#/usr/bin/perl
 
 package Bundle::DBD::CSV;
 
-$VERSION = "1.05";
+use strict;
+use warnings;
+
+our $VERSION = "1.05";
 
 1;
 
@@ -18,9 +21,9 @@ Bundle::DBD::CSV - A bundle to install the DBD::CSV driver
 
 =head1 CONTENTS
 
-DBI 1.617
+DBI 1.620
 
-Text::CSV_XS 0.85
+Text::CSV_XS 0.88
 
 SQL::Statement 1.33
 
