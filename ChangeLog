@@ -1,6 +1,7 @@
-0.34	- 2012-04-29, H.Merijn Brand
+0.34	- 2012-05-12, H.Merijn Brand
     * Updated copyright to 2012
     * Require 5.8.1, as DBI does
+    * Tested against perl-5.16.0-RC0 + DBI-1.620
 
 0.33	- 2011-09-07, H.Merijn Brand
     * NAME / DISTNAME in Makefile.PL
