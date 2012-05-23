@@ -572,7 +572,7 @@ that the test suite does not test in this mode!
 =item Text::CSV_XS
 X<Text::CSV_XS>
 
-This module is used for writing rows to or reading rows from CSV files.
+This module is used to read and write rows in a CSV file.
 
 =back
 
@@ -686,7 +686,7 @@ otherwise be seen as attribute separator:
 
 Using attributes in the DSN is easier to use when the DSN is derived from an
 outside source (environment variable, database entry, or configure file),
-whereas using all entries in the attribute hash is easier to read and to
+whereas specifying entries in the attribute hash is easier to read and to
 maintain.
 
 =head2 Creating and dropping tables
@@ -714,7 +714,7 @@ with "/", "./" or "../" and they must not contain white space.
 =head2 Inserting, fetching and modifying data
 
 The following examples insert some data in a table and fetch it back:
-First all data in the string:
+First, an example where the column data is concatenated in the SQL string:
 
     $dbh->do ("INSERT INTO $table VALUES (1, ".
 	       $dbh->quote ("foobar") . ")");
@@ -722,18 +722,18 @@ First all data in the string:
 Note the use of the quote method for escaping the word "foobar". Any
 string must be escaped, even if it does not contain binary data.
 
-Next an example using parameters:
+Next, an example using parameters:
 
     $dbh->do ("INSERT INTO $table VALUES (?, ?)", undef, 2,
 	      "It's a string!");
 
-Note that you don't need to use the quote method here, this is done
-automatically for you. This version is particularly well designed for
+Note that you don't need to quote column data passed as parameters.
+This version is particularly well designed for
 loops. Whenever performance is an issue, I recommend using this method.
 
 You might wonder about the C<undef>. Don't wonder, just take it as it
-is. :-) It's an attribute argument that I have never ever used and
-will be parsed to the prepare method as a second argument.
+is. :-) It's an attribute argument that I have never used and will be
+passed to the prepare method as the second argument.
 
 To retrieve data, you can use the following:
 
@@ -785,8 +785,9 @@ Likewise you use the DELETE statement for removing rows:
 
 =head2 Error handling
 
-In the above examples we have never cared about return codes. Of course,
-this cannot be recommended. Instead we should have written (for example):
+In the above examples we have never cared about return codes. Of
+course, this is not recommended. Instead we should have written (for
+example):
 
     my $sth = $dbh->prepare ("SELECT * FROM $table WHERE id = ?") or
 	die "prepare: " . $dbh->errstr ();
@@ -901,8 +902,8 @@ attributes:
 X<f_dir>
 
 This attribute is used for setting the directory where CSV files are
-opened. Usually you set it in the dbh, it defaults to the current
-directory ("."). However, it is overwritable in the statement handles.
+opened. Usually you set it in the dbh and it defaults to the current
+directory ("."). However, it may be overriden in statement handles.
 
 =item f_ext
 X<f_ext>
@@ -924,18 +925,18 @@ to use the owner of C<f_dir>. C<undef> is allowed, but not in the DSN part.
 =item f_encoding
 X<f_encoding>
 
-This attribute allows you to set the encoding of the data. With CSV, it is
-not possible to set (and remember) the encoding on a per-field basis, but
-DBD::File now allows to set the encoding of the underlying file. If this
-attribute is not set, or undef is passed, the file will be seen as binary.
+This attribute allows you to set the encoding of the data. With CSV, it is not
+possible to set (and remember) the encoding on a column basis, but DBD::File
+now allows the encoding to be set on the underlying file. If this attribute is
+not set, or undef is passed, the file will be seen as binary.
 
 =item f_lock
 X<f_lock>
 
-With this attribute, you can force locking mode (if locking is supported
-at all) for opening tables. By default, tables are opened with a shared
-lock for reading, and with an exclusive lock for writing. The supported
-modes are:
+With this attribute you can specify a locking mode to be used (if locking is
+supported at all) for opening tables. By default, tables are opened with a
+shared lock for reading, and with an exclusive lock for writing. The
+supported modes are:
 
 =over 2
 
@@ -984,7 +985,7 @@ X<csv_csv>
 
 The attributes I<csv_eol>, I<csv_sep_char>, I<csv_quote_char> and
 I<csv_escape_char> are corresponding to the respective attributes of the
-Text::CSV_XS object. You want to set these attributes if you have unusual
+Text::CSV_XS object. You may want to set these attributes if you have unusual
 CSV files like F</etc/passwd> or MS Excel generated CSV files with a semicolon
 as separator. Defaults are "\015\012", ';', '"' and '"', respectively.
 
@@ -1046,8 +1047,8 @@ hash ref with the following attributes:
 X<csv_*>
 
 All other attributes that start with C<csv_> and are not described above
-will be passed to C<Text::CSV_XS> (without the C<csv_> prefix). these
-extra options are most likely to be only useful for reading (select)
+will be passed to C<Text::CSV_XS> (without the C<csv_> prefix). These
+extra options are only likely to be useful for reading (select)
 handles. Examples:
 
   $dbh->{csv_allow_whitespace}    = 1;
@@ -1089,7 +1090,7 @@ X<csv>
 
 These correspond to the attributes I<csv_eol>, I<csv_sep_char>,
 I<csv_quote_char>, I<csv_escape_char>, I<csv_class> and I<csv_csv>.
-The difference is that they work on a per-table base.
+The difference is that they work on a per-table basis.
 
 =item col_names
 X<col_names>
@@ -1125,7 +1126,7 @@ and the chances are high that the SQL statements will fail.
 It's strongly recommended to check the attributes supported by
 L<DBD::File/Metadata>.
 
-Example: Suggest you want to use F</etc/passwd> as a CSV file. :-)
+Example: Suppose you want to use /etc/passwd as a CSV file. :-)
 There simplest way is:
 
     use DBI;
@@ -1142,7 +1143,7 @@ There simplest way is:
     $sth = $dbh->prepare ("SELECT * FROM passwd");
 
 Another possibility where you leave all the defaults as they are and
-overwrite them on a per table base:
+override them on a per table basis:
 
     require DBI;
     my $dbh = DBI->connect ("dbi:CSV:");
@@ -1196,9 +1197,9 @@ L<Creating and dropping tables> above.
 =item *
 
 The module is using flock () internally. However, this function is not
-available on platforms. Using flock () is disabled on MacOS and Windows
-95: There's no locking at all (perhaps not so important on these
-operating systems, as they are for single users anyways).
+available on some platforms. Use of flock () is disabled on MacOS and
+Windows 95: There's no locking at all (perhaps not so important on
+these operating systems, as they are for single users anyways).
 
 =back
 
