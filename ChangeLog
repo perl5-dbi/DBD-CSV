@@ -1,5 +1,6 @@
-0.35	- 2012-05-23, H.Merijn Brand
+0.35	- 2012-05-24, H.Merijn Brand
     * Improved documentation (including mje's contribution)
+    * Tested under 5.16.0 (installed)
 
 0.34	- 2012-05-12, H.Merijn Brand
     * Updated copyright to 2012
