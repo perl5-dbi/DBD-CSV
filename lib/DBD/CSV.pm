@@ -903,7 +903,7 @@ X<f_dir>
 
 This attribute is used for setting the directory where CSV files are
 opened. Usually you set it in the dbh and it defaults to the current
-directory ("."). However, it may be overriden in statement handles.
+directory ("."). However, it may be overridden in statement handles.
 
 =item f_ext
 X<f_ext>
