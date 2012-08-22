@@ -54,7 +54,7 @@ requires:
     DBI:                 1.614
     DBD::File:           0.40
     SQL::Statement:      1.33
-    Text::CSV_XS:        0.71
+    Text::CSV_XS:        0.91
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:

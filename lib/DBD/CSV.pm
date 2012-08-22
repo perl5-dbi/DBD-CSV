@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.35";
+$VERSION  = "0.36";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -460,7 +460,7 @@ sub fetch_row
 
 	my @diag = $csv->error_diag;
 	my $file = $DBD::File::VERSION <= 0.38 ? $self->{file} : $tbl->{f_fqfn};
-	croak "Error $diag[0] while reading file $file: $diag[1]";
+	croak "Error $diag[0] while reading file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
     @$fields < @{$tbl->{col_names}} and
 	push @$fields, (undef) x (@{$tbl->{col_names}} - @$fields);
@@ -477,7 +477,7 @@ sub push_row
     unless ($csv->print ($fh, $fields)) {
 	my @diag = $csv->error_diag;
 	my $file = $DBD::File::VERSION <= 0.38 ? $self->{file} : $tbl->{f_fqfn};
-	croak "Error $diag[0] while writing file $file: $diag[1]";
+	croak "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
     1;
     } # push_row

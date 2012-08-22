@@ -28,5 +28,6 @@ t/71_csv-ext.t
 t/72_csv-schema.t
 t/73_csv-case.t
 t/80_rt.t
+t/85_error.t
 t/lib.pl
 examples/passwd.pl
