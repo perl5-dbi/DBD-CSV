@@ -35,6 +35,7 @@ ok ($dbh = Connect (),			"connect");
     local $dbh->{RaiseError} = 0;
     ok (my $sth = $dbh->prepare ("select * from $tbl"), "prepare");
     is ($sth->execute, undef,		"execute should fail");
+    # It is safe to regex on this text, as it is NOT local dependant
     like ($dbh->errstr, qr{\w+ \@ line [0-9?]+ pos [0-9?]+}, "error message");
     };
 ok ($dbh->do ("drop table $tbl"),       "drop");

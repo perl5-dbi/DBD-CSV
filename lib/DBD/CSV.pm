@@ -441,6 +441,15 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
 	}
     }; # open_file
 
+sub _csv_diag
+{
+    my @diag = $_[0]->error_diag;
+    for (2, 3) {
+	defined $diag[$_] or $diag[$_] = "?";
+	}
+    return @diag;
+    } # _csv_diag
+
 sub fetch_row
 {
     my ($self, $data) = @_;
@@ -458,7 +467,7 @@ sub fetch_row
     unless ($fields) {
 	$csv->eof and return;
 
-	my @diag = $csv->error_diag;
+	my @diag = _csv_diag ($csv);
 	my $file = $DBD::File::VERSION <= 0.38 ? $self->{file} : $tbl->{f_fqfn};
 	croak "Error $diag[0] while reading file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
@@ -475,7 +484,7 @@ sub push_row
     my $fh  = $tbl->{fh};
 
     unless ($csv->print ($fh, $fields)) {
-	my @diag = $csv->error_diag;
+	my @diag = _csv_diag ($csv);
 	my $file = $DBD::File::VERSION <= 0.38 ? $self->{file} : $tbl->{f_fqfn};
 	croak "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
