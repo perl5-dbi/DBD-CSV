@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.36";
+$VERSION  = "0.37";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -94,31 +94,6 @@ sub set_versions
     return $this->SUPER::set_versions ();
     } # set_versions
 
-if ($DBD::File::VERSION <= 0.38) {
-    # Map csv_tables to f_meta.
-    # Not absolutely needed, but otherwise I have to write two test suites
-    *STORE = sub {
-	my ($self, @attr) = @_;
-	@attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
-	$self->SUPER::STORE (@attr);
-	}; # STORE
-
-    *FETCH = sub {
-	my ($self, @attr) = @_;
-	@attr && $attr[0] eq "csv_tables" and $attr[0] = "f_meta";
-	$self->SUPER::FETCH (@attr);
-	}; # FETCH
-
-    *DBI::db::csv_versions = *csv_versions = sub {
-	join "\n",
-	    "DBD::CSV     $DBD::CSV::VERSION using Text::CSV_XS-$Text::CSV_XS::VERSION",
-	    "  DBD::File  $DBD::File::VERSION",
-	    "DBI          $DBI::VERSION",
-	    "OS           $^O",
-	    "Perl         $]";
-	}; # csv_versions
-    }
-
 my %csv_xs_attr;
 
 sub init_valid_attributes
@@ -176,35 +151,6 @@ $DBD::CSV::st::imp_data_size = 0;
 
 @DBD::CSV::st::ISA = qw(DBD::File::st);
 
-$DBD::File::VERSION <= 0.38 and *FETCH = sub {
-    my ($sth, $attr) = @_;
-
-    my ($struct, @coldefs, @colnames);
-
-    # Being a bit dirty here, as SQL::Statement::Structure does not offer
-    # me an interface to the data I want
-    $struct   = $sth->{f_stmt}{struct} || {};
-    @coldefs  = @{ $struct->{column_defs} || [] };
-    @colnames = map { $_->{name} || $_->{value} } @coldefs;
-
-    # dangerous: this accesses the table_defs information from last CREATE TABLE statement
-    $attr eq "TYPE"      and	# 12 = VARCHAR, TYPE should be numeric
-	return [ map { $struct->{table_defs}{columns}{$_}{data_type}   || 12 }
-		    @colnames ];
-
-    $attr eq "PRECISION" and
-	return [ map { $struct->{table_defs}{columns}{$_}{data_length} ||  0 }
-		    @colnames ];
-
-    $attr eq "NULLABLE"  and
-	return [ map { ( grep m/^NOT NULL$/ =>
-		    @{ $struct->{table_defs}{columns}{$_}{constraints} || [] }
-		       ) ? 0 : 1 }
-		    @colnames ];
-
-    return $sth->SUPER::FETCH ($attr);
-    }; # FETCH
-
 package DBD::CSV::Statement;
 
 use strict;
@@ -212,100 +158,6 @@ use DBD::File;
 use Carp;
 
 @DBD::CSV::Statement::ISA = qw(DBD::File::Statement);
-
-# open_table (0 is used up to and including DBI-1.1611
-# Later versions use open_file (see DBD::CSV::Table)
-
-$DBD::File::VERSION <= 0.38 and *open_table = sub {
-    my ($self, $data, $table, $createMode, $lockMode) = @_;
-
-    my $dbh    = $data->{Database};
-    my $tables = $dbh->{f_meta};
-       $tables->{$table} ||= {};
-    my $meta   = $tables->{$table} || {};
-    my $csv_in = $meta->{csv_in} || $dbh->{csv_csv_in};
-    unless ($csv_in) {
-	my %opts  = ( binary => 1, auto_diag => 1 );
-
-	# Allow specific Text::CSV_XS options
-	foreach my $key (grep m/^csv_/ => keys %$dbh) {
-	    (my $attr = $key) =~ s/csv_//;
-	    $attr =~ m{^(?: eol | sep | quote | escape	# Handled below
-			  | tables | sql_parser_object	# Not for Text::CSV_XS
-			  | sponge_driver | version	# internal
-			  )$}x and next;
-	    $opts{$attr} = $dbh->{$key};
-	    }
-	delete $opts{null} and
-	    $opts{blank_is_undef} = $opts{always_quote} = 1;
-
-	my $class = $meta->{class} || $dbh->{csv_class} || "Text::CSV_XS";
-	my $eol   = $meta->{eol}   || $dbh->{csv_eol}   || "\r\n";
-	$eol =~ m/^\A(?:[\r\n]|\r\n)\Z/ or $opts{eol} = $eol;
-	for ([ "sep",    ',' ],
-	     [ "quote",  '"' ],
-	     [ "escape", '"' ],
-	     ) {
-	    my ($attr, $def) = ($_->[0]."_char", $_->[1]);
-	    $opts{$attr} =
-		exists $meta->{$attr} ? $meta->{$attr} :
-		    exists $dbh->{"csv_$attr"} ? $dbh->{"csv_$attr"} : $def;
-	    }
-	$meta->{csv_in}  = $class->new (\%opts) or
-	    $class->error_diag;
-	$opts{eol} = $eol;
-	$meta->{csv_out} = $class->new (\%opts) or
-	    $class->error_diag;
-	}
-    my $file = $meta->{file} || $table;
-    my $tbl  = $self->SUPER::open_table ($data, $file, $createMode, $lockMode);
-    if ($tbl && $tbl->{fh}) {
-	$tbl->{csv_csv_in}  = $meta->{csv_in};
-	$tbl->{csv_csv_out} = $meta->{csv_out};
-	if (my $types = $meta->{types}) {
-	    # The 'types' array contains DBI types, but we need types
-	    # suitable for Text::CSV_XS.
-	    my $t = [];
-	    for (@{$types}) {
-		$_ = $_
-		    ? $DBD::CSV::dr::CSV_TYPES[$_ + 6] || Text::CSV_XS::PV ()
-		    : Text::CSV_XS::PV ();
-		push @$t, $_;
-		}
-	    $tbl->{types} = $t;
-	    }
-	if ( !$createMode and
-	     !$self->{ignore_missing_table} and $self->{command} ne "DROP") {
-	    my $array;
-	    my $skipRows = exists $meta->{skip_rows}
-		? $meta->{skip_rows}
-		: exists $meta->{col_names} ? 0 : 1;
-	    if ($skipRows--) {
-		$array = $tbl->fetch_row ($data) or croak "Missing first row";
-		unless ($self->{raw_header}) {
-		    s/\W/_/g for @$array;
-		    }
-		$tbl->{col_names} = $array;
-		while ($skipRows--) {
-		    $tbl->fetch_row ($data);
-		    }
-		}
-	    $tbl->{first_row_pos} = $tbl->{fh}->tell ();
-	    exists $meta->{col_names} and
-		$array = $tbl->{col_names} = $meta->{col_names};
-	    if (!$tbl->{col_names} || !@{$tbl->{col_names}}) {
-		# No column names given; fetch first row and create default
-		# names.
-		my $ar = $tbl->{cached_row} = $tbl->fetch_row ($data);
-		$array = $tbl->{col_names};
-		push @$array, map { "col$_" } 0 .. $#$ar;
-		}
-	    my $i = 0;
-	    $tbl->{col_nums}{$_} = $i++ for @$array;
-	    }
-	}
-    $tbl;
-    }; # open_table
 
 package DBD::CSV::Table;
 
@@ -383,7 +235,7 @@ sub table_meta_attr_changed
     $class->SUPER::table_meta_attr_changed ($meta, $attr, $value);
     } # table_meta_attr_changed
 
-$DBD::File::VERSION > 0.38 and *open_file = sub {
+sub open_file {
     my ($self, $meta, $attrs, $flags) = @_;
     $self->SUPER::open_file ($meta, $attrs, $flags);
 
@@ -439,7 +291,7 @@ $DBD::File::VERSION > 0.38 and *open_file = sub {
 	    $tbl->{col_nums}{$_} = $i++ for @$array; # XXX not necessary for DBI > 1.611
 	    }
 	}
-    }; # open_file
+    } # open_file
 
 sub _csv_diag
 {
@@ -457,7 +309,7 @@ sub fetch_row
     exists $self->{cached_row} and
 	return $self->{row} = delete $self->{cached_row};
 
-    my $tbl = $DBD::File::VERSION <= 0.38 ? $self : $self->{meta};
+    my $tbl = $self->{meta};
 
     my $csv = $self->{csv_csv_in} or
 	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
@@ -468,7 +320,7 @@ sub fetch_row
 	$csv->eof and return;
 
 	my @diag = _csv_diag ($csv);
-	my $file = $DBD::File::VERSION <= 0.38 ? $self->{file} : $tbl->{f_fqfn};
+	my $file = $tbl->{f_fqfn};
 	croak "Error $diag[0] while reading file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
     @$fields < @{$tbl->{col_names}} and
@@ -479,13 +331,13 @@ sub fetch_row
 sub push_row
 {
     my ($self, $data, $fields) = @_;
-    my $tbl = $DBD::File::VERSION <= 0.38 ? $self : $self->{meta};
+    my $tbl = $self->{meta};
     my $csv = $self->{csv_csv_out};
     my $fh  = $tbl->{fh};
 
     unless ($csv->print ($fh, $fields)) {
 	my @diag = _csv_diag ($csv);
-	my $file = $DBD::File::VERSION <= 0.38 ? $self->{file} : $tbl->{f_fqfn};
+	my $file = $tbl->{f_fqfn};
 	croak "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
     1;
