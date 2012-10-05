@@ -72,8 +72,7 @@ sub connect
 {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
-    $dbh->{f_meta} ||= {};
-    $dbh->{Active}   = 1;
+    $dbh->{Active} = 1;
     $dbh;
     } # connect
 
