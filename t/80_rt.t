@@ -261,6 +261,35 @@ while (<DATA>) {
     ok ($dbh->do ("drop table RT$rt"),		"drop");
     ok ($dbh->disconnect,			"disconnect");
     }
+
+{   $rt = 80078;
+    ok ($rt, "RT-$rt - $desc{$rt}");
+    my @lines = @{$input{$rt}};
+
+    my $tbl = "rt$rt";
+    open  my $fh, ">", "output/$tbl";
+    print $fh @lines;
+    close $fh;
+
+    ok (my $dbh = Connect ({
+	    csv_sep_char            => "\t",
+	    csv_quote_char          => undef,
+	    csv_escape_char         => "\\",
+	    csv_allow_loose_escapes => 1,
+	    RaiseError              => 1,
+	    PrintError              => 1,
+	    }),					"connect");
+    $dbh->{csv_tables}{$tbl}{col_names} = [];
+    ok (my $sth = $dbh->prepare ("select * from $tbl"), "prepare");
+    eval {
+	ok ($sth->execute, "execute");
+	ok (!$@, "no error");
+	};
+
+    ok ($dbh->do ("drop table $tbl"),		"drop");
+    ok ($dbh->disconnect,			"disconnect");
+    }
+
 done_testing ();
 
 __END__
@@ -299,3 +328,6 @@ integer,longvarchar,numeric
 "HEADER1";"HEADER2"
 Volki;Bolki
 Zolki;Solki
+«80078» - bug in DBD::CSV causes select to fail
+a	b	c	d
+e	f	g	h

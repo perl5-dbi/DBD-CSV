@@ -272,7 +272,7 @@ sub open_file {
 		    }
 		$tbl->{col_names} = $array;
 		while ($skipRows--) {
-		    $tbl->{csv_csv_in}->getline ($tbl->{fh});
+		    $attrs->{csv_csv_in}->getline ($tbl->{fh});
 		    }
 		}
 	    $tbl->{first_row_pos} = $tbl->{fh}->tell ();
@@ -282,7 +282,7 @@ sub open_file {
 		# No column names given; fetch first row and create default
 		# names.
 		my $ar = $tbl->{cached_row} =
-		    $tbl->{csv_csv_in}->getline ($tbl->{fh});
+		    $attrs->{csv_csv_in}->getline ($tbl->{fh});
 		$array = $tbl->{col_names};
 		push @$array, map { "col$_" } 0 .. $#$ar;
 		}
