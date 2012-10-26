@@ -21,7 +21,7 @@ my $dbh = DBI->connect ( "dbi:CSV:", undef, undef, {
 
 # does *not* work with the csv_tables entry uncommented
 
-$new or $dbh->{csv_tables}{dinges} = $dinges;
+$new or $dbh->{csv_tables} = { dinges => $dinges };
 
 # now it *does* work
 

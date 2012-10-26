@@ -238,8 +238,7 @@ sub open_file {
     my ($self, $meta, $attrs, $flags) = @_;
     $self->SUPER::open_file ($meta, $attrs, $flags);
 
-    my $tbl = $meta;
-    if ($tbl && $tbl->{fh}) {
+    if ($meta && $meta->{fh}) {
 	$attrs->{csv_csv_in}  = $meta->{csv_in};
 	$attrs->{csv_csv_out} = $meta->{csv_out};
 	if (my $types = $meta->{types}) {
@@ -253,7 +252,7 @@ sub open_file {
 		    : Text::CSV_XS::PV ();
 		push @$t, $_;
 		}
-	    $tbl->{types} = $t;
+	    $meta->{types} = $t;
 	    }
 	if (!$flags->{createMode}) {
 	    my $array;
@@ -265,29 +264,30 @@ sub open_file {
 	    defined $meta->{skip_rows} or
 		$meta->{skip_rows} = $skipRows;
 	    if ($skipRows--) {
-		$array = $attrs->{csv_csv_in}->getline ($tbl->{fh}) or
+		$array = $attrs->{csv_csv_in}->getline ($meta->{fh}) or
 		    croak "Missing first row due to ".$attrs->{csv_csv_in}->error_diag;
 		unless ($meta->{raw_header}) {
 		    s/\W/_/g for @$array;
 		    }
-		$tbl->{col_names} = $array;
+		defined $meta->{col_names} or
+		    $meta->{col_names} = $array;
 		while ($skipRows--) {
-		    $attrs->{csv_csv_in}->getline ($tbl->{fh});
+		    $attrs->{csv_csv_in}->getline ($meta->{fh});
 		    }
 		}
-	    $tbl->{first_row_pos} = $tbl->{fh}->tell ();
+	    $meta->{first_row_pos} = $meta->{fh}->tell ();
 	    exists $meta->{col_names} and
-		$array = $tbl->{col_names} = $meta->{col_names};
-	    if (!$tbl->{col_names} || !@{$tbl->{col_names}}) {
+		$array = $meta->{col_names};
+	    if (!$meta->{col_names} || !@{$meta->{col_names}}) {
 		# No column names given; fetch first row and create default
 		# names.
-		my $ar = $tbl->{cached_row} =
-		    $attrs->{csv_csv_in}->getline ($tbl->{fh});
-		$array = $tbl->{col_names};
+		my $ar = $meta->{cached_row} =
+		    $attrs->{csv_csv_in}->getline ($meta->{fh});
+		$array = $meta->{col_names};
 		push @$array, map { "col$_" } 0 .. $#$ar;
 		}
 	    my $i = 0;
-	    $tbl->{col_nums}{$_} = $i++ for @$array; # XXX not necessary for DBI > 1.611
+	    $meta->{col_nums}{$_} = $i++ for @$array; # XXX not necessary for DBI > 1.611
 	    }
 	}
     } # open_file
