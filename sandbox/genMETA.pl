@@ -51,8 +51,8 @@ provides:
         version:         VERSION
 requires:
     perl:                5.008001
-    DBI:                 1.614
-    DBD::File:           0.40
+    DBI:                 1.623
+    DBD::File:           0.41
     SQL::Statement:      1.33
     Text::CSV_XS:        0.91
 configure_requires:
@@ -67,7 +67,6 @@ test_requires:
     charnames:           0
 recommends:
     perl:                5.014002
-    DBI:                 1.622
     Test::More:          0.98
 installdirs:             site
 resources:
