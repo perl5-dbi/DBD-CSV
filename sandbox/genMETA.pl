@@ -53,7 +53,7 @@ requires:
     perl:                5.008001
     DBI:                 1.623
     DBD::File:           0.41
-    SQL::Statement:      1.33
+    SQL::Statement:      1.401
     Text::CSV_XS:        0.91
 configure_requires:
     ExtUtils::MakeMaker: 0
