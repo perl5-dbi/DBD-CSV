@@ -38,8 +38,8 @@ foreach my $row (@rows) {
     $sth->{ChopBlanks} = 0;
     ok (1,					"ChopBlanks 0");
     ok ($sth->execute ($row->[0]),		"execute");
-    ok (my $r = $sth->fetch,			"fetch");
-    is_deeply ($r, $row,			"content");
+    ok (my $r = $sth->fetch,			"fetch ($row->[0]:1)");
+    is_deeply ($r, $row,			"content ($row->[0]:1)");
     
     $sth->{ChopBlanks} = 1;
     ok (1,					"ChopBlanks 1");
@@ -48,8 +48,8 @@ foreach my $row (@rows) {
     if ($DBD::File::VERSION <= 0.38) {
 	s/\s+$// for @$row;	# Bug fixed in new DBI
 	}
-    ok ($r = $sth->fetch,			"fetch");
-    is_deeply ($r, $row,			"content");
+    ok ($r = $sth->fetch,			"fetch ($row->[0]:2)");
+    is_deeply ($r, $row,			"content ($row->[0]:2)");
     }
 
 ok ($sti->finish,				"finish sti");
