@@ -66,7 +66,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 recommends:
-    perl:                5.014002
+    perl:                5.016002
     Test::More:          0.98
 installdirs:             site
 resources:
