@@ -275,7 +275,11 @@ sub open_file {
 		    $attrs->{csv_csv_in}->getline ($meta->{fh});
 		    }
 		}
-	    $meta->{first_row_pos} = $meta->{fh}->tell ();
+	    # lockMode is set 1 for DELETE, INSERT or UPDATE
+	    # no other case needs seeking
+	    $flags->{lockMode} and
+		# $meta->{fh}->can("tell") and
+		$meta->{first_row_pos} = $meta->{fh}->tell ();
 	    exists $meta->{col_names} and
 		$array = $meta->{col_names};
 	    if (!$meta->{col_names} || !@{$meta->{col_names}}) {
