@@ -1,7 +1,8 @@
-0.37	- 2013-01-02, H.Merijn Brand
+0.37	- 2013-01-07, H.Merijn Brand
     * Fixed RT#80078, resulting in getline calls on undef (Benjamin Booth)
     * Require latest DBI and SQL::Statement
     * Updated copyright to 2013
+    * Fix for DBI-1.623 (Jens Rehsack)
 
 0.36	- 2012-08-22, H.Merijn Brand
     * Add line/record number and position in error messages
