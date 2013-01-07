@@ -290,8 +290,6 @@ sub open_file {
 		$array = $meta->{col_names};
 		push @$array, map { "col$_" } 0 .. $#$ar;
 		}
-	    my $i = 0;
-	    $meta->{col_nums}{$_} = $i++ for @$array; # XXX not necessary for DBI > 1.611
 	    }
 	}
     } # open_file
