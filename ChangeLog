@@ -1,5 +1,5 @@
 0.38	- 2013-01-09, H.Merijn Brand
-    * 
+    * the tar paxheaders hit again (http://www.perlmonks.org/?node_id=1004571)
 
 0.37	- 2013-01-09, H.Merijn Brand
     * Fixed RT#80078, resulting in getline calls on undef (Benjamin Booth)

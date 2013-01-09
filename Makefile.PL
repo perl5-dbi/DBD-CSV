@@ -48,6 +48,9 @@ my %wm = (
 	    valgrind.log
 	    )
 	},
+    macro        => {
+	TARFLAGS => "--format=ustar -c -v -f",
+	},
     );
 $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 
