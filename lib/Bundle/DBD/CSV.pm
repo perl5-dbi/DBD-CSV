@@ -5,7 +5,7 @@ package Bundle::DBD::CSV;
 use strict;
 use warnings;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 1;
 
@@ -29,7 +29,7 @@ SQL::Statement 1.402
 
 DBD::File 0.41
 
-DBD::CSV 0.37
+DBD::CSV 0.38
 
 =head1 DESCRIPTION
 

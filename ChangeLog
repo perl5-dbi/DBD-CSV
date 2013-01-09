@@ -1,3 +1,6 @@
+0.38	- 2013-01-09, H.Merijn Brand
+    * 
+
 0.37	- 2013-01-09, H.Merijn Brand
     * Fixed RT#80078, resulting in getline calls on undef (Benjamin Booth)
     * Require latest DBI and SQL::Statement
