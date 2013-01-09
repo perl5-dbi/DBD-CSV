@@ -19,11 +19,12 @@ package DBD::CSV;
 
 use strict;
 
-use vars qw( @ISA $VERSION $drh $err $errstr $sqlstate );
+use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
 $VERSION  = "0.37";
+$ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
 $errstr   = "";		# holds error string for DBI::errstr
@@ -61,12 +62,10 @@ use vars qw( @ISA @CSV_TYPES );
     Text::CSV_XS::NV (), # SQL_DOUBLE
     );
 
-@DBD::CSV::dr::ISA = qw( DBD::File::dr );
+our @ISA = qw( DBD::File::dr );
 
-$DBD::CSV::dr::imp_data_size     = 0;
-$DBD::CSV::dr::data_sources_attr = undef;
-
-$DBD::CSV::ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
+our $imp_data_size     = 0;
+our $data_sources_attr = undef;
 
 sub connect
 {
@@ -82,10 +81,8 @@ package DBD::CSV::db;
 
 use strict;
 
-our $imp_data_size;
-$DBD::CSV::db::imp_data_size = 0;
-
-@DBD::CSV::db::ISA = qw( DBD::File::db );
+our $imp_data_size = 0;
+our @ISA = qw( DBD::File::db );
 
 sub set_versions
 {
@@ -147,25 +144,22 @@ package DBD::CSV::st;
 
 use strict;
 
-$DBD::CSV::st::imp_data_size = 0;
-
-@DBD::CSV::st::ISA = qw(DBD::File::st);
+our $imp_data_size = 0;
+our @ISA = qw(DBD::File::st);
 
 package DBD::CSV::Statement;
 
 use strict;
-use DBD::File;
 use Carp;
 
-@DBD::CSV::Statement::ISA = qw(DBD::File::Statement);
+our @ISA = qw(DBD::File::Statement);
 
 package DBD::CSV::Table;
 
 use strict;
-use DBD::File;
 use Carp;
 
-@DBD::CSV::Table::ISA = qw(DBD::File::Table);
+our @ISA = qw(DBD::File::Table);
 
 sub bootstrap_table_meta
 {
@@ -344,11 +338,14 @@ sub push_row
     unless ($csv->print ($fh, $fields)) {
 	my @diag = _csv_diag ($csv);
 	my $file = $tbl->{f_fqfn};
-	croak "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
+	return do { $data->set_err ($DBI::stderr, "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]"); undef };
 	}
     1;
     } # push_row
+
+no warnings 'once';
 *push_names = \&push_row;
+use warnings;
 
 1;
 
