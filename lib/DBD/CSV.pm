@@ -82,6 +82,7 @@ package DBD::CSV::db;
 
 use strict;
 
+our $imp_data_size;
 $DBD::CSV::db::imp_data_size = 0;
 
 @DBD::CSV::db::ISA = qw( DBD::File::db );
@@ -234,7 +235,7 @@ sub table_meta_attr_changed
     $class->SUPER::table_meta_attr_changed ($meta, $attr, $value);
     } # table_meta_attr_changed
 
-sub open_file {
+sub open_data {
     my ($self, $meta, $attrs, $flags) = @_;
     $self->SUPER::open_file ($meta, $attrs, $flags);
 
@@ -292,6 +293,11 @@ sub open_file {
 	    }
 	}
     } # open_file
+
+no warnings 'once';
+$DBI::VERSION < 1.623 and
+    *open_file = \&open_data;
+use warnings;
 
 sub _csv_diag
 {
