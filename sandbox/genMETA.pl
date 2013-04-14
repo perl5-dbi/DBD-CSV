@@ -51,10 +51,10 @@ provides:
         version:         VERSION
 requires:
     perl:                5.008001
-    DBI:                 1.623
+    DBI:                 1.625
     DBD::File:           0.41
     SQL::Statement:      1.402
-    Text::CSV_XS:        0.95
+    Text::CSV_XS:        0.97
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
@@ -66,7 +66,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 recommends:
-    perl:                5.016002
+    perl:                5.016003
     Test::More:          0.98
 installdirs:             site
 resources:
