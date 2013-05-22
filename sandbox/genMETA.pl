@@ -71,7 +71,7 @@ recommends:
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
-    repository:          http://repo.or.cz/w/DBD-CSV.git
+    repository:          https://github.com/perl5-dbi/DBD-CSV.git
 meta-spec:
     version:             1.4
     url:                 http://module-build.sourceforge.net/META-spec-v1.4.html
