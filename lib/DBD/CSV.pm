@@ -529,7 +529,7 @@ The preferred way of passing the arguments is by driver attributes:
 	csv_class        => "Text::CSV_XS",
 	csv_null         => 1,
 	csv_tables       => {
-	    info => { file => "info.csv" }
+	    info => { f_file => "info.csv" }
 	    },
 
 	RaiseError       => 1,
@@ -927,10 +927,10 @@ See the C<Text::CSV_XS> documentation for the full list and the documentation.
 
 =over 4
 
-=item file
-X<file>
+=item f_file
+X<f_file>
 
-The tables file name; defaults to
+The name of the file used for the table; defaults to
 
     "$dbh->{f_dir}/$table"
 
@@ -1016,7 +1016,7 @@ override them on a per table basis:
 	sep_char    => ":",
 	quote_char  => undef,
 	escape_char => undef,
-	file        => "/etc/passwd",
+	f_file      => "/etc/passwd",
 	col_names   => [qw( login password uid gid
 			    realname directory shell )],
 	};
@@ -1042,7 +1042,7 @@ If you want to read the sub-directories of another directory, use
 =item list_tables
 X<list_tables>
 
-This method returns a list of file names inside $dbh->{directory}.
+This method returns a list of file-names inside $dbh->{directory}.
 Example:
 
     my $dbh  = DBI->connect ("dbi:CSV:directory=/usr/local/csv_data");
