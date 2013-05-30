@@ -51,7 +51,7 @@ provides:
         version:         VERSION
 requires:
     perl:                5.008001
-    DBI:                 1.627
+    DBI:                 1.628
     DBD::File:           0.41
     SQL::Statement:      1.405
     Text::CSV_XS:        0.97
