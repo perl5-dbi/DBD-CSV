@@ -1,5 +1,5 @@
 setenv PERL5LIB `perl \
  -e '$a = "/pro/3gl/CPAN";' \
  -e 'print join ":" => grep { -d } map { ( "$a/$_/blib/lib", "$a/$_/blib/arch" ) }' \
- -e '    qw( DBI-svn Text-CSV_XS SS-svn DBD-CSV )' \
+ -e '    qw( DBI-git Text-CSV_XS SQL-Statement-git DBD-CSV )' \
  `
