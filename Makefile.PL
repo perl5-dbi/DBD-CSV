@@ -65,6 +65,9 @@ sub postamble
     my $min_vsn = ($] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
 	    'test ::',
+	    '	-@env DBI_SQL_NANO=1 TEST_FILES="t/[123]*t" make -e test_dynamic',
+	    '',
+	    'test ::',
 	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
 	    ''
 	: "";
