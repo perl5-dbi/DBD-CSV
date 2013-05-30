@@ -80,6 +80,16 @@ ok ($sth->execute (4, "Vischje", 33, "in het riet"), "insert prepared");
 ok ($sth->finish,			"finish");
 undef $sth;
 
+ok ($dbh->do ("delete from $tbl"),	"delete all");
+ok ($dbh->do ("insert into $tbl (id) values (0)"), "insert just one field");
+{   local (@ARGV) = DbFile ($tbl);
+    my @csv = <>;
+    s/\r?\n\Z// for @csv;
+    is (scalar @csv, 2,			"Just two lines");
+    is ($csv[0], "id,name,val,txt",	"header");
+    is ($csv[1], "0,,,",		"data");
+    }
+
 ok ($dbh->do ("drop table $tbl"),	"drop");
 ok ($dbh->disconnect,			"disconnect");
 

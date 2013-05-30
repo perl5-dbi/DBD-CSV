@@ -1,6 +1,7 @@
-0.39	- 2013-05-22, H.Merijn Brand
+0.39	- 2013-05-30, H.Merijn Brand
     * Use f_file in docs. file is deprecated
     * Move to github
+    * Add test for row-completeness
 
 0.38	- 2013-01-09, H.Merijn Brand
     * the tar paxheaders hit again (http://www.perlmonks.org/?node_id=1004571)
