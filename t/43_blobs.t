@@ -23,7 +23,8 @@ like (my $def = TableDefinition ($tbl, @tbl_def),
 	qr{^create table $tbl}i,		"table definition");
 ok ($dbh->do ($def),				"create table");
 
-ok (my $blob = (join "", map { chr $_ } 0 .. 255) x $size, "create blob");
+ok (my $blob = (pack "C*", 0 .. 255) x $size,	"create blob");
+is (length $blob, $size * 256,			"blob size");
 ok (my $qblob = $dbh->quote ($blob),		"quote blob");
 
 ok ($dbh->do ("insert into $tbl values (1, ?)", undef, $blob), "insert");
