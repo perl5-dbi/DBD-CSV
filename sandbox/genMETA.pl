@@ -67,7 +67,7 @@ test_requires:
     charnames:           0
 recommends:
     perl:                5.016003
-    Test::More:          0.98
+    Test::More:          0.99
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

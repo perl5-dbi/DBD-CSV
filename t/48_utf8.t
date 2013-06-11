@@ -43,7 +43,9 @@ foreach my $tbl ($tbl1, $tbl2) {
     ok ($sth->execute,				"execute");
     foreach my $i (1 .. scalar @data) {
 	ok ($row = $sth->fetch,			"fetch $i");
-	is_deeply ($row, [ $i , encode ("utf8", $data[$i - 1]) ],	"unencoded content $i");
+	my $v = $data[$i - 1];
+	utf8::is_utf8 ($v) or $v = encode ("utf8", $v);
+	is_deeply ($row, [ $i , $v ],		"unencoded content $i");
 	}
     ok ($sth->finish,				"finish");
     undef $sth;
@@ -57,7 +59,9 @@ foreach my $tbl ($tbl1, $tbl2) {
     ok ($sth->execute,				"execute");
     foreach my $i (1 .. scalar @data) {
 	ok ($row = $sth->fetch,			"fetch $i");
-	is_deeply ($row, [ $i , $data[$i - 1] ],	"encoded content $i");
+	my $v = $data[$i - 1];
+	ok (utf8::is_utf8 ($v),			"is encoded");
+	is_deeply ($row, [ $i , $v ],		"encoded content $i");
 	}
     ok ($sth->finish,				"finish");
     undef $sth;
