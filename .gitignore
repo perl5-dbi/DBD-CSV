@@ -13,3 +13,4 @@ DBD-CSV*
 xx*
 valgrind.log
 tmp/*
+!tmp/tmp.csv

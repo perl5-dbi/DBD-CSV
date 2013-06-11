@@ -52,7 +52,7 @@ provides:
 requires:
     perl:                5.008001
     DBI:                 1.628
-    DBD::File:           0.41
+    DBD::File:           0.42
     SQL::Statement:      1.405
     Text::CSV_XS:        0.98
 configure_requires:

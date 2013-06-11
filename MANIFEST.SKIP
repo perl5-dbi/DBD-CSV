@@ -17,5 +17,4 @@ tmp/
 ^xx
 META.yml
 valgrind.log
-xt/00_minimumversion.t
-xt/00_pod_spell.t
+xt/
