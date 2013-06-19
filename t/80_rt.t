@@ -75,7 +75,7 @@ while (<DATA>) {
 	like ($dbh->errstr, qr{Error 2034 while reading},	"error message");
 	is   (my $row = $sth->fetch, undef,			"fetch");
 	like ($dbh->errstr,
-	      qr{fetch row without a preceeding execute},	"error message");
+	      qr{fetch row without a precee?ding execute},	"error message");
 	};
     ok ($sth->finish,						"finish");
     ok ($dbh->do ("drop table rt$rt"),				"drop table");

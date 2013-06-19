@@ -31,7 +31,7 @@ ok (my $sth = $dbh->prepare ("select * from $tbl where id = 1"), "prepare");
     eval { is ($sth->fetch, undef,			"fetch w/o execute"); };
     is (scalar @warn, 1,				"one error");
     like ($warn[0],
-	qr/fetch row without a preceeding execute/,	"error message");
+	qr/fetch row without a precee?ding execute/,	"error message");
     }
 ok ($sth->execute,					"execute");
 is ($sth->fetch, undef,					"fetch no rows");
