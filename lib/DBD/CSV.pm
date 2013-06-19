@@ -825,6 +825,20 @@ Only exclusive locks will be used.
 
 But see L<DBD::File/"KNOWN BUGS">.
 
+=head2 DBD::CSV specific attributes
+
+=over 4
+
+=item csv_class
+
+The attribute I<csv_class> controls the CSV parsing engine. This defaults
+to C<Text::CSV_XS>, but C<Text::CSV> can be used in some cases, too.
+Please be aware that C<Text::CSV> doesn't care about any edge case as
+C<Text::CSV_XS> does and that C<Text::CSV> is probably about 100 times
+slower than C<Text::CSV_XS>.
+
+=back
+
 =head2 Text::CSV_XS specific attributes
 
 =over 4
@@ -841,17 +855,15 @@ X<csv_quote_char>
 =item csv_escape_char
 X<csv_escape_char>
 
-=item csv_class
-X<csv_class>
-
 =item csv_csv
 X<csv_csv>
 
 The attributes I<csv_eol>, I<csv_sep_char>, I<csv_quote_char> and
 I<csv_escape_char> are corresponding to the respective attributes of the
-Text::CSV_XS object. You may want to set these attributes if you have unusual
-CSV files like F</etc/passwd> or MS Excel generated CSV files with a semicolon
-as separator. Defaults are "\015\012", ';', '"' and '"', respectively.
+I<csv_class> (usually Text::CSV_CS) object. You may want to set these
+attributes if you have unusual CSV files like F</etc/passwd> or MS Excel
+generated CSV files with a semicolon as separator. Defaults are
+"\015\012", ';', '"' and '"', respectively.
 
 The I<csv_eol> attribute defines the end-of-line pattern, which is better
 known as a record separator pattern since it separates records.  The default
