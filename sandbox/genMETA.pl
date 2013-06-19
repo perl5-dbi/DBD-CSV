@@ -67,7 +67,8 @@ test_requires:
     charnames:           0
 recommends:
     perl:                5.016003
-    Test::More:          0.99
+    Test::More:          0.98
+    Text::CSV_XS:        1.01
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
