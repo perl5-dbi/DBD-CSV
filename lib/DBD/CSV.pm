@@ -847,7 +847,7 @@ But see L<DBD::File/"KNOWN BUGS">.
 
 The attribute I<csv_class> controls the CSV parsing engine. This defaults
 to C<Text::CSV_XS>, but C<Text::CSV> can be used in some cases, too.
-Please be aware that C<Text::CSV> doesn't care about any edge case as
+Please be aware that C<Text::CSV> does not care about any edge case as
 C<Text::CSV_XS> does and that C<Text::CSV> is probably about 100 times
 slower than C<Text::CSV_XS>.
 
