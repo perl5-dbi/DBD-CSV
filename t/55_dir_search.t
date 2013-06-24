@@ -8,13 +8,13 @@ use Test::More;
 
 my $pwd = getcwd;
 
-use DBI;
-use Data::Peek;
+BEGIN { use_ok ("DBI") }
+require "t/lib.pl";
 
 my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
     f_schema         => undef,
-    f_dir            => "tmp",
-    f_dir_search     => [ "sandbox", "/tmp" ],
+    f_dir            => DbDir (),
+    f_dir_search     => [ "t", "/tmp" ],
     f_ext            => ".csv/r",
     f_lock           => 2,
     f_encoding       => "utf8",
@@ -27,22 +27,26 @@ my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
 my @dsn = $dbh->data_sources;
 my %dir = map { m{^dbi:CSV:.*\bf_dir=([^;]+)}i; ($1 => 1) } @dsn;
 
-is ($dir{$_}, 1, "DSN for $_") for $pwd."/tmp", qw( sandbox /tmp );
+# Use $test_dir
+$dbh->do ("create table foo (c_foo integer, foo char (1))");
+$dbh->do ("insert into foo values ($_, $_)") for 1, 2, 3;
+
+is ($dir{$_}, 1, "DSN for $_") for $pwd."/output", qw( t /tmp );
 
 my %tbl = map { $_ => 1 } $dbh->tables (undef, undef, undef, undef);
 
-is ($tbl{$_}, 1, "Table $_ found") for qw( tmp foo test rt50788 rt31395 rt51090 );
+is ($tbl{$_}, 1, "Table $_ found") for qw( tmp foo );
 
 my %data = (
-    tmp => {		# tmp/tmp.csv
+    tmp => {		# t/tmp.csv
 	1 => "ape",
 	2 => "monkey",
 	3 => "gorilla",
 	},
-    foo => {		# sandbox/foo.csv
-	1 => "boo",
-	2 => 1,
-	3 => 1,
+    foo => {		# output/foo.csv
+	1 => 1,
+	2 => 2,
+	3 => 3,
 	},
     );
 foreach my $tbl ("tmp", "foo") {
