@@ -22,6 +22,7 @@ t/44_listfields.t
 t/48_utf8.t
 t/50_chopblanks.t
 t/51_commit.t
+t/55_dir_search.t
 t/60_misc.t
 t/61_meta.t
 t/70_csv.t

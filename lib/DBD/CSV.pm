@@ -518,6 +518,7 @@ The preferred way of passing the arguments is by driver attributes:
     $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
 	f_schema         => undef,
 	f_dir            => "data",
+	f_dir_search     => [],
 	f_ext            => ".csv/r",
 	f_lock           => 2,
 	f_encoding       => "utf8",
@@ -768,6 +769,19 @@ X<f_dir>
 This attribute is used for setting the directory where CSV files are
 opened. Usually you set it in the dbh and it defaults to the current
 directory ("."). However, it may be overridden in statement handles.
+
+=item f_dir_search
+X<f_dir_search>
+
+This attribute optionally defines a list of extra directories to search
+when opening existing tables. It should be an anonymous list or an array
+reference listing all folders where tables could be found.
+
+    my $dbh = DBI->connect ("dbi:CSV:", "", "", {
+	f_dir        => "data",
+	f_dir_search => [ "ref/data", "ref/old" ],
+	f_ext        => ".csv/r",
+	}) or die $DBI::errstr;
 
 =item f_ext
 X<f_ext>
