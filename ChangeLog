@@ -1,7 +1,15 @@
-0.39	- 2013-05-30, H.Merijn Brand
+0.39	- 2013-06-28, H.Merijn Brand
     * Use f_file in docs. file is deprecated
-    * Move to github
+    * DBD::CSV's repository moved to github
     * Add test for row-completeness
+    * Fix UTF-8 tests to better follow Text::CSV_XS auto-encoding
+    * Require more recent versions of low level modules that fixe
+      issues reported for DBD::CSV
+    * Development will also do mosts tests with DBI_SQL_NANO=1
+    * Added support for f_dir_search from DBD::File (in fact DBI was
+      changed to feature this for DBD::CSV :)
+    * Fix test relying on spell-error in DBI's error message
+    * Document csv_class (still undertested)
 
 0.38	- 2013-01-09, H.Merijn Brand
     * the tar paxheaders hit again (http://www.perlmonks.org/?node_id=1004571)
