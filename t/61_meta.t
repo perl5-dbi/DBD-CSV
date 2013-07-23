@@ -9,10 +9,6 @@ use DBI qw(:sql_types);
 use Cwd qw(abs_path);
 do "t/lib.pl";
 
-my $dbdfv = version->parse (DBD::File->VERSION);
-$dbdfv >= version->parse ("0.41") or
-    plan skip_all => "DBD::File 0.41 required. You only have $dbdfv";
-
 my $cnt = join "" => <DATA>;
 my $tbl;
 
