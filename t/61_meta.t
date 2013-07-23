@@ -55,7 +55,7 @@ SKIP: {
 
 # abs_path () fails under MSWin32 for non-existing files!
 my $fn = DbFile ($tbl);
-   $fn = $^O eq "MSWin32"
+   $fn = $^O eq "MSWin32" || $^O eq "cygwin"
        ? File::Spec->catdir ($pwd, $fn)
        : abs_path ($fn);
 open my $fh, ">", $fn or die "Can't open $fn for writing: $!";
