@@ -1,4 +1,4 @@
-personal_ws-1.1 en 29 
+personal_ws-1.1 en 31 
 AutoCommit
 ChopBlanks
 cpan
@@ -11,6 +11,8 @@ DBI
 DSN
 eol
 Jochen
+json
+Makefile
 Merijn
 metadata
 Metadata

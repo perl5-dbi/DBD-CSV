@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION  = "0.39";
+$VERSION  = "0.40";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -411,15 +411,16 @@ from any CPAN mirror, for example
 =item DBI
 X<DBI>
 
-The DBI (Database independent interface for Perl), version 1.00 or
-a later release
+A recent version of the L<DBI> (Database independent interface for Perl).
+See below why.
 
 =item DBD::File
 X<DBD::File>
 
 This is the base class for DBD::CSV, and it is part of the DBI
-distribution. As DBD::CSV requires version 0.38 or newer for DBD::File
-it effectively requires DBI version 1.611 or newer.
+distribution. As DBD::CSV requires a matching version of L<DBD::File>
+which is (partly) developed by the same team that maintains
+DBD::CSV. See META.json or Makefile.PL for the minimum versions.
 
 =item SQL::Statement
 X<SQL::Statement>
@@ -431,7 +432,8 @@ look for updates to SQL::Statement regularly.
 It is possible to run C<DBD::CSV> without this module if you define
 the environment variable C<$DBI_SQL_NANO> to 1. This will reduce the
 SQL support a lot though. See L<DBI::SQL::Nano> for more details. Note
-that the test suite does not test in this mode!
+that the test suite does only test in this mode in the development
+environment.
 
 =item Text::CSV_XS
 X<Text::CSV_XS>
@@ -458,12 +460,12 @@ or even trust C<cpan> to resolve all dependencies for you:
 If you cannot, for whatever reason, use cpan, fetch all modules from
 CPAN, and build with a sequence like:
 
-    gzip -d < DBD-CSV-0.28.tgz | tar xf -
+    gzip -d < DBD-CSV-0.40.tgz | tar xf -
 
 (this is for Unix users, Windows users would prefer WinZip or something
 similar) and then enter the following:
 
-    cd DBD-CSV-0.28
+    cd DBD-CSV-0.40
     perl Makefile.PL
     make test
 
