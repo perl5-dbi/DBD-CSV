@@ -1,5 +1,6 @@
 0.40	- 2013-07-23, H.Merijn Brand
-    * fix version references in doc
+    * Fix version references in doc
+    * Fix Tests for Windows
 
 0.39	- 2013-06-28, H.Merijn Brand
     * Use f_file in docs. file is deprecated
