@@ -11,7 +11,7 @@ my $pwd = getcwd;
 BEGIN { use_ok ("DBI") }
 require "t/lib.pl";
 
-my $root_temp = $^O eq "MSWin32" ? "C:/Temp" : "/tmp";
+my $root_temp = $^O eq "MSWin32" ? "C:/" : "/tmp";
 my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
     f_schema         => undef,
     f_dir            => DbDir (),

@@ -1,5 +1,6 @@
-0.41	- 2013-07-23, H.Merijn Brand
+0.41	- 2013-07-24, H.Merijn Brand
     * Cwd::abs_path () on Cygwin works like on Window :(
+    * Test fixed for Windows with no C:\Temp
 
 0.40	- 2013-07-23, H.Merijn Brand
     * Fix version references in doc
