@@ -3,19 +3,18 @@
 use strict;
 use warnings;
 
-use Cwd;
+use Cwd qw( abs_path );
 use Test::More;
-
-my $pwd = getcwd;
 
 BEGIN { use_ok ("DBI") }
 require "t/lib.pl";
 
-my $root_temp = $^O eq "MSWin32" ? "C:/" : "/tmp";
+my $tmpdir = File::Spec->tmpdir ();
+my $tstdir = abs_path (DbDir ());
 my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
     f_schema         => undef,
     f_dir            => DbDir (),
-    f_dir_search     => [ "t", $root_temp ],
+    f_dir_search     => [ "t", $tmpdir ],
     f_ext            => ".csv/r",
     f_lock           => 2,
     f_encoding       => "utf8",
@@ -39,8 +38,7 @@ my %dir = map {
 $dbh->do ("create table foo (c_foo integer, foo char (1))");
 $dbh->do ("insert into foo values ($_, $_)") for 1, 2, 3;
 
-my @test_dirs = ($pwd."/output", "t");
-$^O eq "VMS" or push @test_dirs, $root_temp;
+my @test_dirs = ($tstdir, "t", $tmpdir);
 is ($dir{$_}, 1, "DSN for $_") for @test_dirs;
 
 my %tbl = map { $_ => 1 } $dbh->tables (undef, undef, undef, undef);
