@@ -3,14 +3,13 @@
 use strict;
 use warnings;
 
-use Cwd qw( abs_path );
 use Test::More;
 
 BEGIN { use_ok ("DBI") }
 require "t/lib.pl";
 
 my $tmpdir = File::Spec->tmpdir ();
-my $tstdir = abs_path (DbDir ());
+my $tstdir = DbDir ();
 my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
     f_schema         => undef,
     f_dir            => DbDir (),
@@ -28,9 +27,8 @@ my @dsn = $dbh->data_sources;
 my %dir = map {
     m{^dbi:CSV:.*\bf_dir=([^;]+)}i;
     my $folder = $1;
-    # Unixify Windows paths
-    $folder =~ s{^([A-Z])\\?:}{$1:};
-    $folder =~ s{\\+}{/}g;
+    # data_sources returns the string just one level to many
+    $folder =~ m{\\[;\\]} and $folder =~ s{\\(.)}{$1}g;
     ($folder => 1);
     } @dsn;
 
@@ -64,5 +62,6 @@ foreach my $tbl ("tmp", "foo") {
 	is ($row->[1], $data{$tbl}{$row->[0]}, "$tbl ($row->[0], ...)");
 	}
     }
+ok ($dbh->do ("drop table foo"), "Drop foo");
 
 done_testing;

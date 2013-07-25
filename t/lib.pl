@@ -9,13 +9,11 @@ use warnings;
 
 use File::Spec;
 
-my $test_dir  = File::Spec->catdir (File::Spec->curdir (), "output");
-my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$test_dir";
+my $base_dir  = File::Spec->rel2abs (File::Spec->curdir ());
+my $test_dir  = File::Spec->rel2abs ("output");
+my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=output";
 my $test_user = $ENV{DBI_USER} || "";
 my $test_pass = $ENV{DBI_PASS} || "";
-
-# Start each test clean
-unlink glob "$test_dir/*";
 
 sub COL_NULLABLE () { 1 }
 sub COL_KEY      () { 2 }
@@ -162,7 +160,7 @@ sub Connect
 
 sub DbDir
 {
-    @_ and $test_dir = File::Spec->catdir (File::Spec->curdir (), shift);
+    @_ and $test_dir = File::Spec->catdir ($base_dir, shift);
     $test_dir;
     } # DbDir
 

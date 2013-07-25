@@ -1,5 +1,6 @@
 0.41	- 2013-07-24, H.Merijn Brand
     * Use File::Spec->tmpdir () for universal existing folder
+    * Use File::Spec::rel2abs () instead of abs_path and hoops
 
 0.40	- 2013-07-23, H.Merijn Brand
     * Fix version references in doc
