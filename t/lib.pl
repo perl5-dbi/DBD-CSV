@@ -9,9 +9,10 @@ use warnings;
 
 use File::Spec;
 
+my $testname  = "output$$";
 my $base_dir  = File::Spec->rel2abs (File::Spec->curdir ());
-my $test_dir  = File::Spec->rel2abs ("output");
-my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=output";
+my $test_dir  = File::Spec->rel2abs ($testname);
+my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$testname";
 my $test_user = $ENV{DBI_USER} || "";
 my $test_pass = $ENV{DBI_PASS} || "";
 
@@ -93,22 +94,15 @@ sub ListTables
 sub DbCleanup
 {
     chdir $base_dir;
-    -d "output" or return;
-    chdir "output" or BAIL_OUT ("Cleanup failed");
+    -d $testname or return;
+    chdir $testname or BAIL_OUT ("Cleanup failed");
     unlink glob "*";
     chdir $base_dir;
-    rmdir "output";
+    rmdir $testname;
     } # DbCleanup
 
-{   my $waiting = 90;
-    while (-d "output") {
-	diag ("No support for parallel testing yet. Waiting for testfolder to disappear $waiting");
-	sleep (1);
-	$waiting-- or BAIL_OUT ("That took way to long");
-	}
-    mkdir "output", 0755;
-    END { DbCleanup (); }
-    }
+mkdir $testname, 0755;
+END { DbCleanup (); }
 
 # This functions generates a list of possible DSN's aka
 # databases and returns a possible table name for a new

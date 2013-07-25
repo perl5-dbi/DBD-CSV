@@ -27,7 +27,7 @@ sub Tables
     sort @tbl;
     } # Tables
 
-my $dir = DbDir () || "output";
+my $dir = DbDir ();
 
 ok ($dbh = Connect (),				"connect");
 

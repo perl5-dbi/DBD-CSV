@@ -20,11 +20,16 @@ while (<DATA>) {
     push @{$input{$rt}}, $_;
     }
 
+sub rt_file
+{
+    return File::Spec->catfile (DbDir (), "rt$_[0]");
+    } # rt_file
+
 {   $rt = 18477;
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open  my $fh, ">", "output/rt$rt";
+    open  my $fh, ">", rt_file ($rt);
     print $fh @lines;
     close $fh;
 
@@ -61,7 +66,7 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open my $fh, ">", "output/rt$rt";
+    open my $fh, ">", rt_file ($rt);
     print $fh @lines;
     close $fh;
 
@@ -127,7 +132,7 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open my $fh, ">", "output/rt$rt";
+    open my $fh, ">", rt_file ($rt);
     print $fh @lines;
     close $fh;
 
@@ -216,7 +221,7 @@ while (<DATA>) {
     my @dbitp = ( SQL_INTEGER, SQL_LONGVARCHAR, SQL_NUMERIC );
     my @csvtp = ( 1, 0, 2 );
 
-    open my $fh, ">", "output/rt$rt";
+    open my $fh, ">", rt_file ($rt);
     print $fh @lines;
     close $fh;
 
@@ -236,7 +241,7 @@ while (<DATA>) {
     ok ($rt, "RT-$rt - $desc{$rt}");
     my @lines = @{$input{$rt}};
 
-    open my $fh, ">", "output/rt$rt";
+    open my $fh, ">", rt_file ($rt);
     print $fh @lines;
     close $fh;
 
@@ -267,7 +272,7 @@ while (<DATA>) {
     my @lines = @{$input{$rt}};
 
     my $tbl = "rt$rt";
-    open  my $fh, ">", "output/$tbl";
+    open  my $fh, ">", rt_file ($rt);
     print $fh @lines;
     close $fh;
 

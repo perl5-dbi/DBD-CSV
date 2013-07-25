@@ -49,7 +49,7 @@ my %data = (
 	2 => "monkey",
 	3 => "gorilla",
 	},
-    foo => {		# output/foo.csv
+    foo => {		# output123/foo.csv
 	1 => 1,
 	2 => 2,
 	3 => 3,

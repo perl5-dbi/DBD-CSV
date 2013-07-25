@@ -9,7 +9,7 @@ do "t/lib.pl";
 
 sub DbFile;
 
-my $dir = DbDir () || "output";
+my $dir = DbDir ();
 
 my @tbl_def = (
     [ "id",   "INTEGER",  4, 0 ],

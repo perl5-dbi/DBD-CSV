@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Cwd;
 
 BEGIN { use_ok ("DBI"); }
 do "t/lib.pl";
@@ -16,12 +15,13 @@ my @tbl_def = (
 
 sub DbFile;
 
-my $dir = DbDir () || "output";
-my $fqd = Cwd::abs_path $dir;
+my $dir = "output$$";
+my $fqd = File::Spec->rel2abs ($dir);
+my $abs = Cwd::abs_path ($dir);
 
 ok (my $dbh = Connect (),			"connect");
 
-ok ($dbh->{f_dir} eq $dir ||
+ok ($dbh->{f_dir} eq $dir || $dbh->{f_dir} eq $abs ||
     $dbh->{f_dir} eq $fqd,			"default dir");
 ok ($dbh->{f_dir} = $dir,			"set f_dir");
 

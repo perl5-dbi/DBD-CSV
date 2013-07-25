@@ -14,8 +14,6 @@ my @tbl_def = (
     [ "name", "CHAR",    64, 0 ],
     );
 
-unlink glob "output/*";
-
 ok (my $dbh = Connect (),		"connect");
 
 ok (my $tbl = FindNewTable ($dbh),	"find new test table");

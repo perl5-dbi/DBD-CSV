@@ -29,7 +29,8 @@ my @data = (
 ok ("Creating table with UTF-8 content");
 foreach my $tbl ($tbl1, $tbl2) {
     ok (my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }), "New csv");
-    ok (open (my $fh, ">:utf8", "output/$tbl.csv"), "Open CSV");
+    ok (open (my $fh, ">:utf8",
+	File::Spec->catfile (DbDir (), "$tbl.csv")), "Open CSV");
     ok ($csv->print ($fh, [ "id", "str" ]), "CSV print header");
     ok ($csv->print ($fh, [ $_, $data[$_ - 1] ]), "CSV row $_") for 1 .. scalar @data;
     ok (close ($fh), "close");

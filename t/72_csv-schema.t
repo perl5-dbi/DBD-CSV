@@ -12,7 +12,7 @@ my @tbl_def = (
     [ "name", "CHAR",    64, 0 ],
     );
 
-my $dir = DbDir () || "output";
+my $dir = DbDir ();
 
 ok (my $dbh = DBI->connect ("dbi:CSV:", "", "", {
 	f_dir	=> $dir,
