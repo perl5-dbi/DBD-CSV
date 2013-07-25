@@ -90,7 +90,25 @@ sub ListTables
     @tables;
     } # ListTables
 
--d "output"or mkdir "output", 0755;
+sub DbCleanup
+{
+    chdir $base_dir;
+    -d "output" or return;
+    chdir "output" or BAIL_OUT ("Cleanup failed");
+    unlink glob "*";
+    chdir $base_dir;
+    rmdir "output";
+    } # DbCleanup
+
+{   my $waiting = 90;
+    while (-d "output") {
+	diag ("No support for parallel testing yet. Waiting for testfolder to disappear $waiting");
+	sleep (1);
+	$waiting-- or BAIL_OUT ("That took way to long");
+	}
+    mkdir "output", 0755;
+    END { DbCleanup (); }
+    }
 
 # This functions generates a list of possible DSN's aka
 # databases and returns a possible table name for a new
