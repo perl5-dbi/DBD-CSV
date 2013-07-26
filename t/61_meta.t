@@ -109,6 +109,10 @@ close $fh;
     is_deeply ($rows, $expect, "all rows found - file-name w col_names" );
     is_deeply ($sth->{NAME_lc}, [qw(foo bar baz)],
 	"column names - file-name w col_names" );
+
+    # TODO: Next test will hang in open_tables ()
+    #  'Cannot obtain exclusive lock on .../output12660/testaa: Interrupted system call'
+    #ok ($dbh->do ("drop table data"), "Drop the table");
     }
 
 done_testing ();
