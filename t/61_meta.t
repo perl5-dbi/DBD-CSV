@@ -17,13 +17,14 @@ my $expect = [
     [ 3, "Beowulf", "CCEE00"	],
     ];
 
-SKIP: {
-    open my $data, "<", \$cnt;
-    my $dbh = Connect ();
+{   my $dbh = Connect ();
     ok ($tbl = FindNewTable ($dbh),		"find new test table");
+    }
 
-    skip "memory i/o currently unsupported by DBD::File", 1;
-
+if ($DBD::File::VERSION gt "0.42") {
+    note ("ScalarIO - no col_names");
+    my $dbh = Connect ();
+    open my $data, "<", \$cnt;
     $dbh->{csv_tables}->{data} = {
 	f_file    => $data,
 	skip_rows => 4,
@@ -34,11 +35,10 @@ SKIP: {
     is_deeply ($rows, $expect, "all rows found - mem-io w/o col_names");
     }
 
-SKIP: {
-    open my $data, "<", \$cnt;
+if ($DBD::File::VERSION gt "0.42") {
+    note ("ScalarIO - with col_names");
     my $dbh = Connect ();
-
-    skip "memory i/o currently unsupported by DBD::File", 1;
+    open my $data, "<", \$cnt;
 
     $dbh->{csv_tables}->{data} = {
 	f_file    => $data,
@@ -56,6 +56,7 @@ open my $fh, ">", $fn or die "Can't open $fn for writing: $!";
 print $fh $cnt;
 close $fh;
 
+note ("File handle - no col_names");
 {   open my $data, "<", $fn;
     my $dbh = Connect ();
     $dbh->{csv_tables}->{data} = {
@@ -70,6 +71,7 @@ close $fh;
 	"column names - file-handle w/o col_names");
     }
 
+note ("File handle - with col_names");
 {   open my $data, "<", $fn;
     my $dbh = Connect ();
     $dbh->{csv_tables}->{data} = {
@@ -84,6 +86,7 @@ close $fh;
     is_deeply ($sth->{NAME_lc}, [qw(foo bar baz)], "column names - file-handle w col_names");
     }
 
+note ("File name - no col_names");
 {   my $dbh = Connect ();
     $dbh->{csv_tables}->{data} = {
 	f_file    => $fn,
@@ -97,6 +100,7 @@ close $fh;
 	"column names - file-name w/o col_names");
     }
 
+note ("File name - with col_names");
 {   my $dbh = Connect ({ RaiseError => 1 });
     $dbh->{csv_tables}->{data} = {
 	f_file    => $fn,
@@ -114,6 +118,8 @@ close $fh;
     #  'Cannot obtain exclusive lock on .../output12660/testaa: Interrupted system call'
     #ok ($dbh->do ("drop table data"), "Drop the table");
     }
+
+unlink $fn;
 
 done_testing ();
 
