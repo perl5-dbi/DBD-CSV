@@ -1,3 +1,6 @@
+0.42	- 2013-07-29, H.Merijn Brand
+    * 
+
 0.41	- 2013-07-29, H.Merijn Brand
     * Use File::Spec->tmpdir () for universal existing folder
       Note that huge $TMP folders may cause the test to run slow
