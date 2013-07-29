@@ -9,6 +9,7 @@ use Test::More;
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
+my $nano = $ENV{DBI_SQL_NANO};
 my @tbl_def = (
     [ "id",   "INTEGER",  4, 0 ],
     [ "name", "CHAR",    64, 0 ],
@@ -17,6 +18,11 @@ my @tbl_def = (
 sub RowCount
 {
     my ($dbh, $tbl) = @_;
+
+    if ($nano) {
+	diag ("SQL::Nano does not support count (*)");
+	return 0;
+	}
 
     local $dbh->{PrintError} = 1;
     my $sth = $dbh->prepare ("SELECT count (*) FROM $tbl") or return;
@@ -41,12 +47,12 @@ is ($dbh->{AutoCommit}, 1,			"AutoCommit still on");
 
 # Check whether AutoCommit mode works.
 ok ($dbh->do ("insert into $tbl values (1, 'Jochen')"), "insert 1");
-is (RowCount ($dbh, $tbl), 1,			"1 row");
+is (RowCount ($dbh, $tbl), $nano ? 0 : 1,	"1 row");
 
 ok ($dbh->disconnect,				"disconnect");
 
 ok ($dbh = Connect (),				"connect");
-is (RowCount ($dbh, $tbl), 1,			"still 1 row");
+is (RowCount ($dbh, $tbl), $nano ? 0 : 1,	"still 1 row");
 
 # Check whether commit issues a warning in AutoCommit mode
 ok ($dbh->do ("insert into $tbl values (2, 'Tim')"), "insert 2");

@@ -7,6 +7,13 @@ use warnings;
 use Test::More;
 
 BEGIN { use_ok ("DBI") }
+
+if ($ENV{DBI_SQL_NANO}) {
+    diag ("These tests are not yet supported for SQL::Nano");
+    done_testing (1);
+    exit 0;
+    }
+
 do "t/lib.pl";
 
 defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };

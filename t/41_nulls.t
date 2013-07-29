@@ -9,6 +9,7 @@ use Test::More;
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
+my $nano = $ENV{DBI_SQL_NANO};
 my @tbl_def = (
     [ "id",   "INTEGER",  4, &COL_NULLABLE	],
     [ "name", "CHAR",    64, &COL_NULLABLE	],
@@ -25,11 +26,15 @@ ok ($dbh->do ($def),				"create table");
 
 ok ($dbh->do ("insert into $tbl values (NULL, 'NULL-id', ' ')"), "insert");
 
+my $row;
+
 ok (my $sth = $dbh->prepare ("select * from $tbl where id is NULL"), "prepare");
 ok ($sth->execute,				"execute");
-ok (my $row = $sth->fetch,			"fetch");
-
-is_deeply ($row, [ "", "NULL-id", " " ],	"default content");
+TODO: {
+    local $TODO = $nano ? "SQL::Nano does not yet support this syntax" : undef;
+    ok ($row = $sth->fetch,			"fetch");
+    is_deeply ($row, [ "", "NULL-id", " " ],	"default content");
+    }
 ok ($sth->finish,				"finish");
 undef $sth;
 
@@ -37,9 +42,11 @@ ok ($dbh = Connect ({ csv_null => 1 }),		"connect csv_null");
 
 ok ($sth = $dbh->prepare ("select * from $tbl where id is NULL"), "prepare");
 ok ($sth->execute,				"execute");
-ok ($row = $sth->fetch,				"fetch");
-is_deeply ($row, [ undef, "NULL-id", " " ],	"NULL content");
-
+TODO: {
+    local $TODO = $nano ? "SQL::Nano does not yet support this syntax" : undef;
+    ok ($row = $sth->fetch,				"fetch");
+    is_deeply ($row, [ undef, "NULL-id", " " ],	"NULL content");
+    }
 ok ($sth->finish,				"finish");
 undef $sth;
 
