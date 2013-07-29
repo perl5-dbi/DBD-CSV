@@ -40,9 +40,10 @@ is_deeply ($sth->{NAME_lc_hash},
 #  lib/DBD/CSV/GetInfo.pm
 is ($sth->{PRECISION}[0],	0,		"PRECISION 1");
 TODO: {
+    local $TODO = "TYPE attribute does not yet use TypeInfo";
+    is ($sth->{TYPE}[0],	&SQL_INTEGER,	"TYPE 1");
+    is ($sth->{TYPE}[1],	&SQL_VARCHAR,	"TYPE 2");
     local $TODO = $nano ? "SQL::Nano does not yet support this syntax" : undef;
-    #s ($sth->{TYPE}[0],	&SQL_INTEGER,	"TYPE 1");
-    #s ($sth->{TYPE}[1],	&SQL_VARCHAR,	"TYPE 2");
     is ($sth->{PRECISION}[1], 	64,		"PRECISION 2");
     is ($sth->{NULLABLE}[0],	0,		"NULLABLE 1");
     is ($sth->{NULLABLE}[1],	1,		"NULLABLE 2");

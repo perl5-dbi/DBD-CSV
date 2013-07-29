@@ -138,6 +138,22 @@ sub get_csv_versions
     return sprintf "%s using %s", $dbh->{csv_version}, $dtype;
     } # get_csv_versions 
 
+sub get_info
+{
+    my ($dbh, $info_type) = @_;
+    require  DBD::CSV::GetInfo;
+    my $v = $DBD::CSV::GetInfo::info{int ($info_type)};
+    ref $v eq "CODE" and $v = $v->($dbh);
+    return $v;
+    } # get_info
+
+sub type_info_all
+{
+    my $dbh = shift;
+    require   DBD::CSV::TypeInfo;
+    return [@$DBD::CSV::TypeInfo::type_info_all];
+    } # type_info_all
+
 # --- STATEMENT ----------------------------------------------------------------
 
 package DBD::CSV::st;
