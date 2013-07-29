@@ -62,6 +62,8 @@ if ($@) {
          "******\n";
     }
 else {
+    use lib "lib";
+
     local $" = " ";
     $wm{PREREQ_PM}{"DBI::Test"} = "0.001";
     my @new_tests = join " " => DBI::Test::Conf->setup ();
