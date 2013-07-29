@@ -54,6 +54,22 @@ my %wm = (
     );
 $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 
+eval "use DBI::Test::Conf ();";
+if ($@) {
+    warn "******\n",
+         "******\tDBI::Test is not installed.\n",
+         "******\tIt will be required in one of the upcoming releases.\n",
+         "******\n";
+    }
+else {
+    local $" = " ";
+    $wm{PREREQ_PM}{"DBI::Test"} = "0.001";
+    my @new_tests = join " " => DBI::Test::Conf->setup ();
+    $wm{test} = { TESTS => join " " =>
+	(sort glob "t/*.t"), @new_tests, };
+    $wm{clean}{FILES} .= " @new_tests";
+    }
+
 my $rv = WriteMakefile (%wm);
 
 1;

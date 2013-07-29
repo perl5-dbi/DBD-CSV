@@ -14,3 +14,5 @@ xx*
 valgrind.log
 tmp/*
 !tmp/tmp.csv
+t/basic/
+xt/basic/

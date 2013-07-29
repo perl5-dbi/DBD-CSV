@@ -18,3 +18,4 @@ tmp/
 META.yml
 valgrind.log
 xt/
+t/basic/
