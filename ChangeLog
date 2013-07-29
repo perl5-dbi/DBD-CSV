@@ -1,7 +1,9 @@
-0.41	- 2013-07-25, H.Merijn Brand
+0.41	- 2013-07-29, H.Merijn Brand
     * Use File::Spec->tmpdir () for universal existing folder
+      Note that huge $TMP folders may cause the test to run slow
     * Use File::Spec::rel2abs () instead of abs_path and hoops
     * Guard against parallel testing, which is unsupported
+    * Guard against streaming tests (they PASS on the DBI-devel)
 
 0.40	- 2013-07-23, H.Merijn Brand
     * Fix version references in doc
