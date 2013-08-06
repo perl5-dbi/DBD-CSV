@@ -66,10 +66,9 @@ else {
 
     local $" = " ";
     $wm{PREREQ_PM}{"DBI::Test"} = "0.001";
-    my @new_tests = join " " => DBI::Test::Conf->setup ();
-    $wm{test} = { TESTS => join " " =>
-	(sort glob "t/*.t"), @new_tests, };
-    $wm{clean}{FILES} .= " @new_tests";
+    my @nt = DBI::Test::Conf->setup (CONTAINED_DBDS => [qw( CSV File NullP )]);
+    $wm{test} = { TESTS => join " " => (sort glob "t/*.t"), @nt };
+    $wm{clean}{FILES} .= " @nt";
     }
 
 my $rv = WriteMakefile (%wm);
