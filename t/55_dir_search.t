@@ -8,12 +8,15 @@ use Test::More;
 BEGIN { use_ok ("DBI") }
 require "t/lib.pl";
 
-my $tmpdir = File::Spec->tmpdir ();
 my $tstdir = DbDir ();
+my @extdir = ("t", File::Spec->tmpdir ());
+if (open my $fh, "<", "tests.skip") {
+    grep m/\b tmpdir \b/x => <$fh> and pop @extdir;
+    }
 my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
     f_schema         => undef,
     f_dir            => DbDir (),
-    f_dir_search     => [ "t", $tmpdir ],
+    f_dir_search     => \@extdir,
     f_ext            => ".csv/r",
     f_lock           => 2,
     f_encoding       => "utf8",
@@ -36,7 +39,7 @@ my %dir = map {
 $dbh->do ("create table foo (c_foo integer, foo char (1))");
 $dbh->do ("insert into foo values ($_, $_)") for 1, 2, 3;
 
-my @test_dirs = ($tstdir, "t", $tmpdir);
+my @test_dirs = ($tstdir, @extdir);
 is ($dir{$_}, 1, "DSN for $_") for @test_dirs;
 
 my %tbl = map { $_ => 1 } $dbh->tables (undef, undef, undef, undef);

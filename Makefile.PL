@@ -7,14 +7,15 @@ require 5.008001;
 use strict;
 
 use ExtUtils::MakeMaker;
+use File::Spec;
 
 eval { require DBD::CSV; };
 if (!$@ && $DBD::CSV::VERSION < 0.1010) {
     print <<'MSG';
 
-WARNING! You seem to have installed a recent version of the DBD::CSV module.
+WARNING!  You seem to have installed a recent version of the DBD::CSV module.
 Note that the API (in particular attribute names) has changed, to conform to
-the DBI specifications. For example $dbh->{directory} has been renamed to
+the DBI specifications.  For example  $dbh->{directory}  has been renamed to
 $dbh->{f_dir} and $dbh->{eol}, $dbh->{quote_char}, ... are gone in favour of
 $dbh->{tables}{$table}{csv}, which is used for storing meta information. You
 might need to modify existing sources before doing a "make install". See the
@@ -26,11 +27,22 @@ MSG
 
 use vars qw( $DBI_INC_DIR );
 
+{   my $tmp_dir = File::Spec->tmpdir ();
+    my $default = $ENV{AUTOMATED_TESTING} ? "n" : "y";
+    if (prompt ("Enable the use of $tmp_dir for tests?", $default) =~ m/[Yy]/) {
+	unlink "tests.skip";
+	}
+    else {
+	open my $fh, ">", "tests.skip";
+	print $fh "tmpdir\n";
+	close $fh;
+	}
+    }
 my %wm = (
     NAME         => "DBD::CSV",
     DISTNAME     => "DBD-CSV",
     ABSTRACT     => "DBI driver for CSV and similar structured files",
-    AUTHOR       => "H.Merijn Brand <h.merijn\@xs4all.nl>",
+    AUTHOR       => "H.Merijn Brand <h.m.brand\@xs4all.nl>",
     VERSION_FROM => "lib/DBD/CSV.pm",
     PREREQ_PM    => {
 	"DBI"            => 1.628,

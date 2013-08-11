@@ -17,5 +17,6 @@ tmp/
 ^xx
 META.yml
 valgrind.log
+tests.skip
 xt/
 t/basic/

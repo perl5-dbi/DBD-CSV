@@ -1,5 +1,5 @@
-0.42	- 2013-07-29, H.Merijn Brand
-    * 
+0.42	- 2013-08-11, H.Merijn Brand
+    * Optionally skip tests using File::Spec->tempdir () RT#87684
 
 0.41	- 2013-07-29, H.Merijn Brand
     * Use File::Spec->tmpdir () for universal existing folder

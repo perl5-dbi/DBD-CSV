@@ -14,5 +14,6 @@ xx*
 valgrind.log
 tmp/*
 !tmp/tmp.csv
+tests.skip
 t/basic/
 xt/basic/
