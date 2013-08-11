@@ -375,23 +375,24 @@ DBD::CSV - DBI driver for CSV files
 
     use DBI;
     # See "Creating database handle" below
-    $dbh = DBI->connect ("dbi:CSV:") or
-	die "Cannot connect: $DBI::errstr";
+    $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
+        f_ext      => ".csv/r",
+        RaiseError => 1,
+        }) or die "Cannot connect: $DBI::errstr";
 
     # Simple statements
-    $dbh->do ("CREATE TABLE a (id INTEGER, name CHAR (10))") or
-	die "Cannot prepare: " . $dbh->errstr ();
+    $dbh->do ("CREATE TABLE foo (id INTEGER, name CHAR (10))");
 
     # Selecting
-    $dbh->{RaiseError} = 1;
     my $sth = $dbh->prepare ("select * from foo");
     $sth->execute;
-    while (my @row = $sth->fetchrow_array) {
-	print "id: $row[0], name: $row[1]\n";
+    $sth->bind_columns (\my ($id, $name));
+    while ($sth->fetch) {
+	print "id: $id, name: $ame\n";
 	}
 
     # Updates
-    my $sth = $dbh->prepare ("UPDATE a SET name = ? WHERE id = ?");
+    my $sth = $dbh->prepare ("UPDATE foo SET name = ? WHERE id = ?");
     $sth->execute ("DBI rocks!", 1);
     $sth->finish;
 
