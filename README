@@ -48,14 +48,27 @@ Build/Installation:
       cpan DBD::CSV
 
     Or standard build/installation:
-      gzip -cd DBD-CSV-0.39.tar.gz | tar xf -
-      cd DBD-CSV-0.39
+      gzip -cd DBD-CSV-0.42.tar.gz | tar xf -
+      cd DBD-CSV-0.42
       perl Makefile.PL
       make test
       make install
 
     (this is for Unix users, Windows users would prefer PowerArchiver,
     WinZip or something similar).
+
+    The test suite contains extensive tests for all features provided
+    by DBD::CSV. Some of them include the use of what is set to be the
+    default temporary directory on the system. Even though the tests
+    do not use the folder to read or modify data, using the folder will
+    imply the scanning of that folder to see if files would qualify for
+    use in DBD::CSV. When the folder contains many files, the scanning
+    will seriously slow down the testing duration. The configure phase
+    therefor asks the user if using the folder is allowed. The default
+    answer is yes unless $AUTOMATED_TESTING is set.
+    As File::Spec->tmpdir () honors the environment, you can enable
+    these tests using another folder by setting $TMPDIR or whatever
+    controls tmpdir () or your OS.
 
 Author:
     This module is currently maintained by
