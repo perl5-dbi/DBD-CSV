@@ -16,4 +16,10 @@ tmp/*
 !tmp/tmp.csv
 tests.skip
 t/basic/
+t/DBI/
+t/DBD/
+t/SQL/
 xt/basic/
+xt/DBI/
+xt/DBD/
+xt/SQL/

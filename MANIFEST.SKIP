@@ -20,3 +20,6 @@ valgrind.log
 tests.skip
 xt/
 t/basic/
+t/DBI/
+t/DBD/
+t/SQL/

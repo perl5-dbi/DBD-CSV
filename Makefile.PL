@@ -78,7 +78,8 @@ else {
 
     local $" = " ";
     $wm{PREREQ_PM}{"DBI::Test"} = "0.001";
-    my @nt = DBI::Test::Conf->setup (CONTAINED_DBDS => [qw( CSV File NullP )]);
+    #File::Path::remove_tree (glob "t/[bA-Z]*");
+    my @nt = DBI::Test::Conf->setup (CONTAINED_DBDS => [qw( CSV )]);
     $wm{test} = { TESTS => join " " => (sort glob "t/*.t"), @nt };
     $wm{clean}{FILES} .= " @nt";
     }
@@ -94,7 +95,7 @@ sub postamble
     my $min_vsn = ($] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
 	    'test ::',
-	    '	-@env DBI_SQL_NANO=1 make -e test_dynamic',
+	    '	-@env DBI_SQL_NANO=1 make -e test_dynamic TEST_FILES=t/[1-9]*.t',
 	    '',
 	    'test ::',
 	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
