@@ -27,6 +27,9 @@ sub supported_variant
 sub run_test
 {
     my @DB_CREDS = @{$_[1]};
+    $DB_CREDS[3]->{PrintError} = 0;
+    $DB_CREDS[3]->{RaiseError} = 0;
+    $DB_CREDS[3]->{csv_class}  = "Text::CSV" if $ENV{DBI_PUREPERL};
 
     # note ("Running tests for $test_dbd");
 
@@ -38,11 +41,6 @@ sub run_test
 	eval "use SQL::Statement;";
 	ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION");
 	}
-    diag ("Showing relevant versions (DBI_SQL_NANO = $nano)");
-    diag ("Using DBI            version $DBI::VERSION");
-    diag ("Using DBD::File      version $DBD::File::VERSION");
-    diag ("Using SQL::Statement version $SQL::Statement::VERSION");
-    diag ("Using Text::CSV_XS   version $Text::CSV_XS::VERSION");
 
     ok (my $switch = DBI->internal, "DBI->internal");
     is (ref $switch, "DBI::dr", "Driver class");
@@ -55,12 +53,13 @@ sub run_test
     ok ($drh->{Version}, "Driver version $drh->{Version}");
 
     # Test RaiseError for prepare errors
-    $DB_CREDS[3]->{PrintError} = 0;
-    $DB_CREDS[3]->{RaiseError} = 0;
     my $dbh = connect_ok (@DB_CREDS, "Connect with dbi:CSV:");
 
-    ok ($dbh, "DBH created");
-
+    diag ("Showing relevant versions (DBI_SQL_NANO = $nano)");
+    diag ("Using DBI            version $DBI::VERSION");
+    diag ("Using DBD::File      version $DBD::File::VERSION");
+    diag ("Using SQL::Statement version $SQL::Statement::VERSION");
+    diag ("Using Text::CSV_XS   version $Text::CSV_XS::VERSION");
 
     my $csv_version_info = $dbh->csv_versions ();
     ok ($csv_version_info, "csv_versions");
