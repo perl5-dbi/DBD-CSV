@@ -13,7 +13,7 @@ sub supported_variant
     my ($self,    $test_case, $cfg_pfx, $test_confs,
 	$dsn_pfx, $dsn_cred,  $options) = @_;
 
-    use DP;DDumper$test_confs;
+    #use DP;DDumper$test_confs;
     #scalar grep { $_->{abbrev} eq "g" } @$test_confs and return;
     return $self->SUPER::supported_variant ($test_case, $cfg_pfx, $test_confs,
 	$dsn_pfx, $dsn_cred, $options);
