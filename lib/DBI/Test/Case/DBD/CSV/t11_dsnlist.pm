@@ -1,4 +1,4 @@
-package DBI::Test::Case::DBD::CSV::t10_base;
+package DBI::Test::Case::DBD::CSV::t11_dsnlist;
 
 use strict;
 use warnings;
@@ -34,23 +34,22 @@ sub run_test
     defined $ENV{DBI_SQL_NANO} or
 	eval "use SQL::Statement;";
 
-    ok (my $switch = DBI->internal, "DBI->internal");
-    is (ref $switch, "DBI::dr", "Driver class");
+    my $dbh = connect_ok (@DB_CREDS,		"Connect with dbi:CSV:");
 
-    # This is a special case. install_driver should not normally be used.
-    ok (my $drh = DBI->install_driver ("CSV"), "Install driver");
+    ok ($dbh->ping,				"ping");
 
-    is (ref $drh, "DBI::dr", "Driver class installed");
+    # This returns at least ".", "lib", and "t"
+    ok (my @dsn = DBI->data_sources ("CSV"),	"data_sources");
+    ok (@dsn >= 2,				"more than one");
+    ok ($dbh->disconnect,			"disconnect");
 
-    ok ($drh->{Version}, "Driver version $drh->{Version}");
-
-    my $dbh = connect_ok (@DB_CREDS, "Connect with dbi:CSV:");
-
-    my $csv_version_info = $dbh->csv_versions ();
-    ok ($csv_version_info, "csv_versions");
-    diag ($csv_version_info);
+    # Try different DSN's
+    foreach my $d (qw( . example lib t )) {
+	ok (my $dns = $self->Connect ("dbi:CSV:f_dir=$d"), "use $d as f_dir");
+	ok ($dbh->disconnect,			"disconnect");
+	}
 
     done_testing ();
-    }
+    } # run_test
 
 1;
