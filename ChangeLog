@@ -1,7 +1,8 @@
-0.42	- 2013-08-11, H.Merijn Brand
+0.42	- 2013-08-14, H.Merijn Brand
     * Optionally skip tests using File::Spec->tempdir () RT#87684
     * And document the use of $TMPDIR in README
     * Make the SYNOPSIS more reflect real-world usage
+    * Detect DBI::Test and use it if available
 
 0.41	- 2013-07-29, H.Merijn Brand
     * Use File::Spec->tmpdir () for universal existing folder

@@ -8,11 +8,6 @@ Description
     and implements access to so-called CSV files (Comma separated
     values).
 
-Warning
-    THIS IS ALPHA SOFTWARE. It is *only* 'Alpha' because the
-    interface (API) is not finalized. The Alpha status does not
-    reflect code quality or stability.
-
 Copying
     Copyright (C) 2009-2013 by H.Merijn Brand
     Copyright (C) 2004-2009 by Jeff Zucker
