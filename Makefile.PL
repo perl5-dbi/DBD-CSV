@@ -66,6 +66,7 @@ my %wm = (
     );
 $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 
+File::Path::remove_tree (glob "t/[bA-Z]*");
 eval "use DBI::Test::Conf ();";
 if ($@) {
     warn "******\n",
@@ -78,7 +79,6 @@ else {
 
     local $" = " ";
     $wm{PREREQ_PM}{"DBI::Test"} = "0.001";
-    #File::Path::remove_tree (glob "t/[bA-Z]*");
     my @nt = DBI::Test::Conf->setup (CONTAINED_DBDS => [qw( CSV )]);
     $wm{test} = { TESTS => join " " => (sort glob "t/*.t"), @nt };
     $wm{clean}{FILES} .= " @nt";

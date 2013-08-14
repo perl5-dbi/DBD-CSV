@@ -1,4 +1,4 @@
-package DBI::Test::Case::DBD::CSV::blarf;
+package DBI::Test::Case::DBD::CSV::t10_base;
 
 use strict;
 use warnings;
@@ -14,33 +14,24 @@ sub supported_variant
     my ($self,    $test_case, $cfg_pfx, $test_confs,
 	$dsn_pfx, $dsn_cred,  $options) = @_;
 
-    #use DP;DDumper$test_confs;
-    #use DP;DDumper{tc=>$test_case,cp=>$cfg_pfx,dp=>$dsn_pfx,op=>$options};
-    $cfg_pfx =~ m/mvb/ and return;
+    $self->is_test_for_mocked ($test_confs) and return;
 
-    #scalar grep { $_->{abbrev} eq "g" } @$test_confs and return;
     return $self->SUPER::supported_variant ($test_case, $cfg_pfx, $test_confs,
 	$dsn_pfx, $dsn_cred, $options);
     } # supported_variant
 
-#foreach my $test_dbd (@test_dbds)
 sub run_test
 {
     my @DB_CREDS = @{$_[1]};
     $DB_CREDS[3]->{PrintError} = 0;
     $DB_CREDS[3]->{RaiseError} = 0;
-    $DB_CREDS[3]->{csv_class}  = "Text::CSV" if $ENV{DBI_PUREPERL};
-
-    # note ("Running tests for $test_dbd");
-
-    do "t/lib.pl";
-
-    my $nano = $ENV{DBI_SQL_NANO};
-    unless (defined $nano) {
-	$nano = "not set";
-	eval "use SQL::Statement;";
-	ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION");
+    if ($ENV{DBI_PUREPERL}) {
+	eval "use Text::CSV;";
+	$@ or $DB_CREDS[3]->{csv_class}  = "Text::CSV"
 	}
+
+    defined $ENV{DBI_SQL_NANO} or
+	eval "use SQL::Statement;";
 
     ok (my $switch = DBI->internal, "DBI->internal");
     is (ref $switch, "DBI::dr", "Driver class");
@@ -54,12 +45,6 @@ sub run_test
 
     # Test RaiseError for prepare errors
     my $dbh = connect_ok (@DB_CREDS, "Connect with dbi:CSV:");
-
-    diag ("Showing relevant versions (DBI_SQL_NANO = $nano)");
-    diag ("Using DBI            version $DBI::VERSION");
-    diag ("Using DBD::File      version $DBD::File::VERSION");
-    diag ("Using SQL::Statement version $SQL::Statement::VERSION");
-    diag ("Using Text::CSV_XS   version $Text::CSV_XS::VERSION");
 
     my $csv_version_info = $dbh->csv_versions ();
     ok ($csv_version_info, "csv_versions");

@@ -7,6 +7,7 @@ lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
 lib/DBD/CSV/TypeInfo.pm
 lib/DBD/CSV/GetInfo.pm
+lib/DBI/Test/Case/DBD/CSV/t10_base.pm
 lib/DBI/Test/DBD/CSV/Conf.pm
 lib/DBI/Test/DBD/CSV/List.pm
 t/00_meta.t
