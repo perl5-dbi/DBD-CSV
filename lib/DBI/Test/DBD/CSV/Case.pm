@@ -45,21 +45,9 @@ my $test_pass = $ENV{DBI_PASS} || "";
 sub COL_NULLABLE () { 1 }
 sub COL_KEY      () { 2 }
 
-my %v;
-{   my @req = qw( DBI SQL::Statement Text::CSV_XS DBD::CSV );
-    my $req = join ";\n" => map { qq{require $_;\n\$v{"$_"} = $_->VERSION ()} } @req;
-    eval $req;
-
-    if ($@) {
-	my @missing = grep { !exists $v{$_} } @req;
-	print STDERR "\n\nYOU ARE MISSING REQUIRED MODULES: [ @missing ]\n\n";
-	exit 0;
-	}
-    }
-
 sub AnsiTypeToDb
 {
-    my ($type, $size) = @_;
+    my ($self, $type, $size) = @_;
     my $uctype = uc $type;
 
     if ($uctype eq "CHAR" || $uctype eq "VARCHAR") {
@@ -87,7 +75,7 @@ sub AnsiTypeToDb
 
 sub TableDefinition
 {
-    my ($tablename, @cols) = @_;
+    my ($self, $tablename, @cols) = @_;
 
     my @keys = ();
     foreach my $col (@cols) {
@@ -96,7 +84,7 @@ sub TableDefinition
 
     my @colDefs;
     foreach my $col (@cols) {
-	my $colDef = $col->[0] . " " . AnsiTypeToDb ($col->[1], $col->[2]);
+	my $colDef = $col->[0] . " " . AnsiTypeToDb ($self, $col->[1], $col->[2]);
 	$col->[3] & COL_NULLABLE or $colDef .= " NOT NULL";
 	push @colDefs, $colDef;
 	}
@@ -109,7 +97,8 @@ sub TableDefinition
 # This function generates a list of tables associated to a given DSN.
 sub ListTables
 {
-    my $dbh = shift or return;
+    my $self = shift;
+    my $dbh  = shift or return;
 
     my @tables = $dbh->func ("list_tables");
     my $msg = $dbh->errstr || $DBI::errstr;
@@ -145,14 +134,14 @@ END { DbCleanup (); }
 
     sub FindNewTable
     {
-	my $dbh = shift;
+	my ($self, $dbh) = @_;
 
 	unless ($listed) {
 	       if (defined $listTablesHook) {
 		@tables = $listTablesHook->($dbh);
 		}
 	    elsif (defined &ListTables) {
-		@tables = ListTables ($dbh);
+		@tables = ListTables ($self, $dbh);
 		}
 	    else {
 		die "Fatal: ListTables not implemented.\n";
@@ -209,5 +198,4 @@ sub DbFile
     File::Spec->catdir ($test_dir, $file);
     } # DbFile
 
-1;
 1;
