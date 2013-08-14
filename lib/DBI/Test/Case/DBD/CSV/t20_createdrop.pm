@@ -1,9 +1,9 @@
-package DBI::Test::Case::DBD::CSV::t11_dsnlist;
+package DBI::Test::Case::DBD::CSV::t20_createdrop;
 
 use strict;
 use warnings;
 
-use parent qw( DBI::Test::DBD::CSV::Case);
+use parent qw( DBI::Test::DBD::CSV::Case );
 
 use Test::More;
 use DBI::Test;
@@ -20,6 +20,11 @@ sub supported_variant
 	$dsn_pfx, $dsn_cred, $options);
     } # supported_variant
 
+my @tbl_def = (
+    [ "id",   "INTEGER",  4, 0 ],
+    [ "name", "CHAR",    64, 0 ],
+    );
+
 use vars q{$AUTOLOAD};
 sub AUTOLOAD
 {
@@ -35,6 +40,7 @@ sub run_test
     my @DB_CREDS = @$dbc;
     $DB_CREDS[3]->{PrintError} = 0;
     $DB_CREDS[3]->{RaiseError} = 0;
+    $DB_CREDS[3]->{f_dir} = DbDir ();
     if ($ENV{DBI_PUREPERL}) {
 	eval "use Text::CSV;";
 	$@ or $DB_CREDS[3]->{csv_class}  = "Text::CSV"
@@ -43,20 +49,18 @@ sub run_test
     defined $ENV{DBI_SQL_NANO} or
 	eval "use SQL::Statement;";
 
-    my $dbh = connect_ok (@DB_CREDS,		"Connect with dbi:CSV:");
+    my $dbh = connect_ok (@DB_CREDS,	"Connect with dbi:CSV:");
 
-    ok ($dbh->ping,				"ping");
+    ok (my $tbl = FindNewTable ($dbh),	"find new test table");
 
-    # This returns at least ".", "lib", and "t"
-    ok (my @dsn = DBI->data_sources ("CSV"),	"data_sources");
-    ok (@dsn >= 2,				"more than one");
+    like (my $def = TableDefinition ($tbl, @tbl_def),
+	    qr{^create table $tbl}i,	"table definition");
+    ok ($dbh->do ($def),		"create table");
+    my $tbl_file = DbFile ($tbl);
+    ok (-s $tbl_file,			"file exists");
+    ok ($dbh->do ("drop table $tbl"),	"drop table");
     ok ($dbh->disconnect,			"disconnect");
-
-    # Try different DSN's
-    foreach my $d (qw( . example lib t )) {
-	ok (my $dns = Connect ("dbi:CSV:f_dir=$d"), "use $d as f_dir");
-	ok ($dbh->disconnect,			"disconnect");
-	}
+    ok (!-f $tbl_file,			"file removed");
 
     done_testing ();
     } # run_test

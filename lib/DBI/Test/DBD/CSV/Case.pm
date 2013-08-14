@@ -47,7 +47,7 @@ sub COL_KEY      () { 2 }
 
 sub AnsiTypeToDb
 {
-    my ($self, $type, $size) = @_;
+    my ($type, $size) = @_;
     my $uctype = uc $type;
 
     if ($uctype eq "CHAR" || $uctype eq "VARCHAR") {
@@ -75,7 +75,7 @@ sub AnsiTypeToDb
 
 sub TableDefinition
 {
-    my ($self, $tablename, @cols) = @_;
+    my ($tablename, @cols) = @_;
 
     my @keys = ();
     foreach my $col (@cols) {
@@ -84,7 +84,7 @@ sub TableDefinition
 
     my @colDefs;
     foreach my $col (@cols) {
-	my $colDef = $col->[0] . " " . AnsiTypeToDb ($self, $col->[1], $col->[2]);
+	my $colDef = $col->[0] . " " . AnsiTypeToDb ($col->[1], $col->[2]);
 	$col->[3] & COL_NULLABLE or $colDef .= " NOT NULL";
 	push @colDefs, $colDef;
 	}
@@ -97,7 +97,6 @@ sub TableDefinition
 # This function generates a list of tables associated to a given DSN.
 sub ListTables
 {
-    my $self = shift;
     my $dbh  = shift or return;
 
     my @tables = $dbh->func ("list_tables");
@@ -134,14 +133,14 @@ END { DbCleanup (); }
 
     sub FindNewTable
     {
-	my ($self, $dbh) = @_;
+	my ($dbh) = @_;
 
 	unless ($listed) {
 	       if (defined $listTablesHook) {
 		@tables = $listTablesHook->($dbh);
 		}
 	    elsif (defined &ListTables) {
-		@tables = ListTables ($self, $dbh);
+		@tables = ListTables ($dbh);
 		}
 	    else {
 		die "Fatal: ListTables not implemented.\n";
@@ -176,7 +175,6 @@ sub ServerError
 
 sub Connect
 {
-    my $self = shift;
     my $attr = @_ && ref $_[-1] eq "HASH" ? pop @_ : {};
     my ($dsn, $usr, $pass) = @_;
     $dsn  ||= $test_dsn;
