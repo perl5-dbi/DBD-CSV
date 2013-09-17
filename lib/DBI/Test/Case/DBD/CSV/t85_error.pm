@@ -55,7 +55,7 @@ sub run_test
 
     like (my $def = TableDefinition ($tbl, @tbl_def),
 	    qr{^create table $tbl}i,	"table definition");
-    ok ($dbh->do ($def),		"create table");
+    do_ok ($dbh, $def,			"create table");
     my $tbl_file = DbFile ($tbl);
     ok (-s $tbl_file,			"file exists");
     ok ($dbh->disconnect,		"disconnect");
@@ -69,12 +69,12 @@ sub run_test
     ok ($dbh = connect_ok (@DB_CREDS,	"Connect with dbi:CSV:"));
     {   local $dbh->{PrintError} = 0;
 	local $dbh->{RaiseError} = 0;
-	ok (my $sth = $dbh->prepare ("select * from $tbl"), "prepare");
+	my $sth = prepare_ok ($dbh, "select * from $tbl", "prepare");
 	is ($sth->execute, undef,	"execute should fail");
 	# It is safe to regex on this text, as it is NOT local dependant
 	like ($dbh->errstr, qr{\w+ \@ line [0-9?]+ pos [0-9?]+}, "error message");
 	};
-    ok ($dbh->do ("drop table $tbl"),	"drop");
+    do_ok ($dbh, "drop table $tbl",	"drop");
     ok ($dbh->disconnect,		"disconnect");
 
     done_testing ();

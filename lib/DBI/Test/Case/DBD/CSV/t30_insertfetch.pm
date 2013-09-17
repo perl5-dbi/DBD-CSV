@@ -45,7 +45,7 @@ sub run_test
     my @DB_CREDS = @$dbc;
     $DB_CREDS[3]->{PrintError} = 0;
     $DB_CREDS[3]->{RaiseError} = 0;
-    $DB_CREDS[3]->{f_dir} = DbDir();
+    $DB_CREDS[3]->{f_dir} = DbDir ();
     if ($ENV{DBI_PUREPERL}) {
         eval "use Text::CSV;";
         $@ or $DB_CREDS[3]->{csv_class} = "Text::CSV"
@@ -56,7 +56,7 @@ sub run_test
 
     # START OF TESTS
 
-    my $dbh = connect_ok(@DB_CREDS,	"connect");
+    my $dbh = connect_ok (@DB_CREDS,	"connect");
 
     ok (my $tbl = FindNewTable ($dbh),	"find new test table");
     $tbl ||= "tmp99";
@@ -69,59 +69,69 @@ sub run_test
 	    qr{^create table $tbl}i,	"table definition");
     
     my $sz = 0;
-    ok ($dbh->do ($def),		"create table");
+    do_ok ($dbh, $def,			"create table");
     my $tbl_file = DbFile ($tbl);
     ok ($sz = -s $tbl_file,		"file exists");
     
-    ok ($dbh->do ("insert into $tbl values ".
-	          "(1, 'Alligator Descartes', 1111, 'Some Text')"), "insert");
+    do_ok ($dbh, "insert into $tbl values ".
+	          "(1, 'Alligator Descartes', 1111, 'Some Text')",
+					"insert");
     ok ($sz < -s $tbl_file,		"file grew");
     $sz = -s $tbl_file;
     
-    ok ($dbh->do ("insert into $tbl (id, name, val, txt) values ".
-	          "(2, 'Crocodile Dundee',    2222, 'Down Under')"), "insert with field names");
+    do_ok ($dbh, "insert into $tbl (id, name, val, txt) values ".
+	          "(2, 'Crocodile Dundee',    2222, 'Down Under')",
+					"insert with field names");
     ok ($sz < -s $tbl_file,		"file grew");
     
-    ok (my $sth = $dbh->prepare ("select * from $tbl where id = 1"), "prepare");
-    is (ref $sth, "DBI::st",		"handle type");
+    my $sth = prepare_ok ($dbh, "select * from $tbl where id = 1",
+					"prepare");
     
-    ok ($sth->execute,			"execute");
+    execute_ok ($sth,			"execute");
     
     ok (my $row = $sth->fetch,		"fetch");
     is (ref $row, "ARRAY",		"returned a list");
     is ($sth->errstr, undef,		"no error");
     
-    is_deeply ($row, [ 1, "Alligator Descartes", 1111, "Some Text" ], "content");
+    is_deeply ($row, [ 1, "Alligator Descartes", 1111, "Some Text" ],
+					"content");
     
     ok ($sth->finish,			"finish");
     undef $sth;
     
     # Try some other capitilization
-    ok ($dbh->do ("DELETE FROM $tbl WHERE id = 1"),	"delete");
+    do_ok ($dbh, "DELETE FROM $tbl WHERE id = 1",
+					"delete");
     
     # Now, try SELECT'ing the row out. This should fail.
-    ok ($sth = $dbh->prepare ("select * from $tbl where id = 1"), "prepare");
+    $sth = prepare_ok ($dbh, "select * from $tbl where id = 1",
+					"prepare");
     is (ref $sth, "DBI::st",		"handle type");
     
-    ok ($sth->execute,			"execute");
+    execute_ok ($sth,			"execute");
     is ($sth->fetch,  undef,		"fetch");
     is ($sth->errstr, undef,		"error");	# ???
     
     ok ($sth->finish,			"finish");
     undef $sth;
     
-    ok ($sth = $dbh->prepare ("insert into $tbl values (?, ?, ?, ?)"), "prepare insert");
-    ok ($sth->execute (3, "Babar", 3333, "Elephant"), "insert prepared");
+    $sth = prepare_ok ($dbh, "insert into $tbl values (?, ?, ?, ?)",
+					"prepare insert");
+    execute_ok ($sth, 3, "Babar", 3333, "Elephant",
+					"insert prepared");
     ok ($sth->finish,			"finish");
     undef $sth;
     
-    ok ($sth = $dbh->prepare ("insert into $tbl (id, name, val, txt) values (?, ?, ?, ?)"), "prepare insert with field names");
-    ok ($sth->execute (4, "Vischje", 33, "in het riet"), "insert prepared");
+    $sth = prepare_ok ($dbh, "insert into $tbl (id, name, val, txt) values (?, ?, ?, ?)",
+					"prepare insert with field names");
+    execute_ok ($sth, 4, "Vischje", 33, "in het riet",
+					"insert prepared");
     ok ($sth->finish,			"finish");
     undef $sth;
     
-    ok ($dbh->do ("delete from $tbl"),	"delete all");
-    ok ($dbh->do ("insert into $tbl (id) values (0)"), "insert just one field");
+    do_ok ($dbh, "delete from $tbl",	"delete all");
+    do_ok ($dbh, "insert into $tbl (id) values (0)",
+					"insert just one field");
     {   local (@ARGV) = DbFile ($tbl);
         my @csv = <>;
         s/\r?\n\Z// for @csv;
@@ -130,7 +140,7 @@ sub run_test
         is ($csv[1], "0,,,",		"data");
         }
     
-    ok ($dbh->do ("drop table $tbl"),	"drop");
+    do_ok ($dbh, "drop table $tbl",	"drop");
     ok ($dbh->disconnect,		"disconnect");
     
     done_testing ();

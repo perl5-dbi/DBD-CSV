@@ -55,11 +55,11 @@ sub run_test
 
     like (my $def = TableDefinition ($tbl, @tbl_def),
 	    qr{^create table $tbl}i,	"table definition");
-    ok ($dbh->do ($def),		"create table");
+    do_ok ($dbh, $def,			"create table");
     my $tbl_file = DbFile ($tbl);
     ok (-s $tbl_file,			"file exists");
-    ok ($dbh->do ("drop table $tbl"),	"drop table");
-    ok ($dbh->disconnect,			"disconnect");
+    do_ok ($dbh, "drop table $tbl",	"drop table");
+    ok ($dbh->disconnect,		"disconnect");
     ok (!-f $tbl_file,			"file removed");
 
     done_testing ();
