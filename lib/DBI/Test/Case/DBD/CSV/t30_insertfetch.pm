@@ -9,18 +9,10 @@ use parent qw( DBI::Test::DBD::CSV::Case );
 
 use Test::More;
 use DBI::Test;
-use DBI;
+# XXX already done by invoking *.t -- use DBI;
 
-sub supported_variant
-{
-    my ($self,    $test_case, $cfg_pfx, $test_confs,
-        $dsn_pfx, $dsn_cred,  $options) = @_;
-
-    $self->is_test_for_mocked ($test_confs) and return;
-
-    return $self->SUPER::supported_variant ($test_case, $cfg_pfx, $test_confs,
-        $dsn_pfx, $dsn_cred, $options);
-    } # supported_variant
+# we want more variants ...
+sub requires_extended { 1 }
 
 use vars q{$AUTOLOAD};
 
@@ -43,16 +35,22 @@ sub run_test
 {
     my ($self, $dbc) = @_;
     my @DB_CREDS = @$dbc;
+
+    # if this is required for more than this file, it should be maybe in the returned DSN credentials
     $DB_CREDS[3]->{PrintError} = 0;
     $DB_CREDS[3]->{RaiseError} = 0;
-    $DB_CREDS[3]->{f_dir} = DbDir ();
-    if ($ENV{DBI_PUREPERL}) {
-        eval "use Text::CSV;";
-        $@ or $DB_CREDS[3]->{csv_class} = "Text::CSV"
-        }
+    # XXX following is done in DSN::Provider::Dir (inherited by DSN::Provider::CSV)
+    # $DB_CREDS[3]->{f_dir} = DbDir ();
 
-    defined $ENV{DBI_SQL_NANO} or
-        eval "use SQL::Statement;";
+    # XXX This isn't really handled, but should be in DSN::Provider::CSV->supported_variant or so
+    #if ($ENV{DBI_PUREPERL}) {
+    #    eval "use Text::CSV;";
+    #    $@ or $DB_CREDS[3]->{csv_class} = "Text::CSV"
+    #    }
+
+    # XXX is part of the test configuration, see "zvn_t*.t"
+    #defined $ENV{DBI_SQL_NANO} or
+    #    eval "use SQL::Statement;";
 
     # START OF TESTS
 

@@ -21,6 +21,10 @@ sub supported_variant
     my ($self,    $test_case, $cfg_pfx, $test_confs,
 	$dsn_pfx, $dsn_cred,  $options) = @_;
 
+    # DBD::CSV's test cases are for testing DBD::CSV & co.
+    # no need to execute them on mocked configurations
+    $self->is_test_for_mocked ($test_confs) and return;
+
     if ($self->is_test_for_dbi ($test_confs)) {
 	$dsn_cred  && $dsn_cred->[0] or return;
 	(my $driver = $dsn_cred->[0]) =~
