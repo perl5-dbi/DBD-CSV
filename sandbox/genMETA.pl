@@ -55,6 +55,10 @@ requires:
     DBD::File:           0.42
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
+recommends:
+    perl:                5.018001
+    DBI:                 1.630
+    Text::CSV_XS:        1.02
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
@@ -65,9 +69,8 @@ test_requires:
     Encode:              0
     Cwd:                 0
     charnames:           0
-recommends:
-    perl:                5.016003
-    Test::More:          0.98
+test_recommends:
+    Test::More:          1.001002
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

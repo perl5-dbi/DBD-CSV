@@ -43,8 +43,8 @@ Build/Installation:
       cpan DBD::CSV
 
     Or standard build/installation:
-      gzip -cd DBD-CSV-0.42.tar.gz | tar xf -
-      cd DBD-CSV-0.42
+      gzip -cd DBD-CSV-0.43.tar.gz | tar xf -
+      cd DBD-CSV-0.43
       perl Makefile.PL
       make test
       make install
