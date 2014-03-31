@@ -24,6 +24,7 @@ if ($check) {
     $meta->check_encoding ();
     $meta->check_required ();
     $meta->check_minimum ([ "t", "lib" ]);
+    $meta->done_testing ();
     }
 elsif ($opt_v) {
     $meta->print_yaml ();
@@ -56,9 +57,9 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    perl:                5.018001
-    DBI:                 1.630
-    Text::CSV_XS:        1.02
+    perl:                5.018002
+    DBI:                 1.631
+    Text::CSV_XS:        1.05
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
@@ -70,7 +71,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.001002
+    Test::More:          1.001003
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
