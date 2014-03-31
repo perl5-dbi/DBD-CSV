@@ -23,14 +23,13 @@ like (my $def = TableDefinition ($tbl, @tbl_def),
     qr{^create table $tbl}i,			"table definition");
 ok ($dbh->do ($def),				"create table");
 
+my @tbl = $dbh->tables ();
 if (my $usr = eval { getpwuid $< }) {
-    $usr = qq{"$usr"};
-    is_deeply ([ $dbh->tables () ],
-	       [ qq{$usr.$tbl}   ],		"tables");
+    s/^(['"`])(.+)\1\./$2./ for @tbl;
+    is_deeply (\@tbl, [ qq{$usr.$tbl} ],	"tables");
     }
 else {
-    is_deeply ([ $dbh->tables () ],
-	       [ qq{$tbl}        ],		"tables");
+    is_deeply (\@tbl, [ qq{$tbl}      ],	"tables");
     }
 
 ok ($dbh->disconnect,				"disconnect");
