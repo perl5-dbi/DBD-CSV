@@ -1,6 +1,7 @@
 0.43	- 2014-03-31, H.Merijn Brand
     * Updated copyright to 2014
     * Unquote schema's in test for cygwin
+    * Extra guards in Makefile.PL for unmet requirements
 
 0.42	- 2013-08-14, H.Merijn Brand
     * Optionally skip tests using File::Spec->tempdir () RT#87684
