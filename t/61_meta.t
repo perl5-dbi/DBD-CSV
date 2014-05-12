@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use version;
 
 use Test::More;
 use DBI qw(:sql_types);
