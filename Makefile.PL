@@ -66,7 +66,7 @@ my %wm = (
     );
 $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 
-File::Path::remove_tree (glob "t/[bA-Z]*");
+$File::Path::VERSION > 2.06 and File::Path::remove_tree (glob "t/[bA-Z]*");
 eval "use DBI::Test::Conf ();";
 if ($@) {
     warn "******\n",
