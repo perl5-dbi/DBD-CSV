@@ -48,7 +48,7 @@ for (qw( foo foO fOo fOO Foo FoO FOo FOO )) {
 	}
     else {
 	TODO: {
-	    local $TODO = "Filesystem has to be case-aware";
+	    local $TODO = "Filesystem has to be case-aware" if $^O =~ m/win32/i;
 	    local $sth->{PrintError} = 0;
 	    ok (!$sth->execute,			"table name '$_' should not match 'foo'");
 	    }
