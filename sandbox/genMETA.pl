@@ -59,7 +59,7 @@ requires:
 recommends:
     perl:                5.018002
     DBI:                 1.631
-    Text::CSV_XS:        1.07
+    Text::CSV_XS:        1.09
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:

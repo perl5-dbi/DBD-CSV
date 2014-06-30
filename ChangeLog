@@ -1,4 +1,4 @@
-0.43	- 2014-03-31, H.Merijn Brand
+0.43	- 2014-06-30, H.Merijn Brand
     * Updated copyright to 2014
     * Unquote schema's in test for cygwin
     * Extra guards in Makefile.PL for unmet requirements
