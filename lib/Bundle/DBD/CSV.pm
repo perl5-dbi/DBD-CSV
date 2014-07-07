@@ -29,7 +29,7 @@ SQL::Statement 1.405
 
 DBD::File 0.42
 
-DBD::CSV 0.43
+DBD::CSV 0.44
 
 =head1 DESCRIPTION
 
