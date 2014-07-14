@@ -896,12 +896,12 @@ I<csv_escape_char> are corresponding to the respective attributes of the
 I<csv_class> (usually Text::CSV_CS) object. You may want to set these
 attributes if you have unusual CSV files like F</etc/passwd> or MS Excel
 generated CSV files with a semicolon as separator. Defaults are
-"\015\012", ';', '"' and '"', respectively.
+C<\015\012>", C<,>, C<"> and C<">, respectively.
 
 The I<csv_eol> attribute defines the end-of-line pattern, which is better
 known as a record separator pattern since it separates records.  The default
-is windows-style end-of-lines "\015\012" for output (writing) and unset for
-input (reading), so if on unix you may want to set this to newline ("\n")
+is windows-style end-of-lines C<\015\012> for output (writing) and unset for
+input (reading), so if on unix you may want to set this to newline (C<\n>)
 like this:
 
   $dbh->{csv_eol} = "\n";
