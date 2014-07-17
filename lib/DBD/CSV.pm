@@ -388,7 +388,7 @@ DBD::CSV - DBI driver for CSV files
     $sth->execute;
     $sth->bind_columns (\my ($id, $name));
     while ($sth->fetch) {
-	print "id: $id, name: $ame\n";
+	print "id: $id, name: $name\n";
 	}
 
     # Updates
