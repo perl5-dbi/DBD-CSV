@@ -336,6 +336,8 @@ sub fetch_row
 	$csv->eof and return;
 
 	my @diag = _csv_diag ($csv);
+	$diag[0] == 2012 and return; # Also EOF (broken in Text::CSV_XS-1.10)
+
 	my $file = $tbl->{f_fqfn};
 	croak "Error $diag[0] while reading file $file: $diag[1] \@ line $diag[3] pos $diag[2]";
 	}
