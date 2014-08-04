@@ -57,9 +57,9 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    perl:                5.018002
+    perl:                5.020000
     DBI:                 1.631
-    Text::CSV_XS:        1.09
+    Text::CSV_XS:        1.10
 configure_requires:
     ExtUtils::MakeMaker: 0
 build_requires:
