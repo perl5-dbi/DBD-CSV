@@ -1,5 +1,5 @@
 0.44	- 2014-08-04, H.Merijn Brand
-    * Table names case sensitiveness not tested on win32/cygwin and darwin
+    * Table names case sensitiveness not tested case-problematic FS's
     * Fix defaults in doc (annocpan)
     * Fix typo in SYNOPSIS (RT#97313)
     * Workaround eof bug in Text::CSV_XS-1.10

@@ -154,6 +154,22 @@ END { DbCleanup (); }
 	} # FindNewTable
     }
 
+sub isSaneCase
+{
+    my @f = glob "??????.???";
+    foreach my $try (qw( FrUbLl BlURgH wOngOs )) {
+	my $fn = "$try.csv";
+	grep m{^$fn$}i => @f and next;
+	open my $fh, ">", $fn or return 1;
+	close $fh;
+	my $sane = (-f $fn && ! -f lc $fn && ! -f uc $fn);
+	unlink $fn;
+	return $sane;
+	}
+    # Assume insane
+    return 0;
+    } # isSaneCase
+
 sub ServerError
 {
     die "# Cannot connect: $DBI::errstr\n";
