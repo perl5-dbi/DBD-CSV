@@ -1,3 +1,6 @@
+0.45	- 2014-10-16, H.Merijn Brand
+    * Test unauthorized folder access (RT#99508). Requires DBD::File-0.43
+
 0.44	- 2014-08-04, H.Merijn Brand
     * Table names case sensitiveness not tested case-problematic FS's
     * Fix defaults in doc (annocpan)

@@ -65,6 +65,24 @@ foreach my $tbl ("tmp", "foo") {
 	is ($row->[1], $data{$tbl}{$row->[0]}, "$tbl ($row->[0], ...)");
 	}
     }
-ok ($dbh->do ("drop table foo"), "Drop foo");
+# Do not drop table foo yet
+
+ok ($dbh->disconnect, "disconnect");
+
+chdir DbDir ();
+my @f = grep m/^foo\.csv/i => glob "*.*";
+is (scalar @f, 1, "foo.csv still here");
+
+is (DBI->connect ("dbi:CSV:", undef, undef, {
+    f_schema         => undef,
+    f_dir            => "./undefined",
+    f_ext            => ".csv/r",
+
+    RaiseError       => 0,
+    PrintError       => 0,
+    }), undef, "Should not be able to connect to non-exiting folder");
+
+# drop table foo;
+@f and unlink @f;
 
 done_testing;
