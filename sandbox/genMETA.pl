@@ -62,6 +62,7 @@ recommends:
     Text::CSV_XS:        1.11
 configure_requires:
     ExtUtils::MakeMaker: 0
+    DBI:                 1.628
 build_requires:
     Config:              0
 test_requires:
