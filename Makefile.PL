@@ -97,10 +97,10 @@ $File::Path::VERSION > 2.06 and File::Path::remove_tree (glob "t/[bA-KM-SU-Z]*")
 
 eval "use DBI::Test::Conf ();";
 if ($@) {
-    warn "******\n",
-         "******\tDBI::Test is not installed.\n",
-         "******\tIt will be required in one of the upcoming releases.\n",
-         "******\n";
+#   warn "******\n",
+#        "******\tDBI::Test is not installed.\n",
+#        "******\tIt will be required in one of the upcoming releases.\n",
+#        "******\n";
     }
 else {
     use lib "lib";
