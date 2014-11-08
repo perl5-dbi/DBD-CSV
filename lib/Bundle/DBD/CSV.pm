@@ -27,7 +27,7 @@ Text::CSV_XS 1.11
 
 SQL::Statement 1.405
 
-DBD::File 0.42
+DBD::File 0.43
 
 DBD::CSV 0.46
 

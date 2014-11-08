@@ -20,7 +20,7 @@ my $expect = [
     ok ($tbl = FindNewTable ($dbh),		"find new test table");
     }
 
-if ($DBD::File::VERSION gt "0.42") {
+if ($DBD::File::VERSION gt "0.43") {
     note ("ScalarIO - no col_names");
     my $dbh = Connect ();
     open my $data, "<", \$cnt;
@@ -34,7 +34,7 @@ if ($DBD::File::VERSION gt "0.42") {
     is_deeply ($rows, $expect, "all rows found - mem-io w/o col_names");
     }
 
-if ($DBD::File::VERSION gt "0.42") {
+if ($DBD::File::VERSION gt "0.43") {
     note ("ScalarIO - with col_names");
     my $dbh = Connect ();
     open my $data, "<", \$cnt;
