@@ -16,6 +16,11 @@ my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$testname";
 my $test_user = $ENV{DBI_USER} || "";
 my $test_pass = $ENV{DBI_PASS} || "";
 
+DBI->import (":sql_types");
+defined &SQL_CHAR    or *SQL_CHAR    = sub {  1 };
+defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
+defined &SQL_INTEGER or *SQL_INTEGER = sub {  4 };
+
 sub COL_NULLABLE () { 1 }
 sub COL_KEY      () { 2 }
 

@@ -9,10 +9,6 @@ use Test::More;
 BEGIN { use_ok ("DBI") }
 do "t/lib.pl";
 
-defined &SQL_CHAR    or *SQL_CHAR    = sub {  1 };
-defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
-defined &SQL_INTEGER or *SQL_INTEGER = sub {  4 };
-
 my $nano = $ENV{DBI_SQL_NANO};
 my @tbl_def = (
     [ "id",   "INTEGER",  4, &COL_KEY		],

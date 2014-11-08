@@ -16,9 +16,6 @@ if ($ENV{DBI_SQL_NANO}) {
 
 do "t/lib.pl";
 
-defined &SQL_VARCHAR or *SQL_VARCHAR = sub { 12 };
-defined &SQL_INTEGER or *SQL_INTEGER = sub {  4 };
-
 my @tbl_def = (
     [ "id",   "INTEGER",  4, 0			],
     [ "name", "CHAR",    64, &COL_NULLABLE	],

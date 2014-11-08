@@ -38,7 +38,7 @@ package DBD::CSV::TypeInfo;
 	[   "VARCHAR", SQL_VARCHAR, undef, "'", "'", undef, 0, 1, 1, 0, undef,
 	    undef, undef, 1, 999999, undef, undef, undef, undef,
 	    ],
-	[   "CHAR", DBIstcf_DISCARD_STRING, undef, "'", "'", undef, 0, 1, 1, 0,
+	[   "CHAR", SQL_CHAR, undef, "'", "'", undef, 0, 1, 1, 0,
 	    undef, undef, undef, 1, 999999, undef, undef, undef, undef,
 	    ],
 	[   "INTEGER", SQL_INTEGER, undef, "", "", undef, 0, 0, 1, 0, undef,

@@ -1,3 +1,6 @@
+0.46	- 2014-11-08, H.Merijn Brand
+    * Column type CHAR should return 1
+
 0.45	- 2014-10-23, H.Merijn Brand
     * Test unauthorized folder access (RT#99508). Requires DBD::File-0.43
     * Fix DBI requirement phase (depend more on toolchain) (RT#99732)
