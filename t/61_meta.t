@@ -20,34 +20,38 @@ my $expect = [
     ok ($tbl = FindNewTable ($dbh),		"find new test table");
     }
 
-if ($DBD::File::VERSION gt "0.43") {
-    note ("ScalarIO - no col_names");
-    my $dbh = Connect ();
-    open my $data, "<", \$cnt;
-    $dbh->{csv_tables}->{data} = {
-	f_file    => $data,
-	skip_rows => 4,
-	};
-    my $sth = $dbh->prepare ("SELECT * FROM data");
-    $sth->execute ();
-    my $rows = $sth->fetchall_arrayref ();
-    is_deeply ($rows, $expect, "all rows found - mem-io w/o col_names");
-    }
+TODO: {
+    local $TODO = "Streaming support";
 
-if ($DBD::File::VERSION gt "0.43") {
-    note ("ScalarIO - with col_names");
-    my $dbh = Connect ();
-    open my $data, "<", \$cnt;
+    if ($DBD::File::VERSION gt "0.43") {
+	note ("ScalarIO - no col_names");
+	my $dbh = Connect ();
+	open my $data, "<", \$cnt;
+	$dbh->{csv_tables}->{data} = {
+	    f_file    => $data,
+	    skip_rows => 4,
+	    };
+	my $sth = $dbh->prepare ("SELECT * FROM data");
+	$sth->execute ();
+	my $rows = $sth->fetchall_arrayref ();
+	is_deeply ($rows, $expect, "all rows found - mem-io w/o col_names");
+	}
 
-    $dbh->{csv_tables}->{data} = {
-	f_file    => $data,
-	skip_rows => 4,
-	col_names => [qw(id name color)],
-	};
-    my $sth = $dbh->prepare ("SELECT * FROM data");
-    $sth->execute ();
-    my $rows = $sth->fetchall_arrayref ();
-    is_deeply ($rows, $expect, "all rows found - mem-io w col_names");
+    if ($DBD::File::VERSION gt "0.43") {
+	note ("ScalarIO - with col_names");
+	my $dbh = Connect ();
+	open my $data, "<", \$cnt;
+
+	$dbh->{csv_tables}->{data} = {
+	    f_file    => $data,
+	    skip_rows => 4,
+	    col_names => [qw(id name color)],
+	    };
+	my $sth = $dbh->prepare ("SELECT * FROM data");
+	$sth->execute ();
+	my $rows = $sth->fetchall_arrayref ();
+	is_deeply ($rows, $expect, "all rows found - mem-io w col_names");
+	}
     }
 
 my $fn = File::Spec->rel2abs (DbFile ($tbl));
