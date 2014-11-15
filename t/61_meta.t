@@ -23,7 +23,7 @@ my $expect = [
 TODO: {
     local $TODO = "Streaming support";
 
-    if ($DBD::File::VERSION gt "0.43") {
+    if ($DBD::File::VERSION gt "0.44") {
 	note ("ScalarIO - no col_names");
 	my $dbh = Connect ();
 	open my $data, "<", \$cnt;
@@ -37,7 +37,7 @@ TODO: {
 	is_deeply ($rows, $expect, "all rows found - mem-io w/o col_names");
 	}
 
-    if ($DBD::File::VERSION gt "0.43") {
+    if ($DBD::File::VERSION gt "0.44") {
 	note ("ScalarIO - with col_names");
 	my $dbh = Connect ();
 	open my $data, "<", \$cnt;
