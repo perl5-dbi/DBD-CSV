@@ -54,8 +54,8 @@ MSG
 use vars qw( $DBI_INC_DIR );
 
 {   my $tmp_dir = File::Spec->tmpdir ();
-    my $default = $ENV{AUTOMATED_TESTING} ? "n" : "y";
-    if (prompt ("Enable the use of $tmp_dir for tests?", $default) =~ m/[Yy]/) {
+    if (!$ENV{AUTOMATED_TESTING} &&
+         prompt ("Enable the use of $tmp_dir for tests?", "y") =~ m/[Yy]/) {
 	unlink "tests.skip";
 	}
     else {
