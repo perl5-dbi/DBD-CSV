@@ -27,9 +27,9 @@ Text::CSV_XS 1.12
 
 SQL::Statement 1.405
 
-DBD::File 0.43
+DBD::File 0.44
 
-DBD::CSV 0.46
+DBD::CSV 0.47
 
 =head1 DESCRIPTION
 
