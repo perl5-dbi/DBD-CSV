@@ -36,15 +36,15 @@ my %dir = map {
     } @dsn;
 
 # Use $test_dir
-$dbh->do ("create table foo (c_foo integer, foo char (1))");
-$dbh->do ("insert into foo values ($_, $_)") for 1, 2, 3;
+$dbh->do ("create table fox (c_fox integer, fox char (1))");
+$dbh->do ("insert into fox values ($_, $_)") for 1, 2, 3;
 
 my @test_dirs = ($tstdir, @extdir);
 is ($dir{$_}, 1, "DSN for $_") for @test_dirs;
 
 my %tbl = map { $_ => 1 } $dbh->tables (undef, undef, undef, undef);
 
-is ($tbl{$_}, 1, "Table $_ found") for qw( tmp foo );
+is ($tbl{$_}, 1, "Table $_ found") for qw( tmp fox );
 
 my %data = (
     tmp => {		# t/tmp.csv
@@ -52,26 +52,26 @@ my %data = (
 	2 => "monkey",
 	3 => "gorilla",
 	},
-    foo => {		# output123/foo.csv
+    fox => {		# output123/fox.csv
 	1 => 1,
 	2 => 2,
 	3 => 3,
 	},
     );
-foreach my $tbl ("tmp", "foo") {
+foreach my $tbl ("tmp", "fox") {
     my $sth = $dbh->prepare ("select * from $tbl");
     $sth->execute;
     while (my $row = $sth->fetch) {
 	is ($row->[1], $data{$tbl}{$row->[0]}, "$tbl ($row->[0], ...)");
 	}
     }
-# Do not drop table foo yet
+# Do not drop table fox yet
 
 ok ($dbh->disconnect, "disconnect");
 
 chdir DbDir ();
-my @f = grep m/^foo\.csv/i => glob "*.*";
-is (scalar @f, 1, "foo.csv still here");
+my @f = grep m/^fox\.csv/i => glob "*.*";
+is (scalar @f, 1, "fox.csv still here");
 
 SKIP: {
     $DBD::File::VERSION < 0.43 and skip "DBD::File-0.43 required", 1;
@@ -85,7 +85,7 @@ SKIP: {
 	}), undef, "Should not be able to connect to non-exiting folder");
     }
 
-# drop table foo;
+# drop table fox;
 @f and unlink @f;
 
 done_testing;
