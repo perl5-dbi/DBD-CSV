@@ -58,9 +58,9 @@ requires:
     Text::CSV_XS:        1.01
 recommends:
     perl:                5.020001
-    DBI:                 1.632
+    DBI:                 1.633
     DBD::File:           0.44
-    Text::CSV_XS:        1.13
+    Text::CSV_XS:        1.14
 configure_requires:
     ExtUtils::MakeMaker: 0
     DBI:                 1.628
