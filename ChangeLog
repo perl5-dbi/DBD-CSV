@@ -1,6 +1,7 @@
-0.47	- 2015-01-07, H.Merijn Brand
-    - Updated copyright to 2015
-    - Make test-tablename unique for parallel testing
+0.47	- 2015-02-11, H.Merijn Brand
+    * Updated copyright to 2015
+    * Make test-tablename unique for parallel testing
+    * Remove perl recommendation from META as it breaks cpan clients
 
 0.46	- 2014-11-08, H.Merijn Brand
     * Column type CHAR should return 1
