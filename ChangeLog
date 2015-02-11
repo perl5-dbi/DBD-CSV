@@ -1,3 +1,6 @@
+0.48	- 2015-02-11, H.Merijn Brand
+    * Update list of valid Text::CSV_XS attributes
+
 0.47	- 2015-02-11, H.Merijn Brand
     * Updated copyright to 2015
     * Make test-tablename unique for parallel testing

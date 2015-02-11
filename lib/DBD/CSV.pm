@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.47";
+$VERSION     = "0.48";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -97,11 +97,31 @@ sub init_valid_attributes
 {
     my $dbh = shift;
 
+    # Straight from Text::CSV_XS.pm
     my @xs_attr = qw(
-	allow_loose_escapes allow_loose_quotes allow_whitespace
-	always_quote auto_diag binary blank_is_undef empty_is_undef
-	eol escape_char keep_meta_info quote_char quote_null
-	quote_space sep_char types verbatim );
+	eol
+	sep_char
+	quote_char
+	escape_char
+	binary
+	decode_utf8
+	auto_diag
+	diag_verbose
+	blank_is_undef
+	empty_is_undef
+	allow_whitespace
+	allow_loose_quotes
+	allow_loose_escapes
+	allow_unquoted_escape
+	always_quote
+	quote_space
+	escape_null
+	quote_binary
+	keep_meta_info
+	verbatim
+	types
+	callbacks
+	);
     @csv_xs_attr{@xs_attr} = ();
 
     $dbh->{csv_xs_valid_attrs} = [ @xs_attr ];
@@ -136,7 +156,7 @@ sub get_csv_versions
     my $dtype = $meta->{csv_class};
     $dvsn and $dtype .= " ($dvsn)";
     return sprintf "%s using %s", $dbh->{csv_version}, $dtype;
-    } # get_csv_versions 
+    } # get_csv_versions
 
 sub get_info
 {
