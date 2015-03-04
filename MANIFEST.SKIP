@@ -5,6 +5,7 @@
 \.tgz$
 \.tar\.gz$
 \.git
+\.travis.yml
 blib/
 cover_db/
 genMETA.pl

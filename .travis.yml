@@ -1,0 +1,16 @@
+language: perl
+perl:
+  - "5.21"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+  - "5.8"
+before_install:
+ - perlbrew install-cpanm -f
+env:
+ - AUTOMATED_TESTING=1
+install:
+  - cpanm --quiet DBI Text::CSV_XS SQL::Statement Pod::Parser Pod::Wordlist Pod::Escapes Text::Wrap Pod::Spell::CommonMistakes
