@@ -118,40 +118,18 @@ END { DbCleanup (); }
 {   my $listTablesHook;
 
     my $testtable = "testaa";
-    my $listed    = 0;
-
-    my @tables;
 
     sub FindNewTable
     {
 	my $dbh = shift;
 
-	unless ($listed) {
-	       if (defined $listTablesHook) {
-		@tables = $listTablesHook->($dbh);
-		}
-	    elsif (defined &ListTables) {
-		@tables = ListTables ($dbh);
-		}
-	    else {
-		die "Fatal: ListTables not implemented.\n";
-		}
-	    $listed = 1;
-	    }
+	my @tables = defined $listTablesHook ? $listTablesHook->($dbh)
+	           : defined &ListTables     ?  ListTables ($dbh)
+	           : die "Fatal: ListTables not implemented.\n";
 
-	# A small loop to find a free test table we can use to mangle stuff in
-	# and out of. This starts at testaa and loops until testaz, then testba
-	# - testbz and so on until testzz.
-	my $foundtesttable = 1;
 	my $table;
-	while ($foundtesttable) {
-	    $foundtesttable = 0;
-	    foreach $table (@tables) {
-		if ($table eq $testtable) {
-		    $testtable++;
-		    $foundtesttable = 1;
-		    }
-		}
+	while (grep { $_ eq $testtable } @tables) {
+	    $testtable++;
 	    }
 	$table = $testtable;
 	$testtable++;
