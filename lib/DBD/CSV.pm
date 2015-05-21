@@ -114,6 +114,7 @@ sub init_valid_attributes
 	allow_loose_escapes
 	allow_unquoted_escape
 	always_quote
+	quote_empty
 	quote_space
 	escape_null
 	quote_binary
@@ -223,7 +224,8 @@ sub init_table_meta
 	    exists $dbh->{"csv_$attr"} and $opts{$attr} = $dbh->{"csv_$attr"};
 	    }
 	$dbh->{csv_null} || $meta->{csv_null} and
-	    $opts{blank_is_undef} = $opts{always_quote} = 1;
+	    $opts{Text::CSV_XS->version < 1.18 ? "always_quote" : "quote_empty"} =
+	    $opts{blank_is_undef} = 1;
 
 	my $class = $meta->{csv_class};
 	my $eol   = $meta->{csv_eol};
