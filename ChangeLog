@@ -1,4 +1,4 @@
-0.49	- 2015-05-21, H.Merijn Brand
+0.49	- 2015-05-26, H.Merijn Brand
     * Simplified test-table-name generation
     * Prefer quote_empty over quote_always for size (Text::CSV_XS => 1.18)
 
