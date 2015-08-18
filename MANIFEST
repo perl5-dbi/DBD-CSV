@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 MANIFEST.SKIP
 Makefile.PL
+CONTRIBUTING.md
 README
 lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
