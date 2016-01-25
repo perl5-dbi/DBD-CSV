@@ -336,7 +336,7 @@ c.tab,"s,tab"
 «46627» - DBD::File is damaged now
 «51090» - Report a bug in DBD-CSV
 integer,longvarchar,numeric
-«61168» - Specifying seperation character per table does not work
+«61168» - Specifying separation character per table does not work
 "HEADER1";"HEADER2"
 Volki;Bolki
 Zolki;Solki
