@@ -58,7 +58,7 @@ ok ($dbh->disconnect,				"disconnect");
 undef $dbh;
 
 
-# And now retreive the rows using bind_columns
+# And now retrieve the rows using bind_columns
 ok ($dbh = Connect ({ csv_null => 1 }),		"connect");
 
 ok ($sth = $dbh->prepare ("select * from $tbl order by id"),	"prepare");

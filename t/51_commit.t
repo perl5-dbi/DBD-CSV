@@ -65,7 +65,7 @@ is ($dbh->{AutoCommit}, 1,			"AutoCommit on");
 
 # Check whether rollback issues a warning in AutoCommit mode
 # We accept error messages as being legal, because the DBI
-# requirement of just issueing a warning seems scary.
+# requirement of just issuing a warning seems scary.
 ok ($dbh->do ("insert into $tbl values (3, 'Alligator')"), "insert 3");
 is ($dbh->{AutoCommit}, 1,			"AutoCommit on");
 {   my $got_warn = 0;
