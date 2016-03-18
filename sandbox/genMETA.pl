@@ -60,7 +60,7 @@ recommends:
     DBI:                 1.634
     DBD::File:           0.44
     SQL::Statement:      1.407
-    Text::CSV_XS:        1.20
+    Text::CSV_XS:        1.22
 configure_requires:
     ExtUtils::MakeMaker: 0
     DBI:                 1.628
