@@ -4,6 +4,7 @@
     * Add CONTRIBUTING.md
     * It's 2016
     * Added docs to warn for reserved words (RT#106529)
+    * Minor spelling corrections (PRC Guillermo O. Freschi)
 
 0.48	- 2015-02-11, H.Merijn Brand
     * Update list of valid Text::CSV_XS attributes
