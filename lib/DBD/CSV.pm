@@ -527,7 +527,7 @@ and more.  See L<SQL::Statement::Syntax> for a description of the SQL
 syntax supported in DBD::CSV.
 
 Table- and column-names are case insensitive unless quoted. Column names
-will be sanitized unless L</raw_header> is true;
+will be sanitized unless L</raw_header> is true.
 
 =head1 Using DBD::CSV with DBI
 
@@ -1040,6 +1040,18 @@ be set to FALSE.
 If you supply an empty array ref, the driver will read the first row
 for you, count the number of columns and create column names like
 C<col0>, C<col1>, ...
+
+Note that column names that match reserved SQL words will cause unwanted
+and sometimes confusing errors. If your CSV has headers that match reserved
+words, you will require these two attributes.
+
+If C<test.csv> looks like
+
+ select,from
+ 1,2
+
+the select query would result in C<select select, from from test;>, which
+obviously is illegal SQL.
 
 =item raw_header
 X<raw_header>
