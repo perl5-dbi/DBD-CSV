@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.49";
+$VERSION     = "0.50";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -1065,6 +1065,26 @@ to a true value and the entries in the first line of the CSV data will be
 used verbatim for column headers and field names.  DBD::CSV cannot guarantee
 that any part in the toolchain will work if field names have those characters,
 and the chances are high that the SQL statements will fail.
+
+Currently, the sanitizing of headers is as simple as
+
+  s/\W/_/g;
+
+Note that headers (column names) might be folded in other parts of the code
+stack, specifically SQL::Statement, whose docs mention:
+
+ Wildcards are expanded to lower cased identifiers. This might
+ confuse some people, but it was easier to implement.
+
+That means that in
+
+ my $sth = $dbh->prepare ("select * from foo");
+ $sth->execute;
+ while (my $row = $sth->fetchrow_hashref) {
+     say for keys %$row;
+     }
+
+all keys will show as all lower case, regardless of the original header.
 
 =back
 
