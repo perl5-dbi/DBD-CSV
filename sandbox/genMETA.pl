@@ -1,15 +1,26 @@
 #!/pro/bin/perl
 
-use strict;
+use 5.14.1;
 use warnings;
 
+our $VERSION = "1.20 - 20160520";
+
+sub usage {
+    my $err = shift and select STDERR;
+    say "usage: $0 [--check | --write]";
+    exit $err;
+    } # usage
+
 use Getopt::Long qw(:config bundling nopermute);
-my $check = 0;
 my $opt_v = 0;
 GetOptions (
-    "c|check"		=> \$check,
-    "v|verbose:1"	=> \$opt_v,
-    ) or die "usage: $0 [--check]\n";
+    "help|?"		=> sub { usage (0); },
+    "V|version"		=> sub { say $0 =~ s{.*/}{}r, " [$VERSION]"; exit 0; },
+
+    "c|check!"		=> \my $check,
+    "w|write:s"		=> \my $write,
+    "v|verbose:1"	=>    \$opt_v,
+    ) or usage (1);
 
 use lib "sandbox";
 use genMETA;
@@ -18,6 +29,7 @@ my $meta = genMETA->new (
     verbose => $opt_v,
     );
 
+$meta->quiet (defined $write);
 $meta->from_data (<DATA>);
 
 if ($check) {
@@ -25,6 +37,9 @@ if ($check) {
     $meta->check_required ();
     $meta->check_minimum ([ "t", "lib" ]);
     $meta->done_testing ();
+    }
+elsif (defined $write) {
+    $meta->write_yaml ($write);
     }
 elsif ($opt_v) {
     $meta->print_yaml ();
@@ -73,7 +88,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302015
+    Test::More:          1.302019
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

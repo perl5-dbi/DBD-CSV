@@ -5,10 +5,9 @@ use warnings;
 use Test::More;
 
 BEGIN { $ENV{AUTHOR_TESTING} = 1; }
-eval "require Test::Kwalitee;";
-$@ and plan skip_all => "Test::Kwalitee not available";
+use Test::Kwalitee qw( kwalitee_ok );;
 
-Test::Kwalitee->import (tests => [qw(
+kwalitee_ok (qw(
     -has_meta_yml
     -metayml_conforms_spec_current
     -metayml_conforms_to_known_spec
@@ -18,7 +17,7 @@ Test::Kwalitee->import (tests => [qw(
     -metayml_is_parsable
 
     -use_strict
-    )]);
+    ));
 # use_strict is still broken, as it does not include "use 5.16.2;" as
 # equivalent to use strict
 
@@ -39,3 +38,5 @@ my @experimental = qw(
      has_version_in_each_file
      uses_test_nowarnings
      );
+
+done_testing ();

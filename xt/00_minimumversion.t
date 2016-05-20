@@ -24,10 +24,10 @@ foreach my $MODULE (@MODULES) {
     }
 
 !$has_meta && -x "sandbox/genMETA.pl" and
-    qx{ perl sandbox/genMETA.pl -v > META.yml };
+    qx{ perl sandbox/genMETA.pl -w };
 
 all_minimum_version_from_metayml_ok ();
 
-$has_meta or unlink "META.yml";
+$has_meta or unlink glob "META.*";
 
 1;
