@@ -88,7 +88,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302019
+    Test::More:          1.302035
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
