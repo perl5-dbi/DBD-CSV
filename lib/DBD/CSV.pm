@@ -31,8 +31,7 @@ $errstr   = "";		# holds error string for DBI::errstr
 $sqlstate = "";         # holds error state  for DBI::state
 $drh      = undef;	# holds driver handle once initialized
 
-sub CLONE		# empty method: prevent warnings when threads are cloned
-{
+sub CLONE {		# empty method: prevent warnings when threads are cloned
     } # CLONE
 
 # --- DRIVER -------------------------------------------------------------------
@@ -67,8 +66,7 @@ our @ISA = qw( DBD::File::dr );
 our $imp_data_size     = 0;
 our $data_sources_attr = undef;
 
-sub connect
-{
+sub connect {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
     $dbh and $dbh->{Active} = 1;
@@ -84,8 +82,7 @@ use strict;
 our $imp_data_size = 0;
 our @ISA = qw( DBD::File::db );
 
-sub set_versions
-{
+sub set_versions {
     my $this = shift;
     $this->{csv_version} = $DBD::CSV::VERSION;
     return $this->SUPER::set_versions ();
@@ -93,8 +90,7 @@ sub set_versions
 
 my %csv_xs_attr;
 
-sub init_valid_attributes
-{
+sub init_valid_attributes {
     my $dbh = shift;
 
     # Straight from Text::CSV_XS.pm
@@ -141,8 +137,7 @@ sub init_valid_attributes
     return $dbh->SUPER::init_valid_attributes ();
     } # init_valid_attributes
 
-sub get_csv_versions
-{
+sub get_csv_versions {
     my ($dbh, $table) = @_;
     $table ||= "";
     my $class = $dbh->{ImplementorClass};
@@ -159,8 +154,7 @@ sub get_csv_versions
     return sprintf "%s using %s", $dbh->{csv_version}, $dtype;
     } # get_csv_versions
 
-sub get_info
-{
+sub get_info {
     my ($dbh, $info_type) = @_;
     require  DBD::CSV::GetInfo;
     my $v = $DBD::CSV::GetInfo::info{int ($info_type)};
@@ -168,8 +162,7 @@ sub get_info
     return $v;
     } # get_info
 
-sub type_info_all
-{
+sub type_info_all {
     my $dbh = shift;
     require   DBD::CSV::TypeInfo;
     return [@$DBD::CSV::TypeInfo::type_info_all];
@@ -198,8 +191,7 @@ use Carp;
 
 our @ISA = qw(DBD::File::Table);
 
-sub bootstrap_table_meta
-{
+sub bootstrap_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
     $meta->{csv_class} ||= $dbh->{csv_class} || "Text::CSV_XS";
     $meta->{csv_eol}   ||= $dbh->{csv_eol}   || "\r\n";
@@ -208,8 +200,7 @@ sub bootstrap_table_meta
     $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
     } # bootstrap_table_meta
 
-sub init_table_meta
-{
+sub init_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
 
     $self->SUPER::init_table_meta ($dbh, $table, $meta);
@@ -252,8 +243,7 @@ my %compat_map = map { $_ => "csv_$_" }
 
 __PACKAGE__->register_compat_map (\%compat_map);
 
-sub table_meta_attr_changed
-{
+sub table_meta_attr_changed {
     my ($class, $meta, $attr, $value) = @_;
 
     (my $csv_attr = $attr) =~ s/^csv_//;
@@ -331,8 +321,7 @@ $DBI::VERSION < 1.623 and
     *open_file = \&open_data;
 use warnings;
 
-sub _csv_diag
-{
+sub _csv_diag {
     my @diag = $_[0]->error_diag;
     for (2, 3) {
 	defined $diag[$_] or $diag[$_] = "?";
@@ -340,8 +329,7 @@ sub _csv_diag
     return @diag;
     } # _csv_diag
 
-sub fetch_row
-{
+sub fetch_row {
     my ($self, $data) = @_;
 
     exists $self->{cached_row} and
@@ -368,8 +356,7 @@ sub fetch_row
     $self->{row} = (@$fields ? $fields : undef);
     } # fetch_row
 
-sub push_row
-{
+sub push_row {
     my ($self, $data, $fields) = @_;
     my $tbl = $self->{meta};
     my $csv = $self->{csv_csv_out};
