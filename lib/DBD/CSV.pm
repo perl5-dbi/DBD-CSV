@@ -127,7 +127,7 @@ sub init_valid_attributes {
 
 	class tables in csv_in out csv_out skip_first_row
 
-	null sep quote escape
+	null sep quote escape bom
 	)};
 
     $dbh->{csv_readonly_attrs} = { };
@@ -197,6 +197,8 @@ sub bootstrap_table_meta {
     $meta->{csv_eol}   ||= $dbh->{csv_eol}   || "\r\n";
     exists $meta->{csv_skip_first_row} or
 	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
+    exists $meta->{csv_bom} or
+	$meta->{csv_bom} = exists $dbh->{bom} ? $dbh->{bom} : $dbh->{csv_bom};
     $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
     } # bootstrap_table_meta
 
@@ -286,6 +288,12 @@ sub open_data {
 		    : exists $meta->{col_names} ? 0 : 1;
 	    defined $meta->{skip_rows} or
 		$meta->{skip_rows} = $skipRows;
+	    if ($meta->{csv_bom}) {
+		my @hdr = $attrs->{csv_csv_in}->header ($meta->{fh}) or
+		    croak "Failed using the header row: ".$attrs->{csv_csv_in}->error_diag;
+		$meta->{col_names} ||= \@hdr;
+		$skipRows = 0 if $skipRows;
+		}
 	    if ($skipRows--) {
 		$array = $attrs->{csv_csv_in}->getline ($meta->{fh}) or
 		    croak "Missing first row due to ".$attrs->{csv_csv_in}->error_diag;
@@ -546,27 +554,28 @@ The preferred way of passing the arguments is by driver attributes:
 
     # specify most possible flags via driver flags
     $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
-	f_schema         => undef,
-	f_dir            => "data",
-	f_dir_search     => [],
-	f_ext            => ".csv/r",
-	f_lock           => 2,
-	f_encoding       => "utf8",
+        f_schema         => undef,
+        f_dir            => "data",
+        f_dir_search     => [],
+        f_ext            => ".csv/r",
+        f_lock           => 2,
+        f_encoding       => "utf8",
 
-	csv_eol          => "\r\n",
-	csv_sep_char     => ",",
-	csv_quote_char   => '"',
-	csv_escape_char  => '"',
-	csv_class        => "Text::CSV_XS",
-	csv_null         => 1,
-	csv_tables       => {
-	    info => { f_file => "info.csv" }
-	    },
+        csv_eol          => "\r\n",
+        csv_sep_char     => ",",
+        csv_quote_char   => '"',
+        csv_escape_char  => '"',
+        csv_class        => "Text::CSV_XS",
+        csv_null         => 1,
+        csv_bom          => 0,
+        csv_tables       => {
+            info => { f_file => "info.csv" }
+            },
 
-	RaiseError       => 1,
-	PrintError       => 1,
-	FetchHashKeyName => "NAME_lc",
-	}) or die $DBI::errstr;
+        RaiseError       => 1,
+        PrintError       => 1,
+        FetchHashKeyName => "NAME_lc",
+        }) or die $DBI::errstr;
 
 but you may set these attributes in the DSN as well, separated by semicolons.
 Pay attention to the semi-colon for C<csv_sep_char> (as seen in many CSV
@@ -955,6 +964,16 @@ reset it with a false value. You can pass it to connect, or set it later:
   $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_null => 1 });
 
   $dbh->{csv_null} = 1;
+
+=item csv_bom
+X<csv_bom>
+
+With this option set, the CSV parser will try to detect BOM (Byte Order Mark)
+in the header line. This requires L<Text::CSV_XS> version 1.22 or higher.
+
+  $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_bom => 1 });
+
+  $dbh->{csv_bom} = 1;
 
 =item csv_tables
 X<csv_tables>
