@@ -12,11 +12,13 @@ perls /pro/bin/perl:/usr/bin/perl\
 :/media/Tux/perls/bin/perl5.14.4\
 :/media/Tux/perls/bin/perl5.16.3\
 :/media/Tux/perls/bin/perl5.18.4\
-:/media/Tux/perls/bin/perl5.2[0245]*\
+:/media/Tux/perls/bin/perl5.2[02468]*\
+:/media/Tux/perls/bin/perl5.27*\
 :/media/Tux/perls/bin/tperl5.8.9\
 :/media/Tux/perls/bin/tperl5.10.1\
 :/media/Tux/perls/bin/tperl5.12.5\
 :/media/Tux/perls/bin/tperl5.14.4\
 :/media/Tux/perls/bin/tperl5.16.3\
 :/media/Tux/perls/bin/tperl5.18.4\
-:/media/Tux/perls/bin/tperl5.2[0245]*\
+:/media/Tux/perls/bin/tperl5.2[02468]*\
+:/media/Tux/perls/bin/tperl5.27*\
