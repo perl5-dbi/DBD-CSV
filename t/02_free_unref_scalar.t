@@ -5,7 +5,7 @@ use warnings;
 
 #use Devel::Peek;
 #use Data::Peek;
-use Test::More;
+use Test::More tests => 405;
 #use Test::NoWarnings;
 
 BEGIN { use_ok "DBI"; }
@@ -99,5 +99,3 @@ test_with_options (
     csv_auto_diag => 0,
     %$callbacks,
     ) for (1 .. 100);
-
-done_testing ();
