@@ -13,7 +13,7 @@ BEGIN { use_ok "DBI"; }
 require "./t/lib.pl";
 
 $SIG{__WARN__} = sub {
-    $_[0] =~ m/^Attempt to free unreferenced scalar: SV (0x[0-9a-f]+)(, \<\w+\> line \d+)? during global destruction\.$/ and
+    $_[0] =~ m/^Attempt to free unreferenced scalar: SV (0x[0-9a-f]+)(, \<\w+\> line \d+)?.* during global destruction\.$/ and
 	fail ("there was an attempt to free unreferenced scalar");
     diag "@_";
     };
