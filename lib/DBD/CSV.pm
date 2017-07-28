@@ -569,7 +569,15 @@ The preferred way of passing the arguments is by driver attributes:
         csv_null         => 1,
         csv_bom          => 0,
         csv_tables       => {
-            info => { f_file => "info.csv" }
+            syspwd => {
+                sep_char    => ":",
+                quote_char  => undef,
+                escape_char => undef,
+                file        => "/etc/passwd",
+                col_names   => [qw( login password
+                                    uid gid realname
+                                    directory shell )],
+		},
             },
 
         RaiseError       => 1,
@@ -981,6 +989,22 @@ X<csv_tables>
 This hash ref is used for storing table dependent metadata. For any
 table it contains an element with the table name as key and another
 hash ref with the following attributes:
+
+=over 4
+
+=item o
+
+All valid attributes to the CSV parsing module. Any of the can optionally
+be prefixed with C<csv_>.
+
+=item o
+
+All attributes valid to DBD::File
+
+=back
+
+If you pass it C<f_file> or its alias C<file>, C<f_ext> has no effect, but
+C<f_dir> and C<f_encoding> still have.
 
 =item csv_*
 X<csv_*>
