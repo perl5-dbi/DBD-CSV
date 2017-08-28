@@ -12,6 +12,7 @@ pm_to_blib
 DBD-CSV*
 xx*
 valgrind.log
+.perlcriticrc
 tmp/*
 !tmp/tmp.csv
 tests.skip

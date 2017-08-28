@@ -114,6 +114,21 @@ else {
 
 my $rv = WriteMakefile (%wm);
 
+# perlcriticrc uses Config::Tiny, which does not support nesting
+if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
+    open my $fh, ">", ".perlcriticrc";
+    print $fh do {
+	local (@ARGV, $/) = ("$ENV{HOME}/.perlcriticrc"); <> };
+    print $fh join "\n" => "",
+	"[-Modules::ProhibitMultiplePackages]",
+	"[-Subroutines::ProhibitBuiltinHomonyms]", # connect
+	"[-ValuesAndExpressions::RestrictLongStrings]",	# error message
+	"[-Variables::ProhibitPackageVars]", # very deliberate for compatability
+	"[-Variables::ProhibitReusedNames]", # @ISA
+	"";
+    close $fh;
+    }
+
 1;
 
 package MY;

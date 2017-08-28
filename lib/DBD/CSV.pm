@@ -163,7 +163,7 @@ sub get_info {
     } # get_info
 
 sub type_info_all {
-    my $dbh = shift;
+#   my $dbh = shift;
     require   DBD::CSV::TypeInfo;
     return [@$DBD::CSV::TypeInfo::type_info_all];
     } # type_info_all
@@ -175,21 +175,21 @@ package DBD::CSV::st;
 use strict;
 
 our $imp_data_size = 0;
-our @ISA = qw(DBD::File::st);
+our @ISA = qw( DBD::File::st );
 
 package DBD::CSV::Statement;
 
 use strict;
 use Carp;
 
-our @ISA = qw(DBD::File::Statement);
+our @ISA = qw( DBD::File::Statement );
 
 package DBD::CSV::Table;
 
 use strict;
 use Carp;
 
-our @ISA = qw(DBD::File::Table);
+our @ISA = qw( DBD::File::Table );
 
 sub bootstrap_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
@@ -292,7 +292,7 @@ sub open_data {
 		my @hdr = $attrs->{csv_csv_in}->header ($meta->{fh}) or
 		    croak "Failed using the header row: ".$attrs->{csv_csv_in}->error_diag;
 		$meta->{col_names} ||= \@hdr;
-		$skipRows = 0 if $skipRows;
+		$skipRows and $skipRows = 0;
 		}
 	    if ($skipRows--) {
 		$array = $attrs->{csv_csv_in}->getline ($meta->{fh}) or
@@ -348,8 +348,7 @@ sub fetch_row {
     my $csv = $self->{csv_csv_in} or
 	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
 
-    my $fields;
-    eval { $fields = $csv->getline ($tbl->{fh}) };
+    my $fields = eval { $csv->getline ($tbl->{fh}) };
     unless ($fields) {
 	$csv->eof and return;
 
@@ -373,7 +372,8 @@ sub push_row {
     unless ($csv->print ($fh, $fields)) {
 	my @diag = _csv_diag ($csv);
 	my $file = $tbl->{f_fqfn};
-	return do { $data->set_err ($DBI::stderr, "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]"); undef };
+	return do { $data->set_err ($DBI::stderr,
+	    "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]"); undef };
 	}
     1;
     } # push_row
@@ -1121,7 +1121,7 @@ all keys will show as all lower case, regardless of the original header.
 It's strongly recommended to check the attributes supported by
 L<DBD::File/Metadata>.
 
-Example: Suppose you want to use /etc/passwd as a CSV file. :-)
+Example: Suppose you want to use F</etc/passwd> as a CSV file. :-)
 There simplest way is:
 
     use DBI;
