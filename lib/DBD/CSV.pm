@@ -191,6 +191,12 @@ use Carp;
 
 our @ISA = qw( DBD::File::Table );
 
+#sub DESTROY {
+#    my $self = shift or return;
+#
+#    $self->{meta} and $self->{meta}{csv_in} = undef;
+#    } # DESTROY
+
 sub bootstrap_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
     $meta->{csv_class} ||= $dbh->{csv_class} || "Text::CSV_XS";

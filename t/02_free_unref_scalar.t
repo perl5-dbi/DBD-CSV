@@ -3,6 +3,10 @@
 use strict;
 use warnings;
 
+# perl5.27.2 -DD -Mblib t/02_free_unref_scalar.t > & alloc-free.log
+#            ^^^
+# -DD  Cleaning up
+
 #use Devel::Peek;
 #use Data::Peek;
 use Test::More tests => 405;
@@ -20,20 +24,9 @@ $SIG{__WARN__} = sub {
 
 sub DBD::CSV::Table::DESTROY {
     my $self = shift;
-    my $csv  = $self->{csv_csv_in};
-    my $dbg  = $self->{csv_csv_in}{auto_diag};
 
-    if ($dbg) {
-	diag scalar DDumper $csv, 2;
-	#diag Dump $csv, 1;
-	}
-    else {
-	#diag sprintf '0x%x', refaddr $csv;
-	}
-
-#   $self->{csv_csv_out} = $self->{meta}{csv_out} = undef;
-#   $self->{csv_csv_in}  = $self->{meta}{csv_in}  = undef;
-    }
+    $self->{meta}{csv_in} = undef;
+    } # DBD::CSV::Table::DESTROY
 
 sub test_with_options {
     my (%opts) = @_;
