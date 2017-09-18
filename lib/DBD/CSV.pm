@@ -611,7 +611,7 @@ The default value for C<csv_binary> is C<1> (True).
 
 The default value for C<csv_auto_diag> is <1>. Note that this might cause
 trouble on perl versions older than 5.8.9, so up to and including perl
-version 5.8.8 it might be requirable to use C<;csv_auto_diag=0> inside the
+version 5.8.8 it might be required to use C<;csv_auto_diag=0> inside the
 C<DSN> or C<csv_auto_diag => 0> inside the attributes.
 
 =head2 Creating and dropping tables
