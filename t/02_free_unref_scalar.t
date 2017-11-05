@@ -25,7 +25,7 @@ $SIG{__WARN__} = sub {
 sub DBD::CSV::Table::DESTROY {
     my $self = shift;
 
-    $self->{meta}{csv_in} = undef;
+    delete $self->{meta}{csv_in};
     } # DBD::CSV::Table::DESTROY
 
 sub test_with_options {

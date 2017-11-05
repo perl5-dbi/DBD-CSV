@@ -194,7 +194,7 @@ our @ISA = qw( DBD::File::Table );
 #sub DESTROY {
 #    my $self = shift or return;
 #
-#    $self->{meta} and $self->{meta}{csv_in} = undef;
+#    $self->{meta} and delete $self->{meta}{csv_in};
 #    } # DESTROY
 
 sub bootstrap_table_meta {
