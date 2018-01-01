@@ -72,7 +72,7 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.637
+    DBI:                 1.639
     DBD::File:           0.44
     SQL::Statement:      1.412
     Text::CSV_XS:        1.34
@@ -88,7 +88,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302106
+    Test::More:          1.302120
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
