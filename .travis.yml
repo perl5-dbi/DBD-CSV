@@ -2,6 +2,8 @@ language: perl
 os:
   - linux
 perl:
+  - "5.26"
+  - "5.24"
   - "5.22"
   - "5.20"
   - "5.18"
@@ -15,4 +17,18 @@ before_install:
 env:
  - AUTOMATED_TESTING=1
 install:
-  - cpanm --quiet DBI Text::CSV_XS SQL::Statement Pod::Parser Pod::Wordlist Pod::Escapes Text::Wrap Pod::Spell::CommonMistakes
+  - cpanm --quiet DBI				|| true
+  - cpanm --quiet Text::CSV_XS			|| true
+  - cpanm --quiet SQL::Statement		|| true
+  - cpanm --quiet Pod::Parser			|| true
+  - cpanm --quiet Pod::Wordlist			|| true
+  - cpanm --quiet Pod::Escapes			|| true
+  - cpanm --quiet Text::Wrap			|| true
+  - cpanm --quiet Pod::Spell::CommonMistakes	|| true
+notifications:
+  irc:
+    channels:
+      - "irc.perl.org#csv"
+      - "irc.perl.org#dbi"
+    on_success: always
+    on_failure: always
