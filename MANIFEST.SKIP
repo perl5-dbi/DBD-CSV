@@ -18,7 +18,6 @@ tmp/
 .releaserc
 .perlcriticrc
 ^xx
-META.yml
 valgrind.log
 tests.skip
 xt/
