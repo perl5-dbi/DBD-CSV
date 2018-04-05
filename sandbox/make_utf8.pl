@@ -5,8 +5,7 @@ use warnings;
 use autodie;
 use charnames ":full";
 
-sub usage
-{
+sub usage {
     my $err = shift and select STDERR;
     print "usage: $0 [--dbi]\n";
     exit $err;

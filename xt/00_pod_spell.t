@@ -141,8 +141,7 @@ use integer;
 use locale;    # so our uc/lc works right
 use Carp;
 
-sub new
-{
+sub new {
     my $x = shift;
     my $new = $x->SUPER::new (@_);
     $new->{spell_stopwords} = {};
@@ -151,8 +150,7 @@ sub new
     return $new;
     } # new
 
-sub output_handle
-{
+sub output_handle {
     my ($self, $arg) = @_;
     if ($arg) {
 	my $oh;
@@ -167,8 +165,7 @@ sub output_handle
     return $self->{oh} || $self->SUPER::output_handle ();
     } # output_handle
 
-sub parse_from_file
-{
+sub parse_from_file {
     my ($self, $fn) = @_;
 
     my $str = "";
@@ -182,8 +179,7 @@ sub parse_from_file
 
 sub verbatim { return ""; }    # totally ignore verbatim sections
 
-sub _get_stopwords_from
-{
+sub _get_stopwords_from {
     my $stopwords = $_[0]{spell_stopwords};
 
     my $word;
@@ -199,8 +195,7 @@ sub _get_stopwords_from
     return;
     } # _get_stopwords_from
 
-sub textblock
-{
+sub textblock {
     my ($self, $paragraph) = @_;
     if (@{$self->{region}}) {
 	my $last = $self->{region}[-1];
@@ -220,8 +215,7 @@ sub textblock
     return;
     } # textblock
 
-sub command
-{
+sub command {
     my $self    = shift;
     my $command = shift;
     $command eq "pod" and return;
@@ -259,8 +253,7 @@ sub command
     return;
     } # command
 
-sub interior_sequence
-{
+sub interior_sequence {
     my $self    = shift;
     my $command = shift;
 
@@ -304,8 +297,7 @@ sub interior_sequence
     carp "Unknown sequence $command<$_>";
     } # interior_sequence
 
-sub _treat_words
-{
+sub _treat_words {
     my $p = shift;
     # Count the things in $_[0]
 

@@ -15,8 +15,7 @@ $dbh->commit;
 my $sth = $dbh->prepare ("select i, c, v from type_123");
 $sth->execute;
 
-sub type
-{
+sub type {
     my $type = shift;
     my $tpi = $dbh->type_info ($type) or return ($type, "-");
     return ($type, $tpi->{TYPE_NAME});

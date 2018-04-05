@@ -15,7 +15,7 @@ sub combine_cols {
 	join ($combine_char, @$data[$next_col .. ($index + $combine_cols)]));
     }
 
-sub after_parse_combine_cols { 
+sub after_parse_combine_cols {
     my ($csv, $data) = @_;
 
     combine_cols ($data, 2);
