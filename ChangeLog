@@ -1,3 +1,6 @@
+0.53	- 2018-04-10, H.Merijn Brand
+    * No folder scanning during automated tests
+
 0.52	- 2018-04-05, H.Merijn Brand
     * Dot-in-inc (cpantesters) - I missed two
 
