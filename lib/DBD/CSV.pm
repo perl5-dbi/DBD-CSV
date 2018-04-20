@@ -489,7 +489,7 @@ This module is used to read and write rows in a CSV file.
 Installing this module (and the prerequisites from above) is quite simple.
 The simplest way is to install the bundle:
 
-    $ cpan Bundle::CSV
+    $ cpan Bundle::DBD::CSV
 
 Alternatively, you can name them all
 
