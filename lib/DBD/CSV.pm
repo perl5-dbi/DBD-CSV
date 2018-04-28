@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.53";
+$VERSION     = "0.54";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -346,10 +346,10 @@ sub _csv_diag {
 sub fetch_row {
     my ($self, $data) = @_;
 
-    exists $self->{cached_row} and
-	return $self->{row} = delete $self->{cached_row};
-
     my $tbl = $self->{meta};
+
+    exists $tbl->{cached_row} and
+	return $self->{row} = delete $tbl->{cached_row};
 
     my $csv = $self->{csv_csv_in} or
 	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
