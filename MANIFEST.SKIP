@@ -25,4 +25,3 @@ t/basic/
 t/DBI/
 t/DBD/
 t/SQL/
-t/02_free_unref_scalar.t

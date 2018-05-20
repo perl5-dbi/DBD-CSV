@@ -9,11 +9,12 @@ use warnings;
 
 #use Devel::Peek;
 #use Data::Peek;
-use Test::More tests => 405;
+use Test::More;
 #use Test::NoWarnings;
 
-BEGIN { use_ok "DBI"; }
+$] < 5.026 and plan skip_all => "This is a perl5 CORE issue fixed in perl-5.26";
 
+use_ok "DBI";
 require "./t/lib.pl";
 
 $SIG{__WARN__} = sub {
@@ -43,7 +44,7 @@ sub test_with_options {
 	RaiseError       => 1,
 	PrintError       => 1,
 	FetchHashKeyName => "NAME_lc",
-	}) or die "$DBI::errstr\n";
+	}) or die "$DBI::errstr\n" || $DBI::errstr;
 
     my %tbl = map { $_ => 1 } $dbh->tables (undef, undef, undef, undef);
 
@@ -92,3 +93,5 @@ test_with_options (
     csv_auto_diag => 0,
     %$callbacks,
     ) for (1 .. 100);
+
+done_testing ();
