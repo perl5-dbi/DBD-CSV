@@ -5,6 +5,7 @@ skip_manifest 1
 skip_prereqs 1
 skip_dist 1
 allow_glob_in_perls 1
+required DBI,Text::CSV_XS,SQL::Statement
 perls /pro/bin/perl:/usr/bin/perl\
 :/media/Tux/perls/bin/perl5.8.9\
 :/media/Tux/perls/bin/perl5.10.1\
