@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# Copyright (c) 2009-2018 H.Merijn Brand
+# Copyright (c) 2009-2019 H.Merijn Brand
 
 require 5.008001;
 
