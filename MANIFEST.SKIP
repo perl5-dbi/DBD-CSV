@@ -6,6 +6,7 @@
 \.tar\.gz$
 \.tgz$
 \.travis.yml
+\.whitesource
 ~$
 \bCVS\b
 blib/
