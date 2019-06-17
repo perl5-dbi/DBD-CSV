@@ -31,6 +31,7 @@ my $meta = genMETA->new (
 
 $meta->quiet (defined $write);
 $meta->from_data (<DATA>);
+$meta->gen_cpanfile ();
 
 if ($check) {
     $meta->check_encoding ();
