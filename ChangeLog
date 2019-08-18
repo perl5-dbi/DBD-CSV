@@ -1,4 +1,4 @@
-0.54	- 2019-06-17, H.Merijn Brand
+0.54	- 2019-08-18, H.Merijn Brand
     * Free unref scalar test fixed in Text::CSV_XS 1.35
     * It's 2019
     * Provide cpanfile

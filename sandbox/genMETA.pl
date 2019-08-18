@@ -89,7 +89,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302164
+    Test::More:          1.302166
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

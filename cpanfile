@@ -24,5 +24,5 @@ on "test" => sub {
     requires   "Test::More"               => "0.90";
     requires   "charnames";
 
-    recommends "Test::More"               => "1.302164";
+    recommends "Test::More"               => "1.302166";
     };
