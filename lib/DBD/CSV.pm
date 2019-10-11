@@ -1007,7 +1007,7 @@ hash ref with the following attributes:
 
 =item o
 
-All valid attributes to the CSV parsing module. Any of the can optionally
+All valid attributes to the CSV parsing module. Any of them can optionally
 be prefixed with C<csv_>.
 
 =item o
@@ -1018,6 +1018,18 @@ All attributes valid to DBD::File
 
 If you pass it C<f_file> or its alias C<file>, C<f_ext> has no effect, but
 C<f_dir> and C<f_encoding> still have.
+
+  csv_tables => {
+      syspwd => {                   # Table name
+          csv_sep_char => ":",      # Text::CSV_XS
+          quote_char   => undef,    # Text::CSV_XS
+          escape_char  => undef,    # Text::CSV_XS
+          f_dir        => "/etc",   # DBD::File
+          f_file       => "passwd", # DBD::File
+          col_names    =>           # DBD::File
+            [qw( login password uid gid realname directory shell )],
+          },
+      },
 
 =item csv_*
 X<csv_*>

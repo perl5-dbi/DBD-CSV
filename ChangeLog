@@ -1,7 +1,8 @@
-0.54	- 2019-08-18, H.Merijn Brand
+0.55	- 2019-10-11, H.Merijn Brand
     * Free unref scalar test fixed in Text::CSV_XS 1.35
     * It's 2019
     * Provide cpanfile
+    * Doc enhancements
 
 0.53	- 2018-05-20, H.Merijn Brand
     * No folder scanning during automated tests
