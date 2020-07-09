@@ -21,9 +21,9 @@ Bundle::DBD::CSV - A bundle to install the DBD::CSV driver
 
 =head1 CONTENTS
 
-DBI 1.642
+DBI 1.643
 
-Text::CSV_XS 1.40
+Text::CSV_XS 1.43
 
 SQL::Statement 1.412
 
@@ -44,7 +44,7 @@ This module is currently maintained by
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by H.Merijn Brand
+Copyright (C) 2009-2020 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 
