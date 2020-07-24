@@ -120,6 +120,13 @@ sub init_valid_attributes {
 	callbacks
 	);
     @csv_xs_attr{@xs_attr} = ();
+    # Dynamically add "new" attributes - available in Text::CSV_XS-1.20
+    if (my @ka = eval { Text::CSV_XS->known_attributes }) {
+	for (grep { m/^[a-su-z]/ && !exists $csv_xs_attr{$_} } @ka) {
+	    push @xs_attr => $_;
+	    $csv_xs_attr{$_} = undef;
+	    }
+	};
 
     $dbh->{csv_xs_valid_attrs} = [ @xs_attr ];
 
@@ -191,6 +198,31 @@ use Carp;
 
 our @ISA = qw( DBD::File::Table );
 
+my %compat_map;
+
+{   my %class_mapped;
+
+    sub _register_compat_map {
+	my $class = shift;
+
+	my $x = 0;
+	if (!%compat_map) {
+	    $compat_map{$_} = "f_$_"   for qw( file ext dir lock lockfile );
+	    $compat_map{$_} = "csv_$_" for qw( class eof eol quote_char sep_char escape_char );
+	    $x++;
+	    }
+	if ($class and !$class_mapped{$class}++ and
+		my @ka = eval { $class->known_attributes }) {
+	    # exclude types
+	    $compat_map{$_} = "csv_$_" for grep m/^[a-su-z]/ => @ka;
+	    $x++;
+	    }
+	if ($x) {
+	    __PACKAGE__->register_compat_map (\%compat_map);
+	    }
+	} # _register_compat_map
+    }
+
 #sub DESTROY {
 #    my $self = shift or return;
 #
@@ -201,6 +233,9 @@ sub bootstrap_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
     $meta->{csv_class} ||= $dbh->{csv_class} || "Text::CSV_XS";
     $meta->{csv_eol}   ||= $dbh->{csv_eol}   || "\r\n";
+
+    _register_compat_map ($meta->{csv_class});
+
     exists $meta->{csv_skip_first_row} or
 	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
     exists $meta->{csv_bom} or
@@ -210,6 +245,8 @@ sub bootstrap_table_meta {
 
 sub init_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
+
+    _register_compat_map ($meta->{csv_class});
 
     $self->SUPER::init_table_meta ($dbh, $table, $meta);
 
@@ -246,13 +283,10 @@ sub init_table_meta {
 	}
     } # init_table_meta
 
-my %compat_map = map { $_ => "csv_$_" }
-    qw( class eof  eol quote_char sep_char escape_char );
-
-__PACKAGE__->register_compat_map (\%compat_map);
-
 sub table_meta_attr_changed {
     my ($class, $meta, $attr, $value) = @_;
+
+    _register_compat_map ($meta->{csv_class});
 
     (my $csv_attr = $attr) =~ s/^csv_//;
     if (exists $csv_xs_attr{$csv_attr}) {
