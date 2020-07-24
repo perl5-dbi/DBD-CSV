@@ -11,6 +11,7 @@
 \bCVS\b
 blib/
 cover_db/
+doc/
 lib/DBI
 genMETA.pl
 Makefile$
