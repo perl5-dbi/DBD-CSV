@@ -1,49 +1,93 @@
-#!/usr/bin/perl
+#!/pro/bin/perl
 
 use 5.18.2;
 use warnings;
 
-use DP;
+our $VERSION = "0.02 - 20200727";
+our $CMD = $0 =~ s{.*/}{}r;
+
+sub usage {
+    my $err = shift and select STDERR;
+    say "usage: $CMD [--devel]";
+    exit $err;
+    } # usage
+
+use CSV;
 use DBI;
-use lib "/pro/3gl/CPAN/DBD-CSV/lib";
-use lib "/pro/3gl/CPAN/DBD-CSV/blib/arch";
-use lib "/pro/3gl/CPAN/DBD-CSV/blib/lib";
+use Test::More;
+use Getopt::Long qw(:config bundling);
+GetOptions (
+    "help|?"		=> sub { usage (0); },
+    "V|version"		=> sub { say "$CMD [$VERSION]"; exit 0; },
 
-my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
-    f_schema		=> undef,
-    f_dir		=> ".",
-    f_ext		=> ".csv/r",
+    "d|devel!"		=> \ my $opt_d,
 
-    RaiseError		=> 1,
-    PrintError		=> 1,
-    }) or die "$DBI::errstr\n" || $DBI::errstr;
+    "v|verbose:1"	=> \(my $opt_v = 0),
+    ) or usage (1);
 
-$dbh->{csv_tables}{tst} = {
-    file		=> "test.csv",		# alias to f_file
-    eol			=> "\n",		# alias to csv_eol
-    sep_char		=> ";",			# alias to csv_sep_char
-    always_quote	=> 1,			# alias to csv_always_quote
-    col_names		=> [qw( c_tst s_tst )],
-    };
-
-#$dbh->{TraceLevel} = 99;
-
-say for $dbh->tables (undef, undef, undef, undef);
-
-$dbh->{csv_tables}{tools}{sep_char} = ";";	# should work
-
-foreach my $t (qw( tools fruit )) {
-    say $t;
-    my $sth = $dbh->prepare ("select * from $t");
-    $sth->execute;
-    while (my @r = $sth->fetchrow_array) {
-	printf "%4d %s\n", @r;
-	}
+if ($opt_d) {
+    unshift @INC => "/pro/3gl/CPAN/DBD-CSV/lib";
+    unshift @INC => "/pro/3gl/CPAN/DBD-CSV/blib/arch";
+    unshift @INC => "/pro/3gl/CPAN/DBD-CSV/blib/lib";
     }
 
-open my $fh, ">", "test.csv";close $fh;
-# If empty should insert "c_tst";"s_tst"
-$dbh->do ("insert into tst values (42, 'Test')");		# "42";"Test"
-$dbh->do ("update tst set s_tst = 'Done' where c_tst = 42");	# "42";"Done"
+foreach my $x (0, 1) {
+    my ($fpfx, $cpfx) = $x ? ("f_", "csv_") : ("", "");
+    my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
+	"${fpfx}schema"		=> undef,
+	"${fpfx}dir"		=> "files",
+	"${fpfx}ext"		=> ".csv/r",
 
-$dbh->disconnect;
+	"${cpfx}eol"		=> "\n",		# alias to csv_eol
+	"${cpfx}always_quote"	=> 1,			# alias to csv_always_quote
+	"${cpfx}sep_char"	=> ";",			# alias to csv_sep_char
+
+	RaiseError		=> 1,
+	PrintError		=> 1,
+	}) or die "$DBI::errstr\n" || $DBI::errstr;
+
+    unlink "test.csv";
+    $dbh->{csv_tables}{tst} = {
+	file			=> "test.csv",		# alias to f_file
+	col_names		=> [qw( c_tst s_tst )],
+	};
+
+    is_deeply (
+	[ sort $dbh->tables (undef, undef, undef, undef) ],
+	[qw( fruit tools )],		"Tables");
+    is_deeply (
+	[ sort keys %{$dbh->{csv_tables}} ],
+	[qw( fruit tools tst )],	"Mixed tables");
+
+    $dbh->{csv_tables}{fruit}{sep_char} = ",";	# should work
+
+    is_deeply ($dbh->selectall_arrayref ("select * from tools order by c_tool"),
+	[ [ 1, "Hammer"		],
+	  [ 2, "Screwdriver"	],
+	  [ 3, "Drill"		],
+	  [ 4, "Saw"		],
+	  [ 5, "Router"		],
+	  [ 6, "Hobbyknife"	],
+	  ], "Sorted tools");
+    is_deeply ($dbh->selectall_arrayref ("select * from fruit order by c_fruit"),
+	[ [ 1, "Apple"		],
+	  [ 2, "Blueberry"	],
+	  [ 3, "Orange"		],
+	  [ 4, "Melon"		],
+	  ], "Sorted fruit");
+
+    open my $fh, ">", "test.csv";close $fh;
+    # If empty should insert "c_tst";"s_tst"
+    $dbh->do ("insert into tst values (42, 'Test')");			# "42";"Test"
+    $dbh->do ("update tst set s_tst = 'Done' where c_tst = 42");	# "42";"Done"
+
+    $dbh->disconnect;
+
+    open  $fh, "<", "test.csv" or die "test.csv: $!\n";
+    my @dta = <$fh>;
+    close $fh;
+    is ($dta[-1], qq{"42";"Done"\n}, "Table tst written to test.csv");
+    unlink "test.csv";
+    }
+
+done_testing;

@@ -15,6 +15,14 @@ require DynaLoader;
 require DBD::File;
 require IO::File;
 
+our @f_SHORT = qw( file dir dir_search ext lock lockfile schema encoding );
+our @c_SHORT = qw( class eof
+	eol sep_char quote_char escape_char binary decode_utf8 auto_diag
+	diag_verbose blank_is_undef empty_is_undef allow_whitespace
+	allow_loose_quotes allow_loose_escapes allow_unquoted_escape
+	always_quote quote_empty quote_space escape_null quote_binary
+	keep_meta_info callbacks );
+
 package DBD::CSV;
 
 use strict;
@@ -23,7 +31,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.54";
+$VERSION     = "0.55";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -68,6 +76,20 @@ our $data_sources_attr = undef;
 
 sub connect {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
+    if ($attr && ref $attr eq "HASH") {
+	# Top-level aliasses
+	foreach my $key (grep { exists $attr->{$_} } @f_SHORT) {
+	    my $f_key = "f_$key";
+	    exists $attr->{$f_key} and next;
+	    $attr->{$f_key} = delete $attr->{$key};
+	    }
+	foreach my $key (grep { exists $attr->{$_} } @c_SHORT) {
+	    my $c_key = "csv_$key";
+	    exists $attr->{$c_key} and next;
+	    $attr->{$c_key} = delete $attr->{$key};
+	    }
+	}
+
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
     $dbh and $dbh->{Active} = 1;
     $dbh;
@@ -94,31 +116,7 @@ sub init_valid_attributes {
     my $dbh = shift;
 
     # Straight from Text::CSV_XS.pm
-    my @xs_attr = qw(
-	eol
-	sep_char
-	quote_char
-	escape_char
-	binary
-	decode_utf8
-	auto_diag
-	diag_verbose
-	blank_is_undef
-	empty_is_undef
-	allow_whitespace
-	allow_loose_quotes
-	allow_loose_escapes
-	allow_unquoted_escape
-	always_quote
-	quote_empty
-	quote_space
-	escape_null
-	quote_binary
-	keep_meta_info
-	verbatim
-	types
-	callbacks
-	);
+    my @xs_attr = @c_SHORT;
     @csv_xs_attr{@xs_attr} = ();
     # Dynamically add "new" attributes - available in Text::CSV_XS-1.20
     if (my @ka = eval { Text::CSV_XS->known_attributes }) {
@@ -207,8 +205,8 @@ my %compat_map;
 
 	my $x = 0;
 	if (!%compat_map) {
-	    $compat_map{$_} = "f_$_"   for qw( file ext dir lock lockfile );
-	    $compat_map{$_} = "csv_$_" for qw( class eof eol quote_char sep_char escape_char );
+	    $compat_map{$_} = "f_$_"   for @f_SHORT;
+	    $compat_map{$_} = "csv_$_" for @c_SHORT;
 	    $x++;
 	    }
 	if ($class and !$class_mapped{$class}++ and
