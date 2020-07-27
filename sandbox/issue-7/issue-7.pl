@@ -31,6 +31,7 @@ if ($opt_d) {
     unshift @INC => "/pro/3gl/CPAN/DBD-CSV/blib/lib";
     }
 
+my $tfn = "test.csv";
 foreach my $x (0, 1) {
     my ($fpfx, $cpfx) = $x ? ("f_", "csv_") : ("", "");
     my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
@@ -46,9 +47,10 @@ foreach my $x (0, 1) {
 	PrintError		=> 1,
 	}) or die "$DBI::errstr\n" || $DBI::errstr;
 
-    unlink "test.csv";
+    my $ffn = "files/$tfn";
+    unlink $ffn;
     $dbh->{csv_tables}{tst} = {
-	file			=> "test.csv",		# alias to f_file
+	file			=> $tfn,		# alias to f_file
 	col_names		=> [qw( c_tst s_tst )],
 	};
 
@@ -76,18 +78,18 @@ foreach my $x (0, 1) {
 	  [ 4, "Melon"		],
 	  ], "Sorted fruit");
 
-    open my $fh, ">", "test.csv";close $fh;
+    open my $fh, ">", $ffn;close $fh;
     # If empty should insert "c_tst";"s_tst"
     $dbh->do ("insert into tst values (42, 'Test')");			# "42";"Test"
     $dbh->do ("update tst set s_tst = 'Done' where c_tst = 42");	# "42";"Done"
 
     $dbh->disconnect;
 
-    open  $fh, "<", "test.csv" or die "test.csv: $!\n";
+    open  $fh, "<", $ffn or die "$ffn: $!\n";
     my @dta = <$fh>;
     close $fh;
-    is ($dta[-1], qq{"42";"Done"\n}, "Table tst written to test.csv");
-    unlink "test.csv";
+    is ($dta[-1], qq{"42";"Done"\n}, "Table tst written to $ffn");
+    unlink $ffn;
     }
 
 done_testing;
