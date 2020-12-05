@@ -1,5 +1,8 @@
-0.56	- 2020-09-18, H.Merijn Brand
+0.56	- 2020-12-05, H.Merijn Brand
     * Fix Changes (add missing 0.54)
+    * Bugtrackter => github issues
+    * f_dir should exist (CVE fix in DBI-1.644 / DBD::File-0.45)
+    * TODO tests better skipped if failing
 
 0.55	- 2020-07-27, H.Merijn Brand
     * It's 2019
