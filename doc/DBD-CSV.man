@@ -752,7 +752,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
        Zucker
 
 [1mCOPYRIGHT AND LICENSE[0m
-       Copyright (C) 2009-2020 by H.Merijn Brand Copyright (C) 2004-2009 by
+       Copyright (C) 2009-2021 by H.Merijn Brand Copyright (C) 2004-2009 by
        Jeff Zucker Copyright (C) 1998-2004 by Jochen Wiedmann
 
        All rights reserved.
@@ -763,4 +763,4 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
 
 
-perl v5.32.0                      2020-12-17                          STDIN(1)
+perl v5.32.0                      2021-01-01                          STDIN(1)

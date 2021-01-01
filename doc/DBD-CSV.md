@@ -853,7 +853,7 @@ Previous maintainer was Jeff Zucker
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2020 by H.Merijn Brand
+Copyright (C) 2009-2021 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 
