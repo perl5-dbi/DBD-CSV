@@ -15,8 +15,8 @@ require DynaLoader;
 require DBD::File;
 require IO::File;
 
-our @f_SHORT = qw( file dir dir_search ext lock lockfile schema encoding );
-our @c_SHORT = qw( class eof
+our @f_SHORT = qw( class file dir dir_search ext lock lockfile schema encoding );
+our @c_SHORT = qw( eof
 	eol sep_char quote_char escape_char binary decode_utf8 auto_diag
 	diag_verbose blank_is_undef empty_is_undef allow_whitespace
 	allow_loose_quotes allow_loose_escapes allow_unquoted_escape
@@ -942,6 +942,10 @@ to C<Text::CSV_XS>, but C<Text::CSV> can be used in some cases, too.
 Please be aware that C<Text::CSV> does not care about any edge case as
 C<Text::CSV_XS> does and that C<Text::CSV> is probably about 100 times
 slower than C<Text::CSV_XS>.
+
+In order to use the specified class other than C<Text::CSV_XS>, it needs
+to be loaded before use.  C<DBD::CSV> does not C<require>/C<use> the
+specified class itself.
 
 =back
 
