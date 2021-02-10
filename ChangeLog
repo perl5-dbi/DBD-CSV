@@ -1,4 +1,4 @@
-0.58	- 2021-02-09, H.Merijn Brand
+0.58	- 2021-02-10, H.Merijn Brand
     * It's 2021
     * "class" is not a CSV attribute to pass on (issue#8)
 
