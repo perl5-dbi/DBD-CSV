@@ -7,31 +7,9 @@ skip_dist 1
 allow_glob_in_perls 1
 required DBI,Text::CSV_XS,SQL::Statement
 perls /pro/bin/perl:/usr/bin/perl\
-:/media/Tux/perls/bin/perl5.8.9\
-:/media/Tux/perls/bin/perl5.10.1\
-:/media/Tux/perls/bin/perl5.12.5\
-:/media/Tux/perls/bin/perl5.14.4\
-:/media/Tux/perls/bin/perl5.16.3\
-:/media/Tux/perls/bin/perl5.18.4\
-:/media/Tux/perls/bin/perl5.20.3\
-:/media/Tux/perls/bin/perl5.22.4\
-:/media/Tux/perls/bin/perl5.24.4\
-:/media/Tux/perls/bin/perl5.26.3\
-:/media/Tux/perls/bin/perl5.28.3\
-:/media/Tux/perls/bin/perl5.30.3\
-:/media/Tux/perls/bin/perl5.32.1\
-:/media/Tux/perls/bin/perl5.33.6\
-:/media/Tux/perls/bin/tperl5.8.9\
-:/media/Tux/perls/bin/tperl5.10.1\
-:/media/Tux/perls/bin/tperl5.12.5\
-:/media/Tux/perls/bin/tperl5.14.4\
-:/media/Tux/perls/bin/tperl5.16.3\
-:/media/Tux/perls/bin/tperl5.18.4\
-:/media/Tux/perls/bin/tperl5.20.3\
-:/media/Tux/perls/bin/tperl5.22.4\
-:/media/Tux/perls/bin/tperl5.24.4\
-:/media/Tux/perls/bin/tperl5.26.3\
-:/media/Tux/perls/bin/tperl5.28.3\
-:/media/Tux/perls/bin/tperl5.30.3\
-:/media/Tux/perls/bin/tperl5.32.1\
-:/media/Tux/perls/bin/tperl5.33.6\
+:/media/Tux/perls/bin/perl5.8\
+:/media/Tux/perls/bin/perl5.[123][02468]\
+:/media/Tux/perls/bin/perl5.35\
+:/media/Tux/perls/bin/tperl5.8\
+:/media/Tux/perls/bin/perl5.[123][02468]\
+:/media/Tux/perls/bin/tperl5.35
