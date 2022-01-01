@@ -447,6 +447,10 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            any edge case as "Text::CSV_XS" does and that "Text::CSV" is
            probably about 100 times slower than "Text::CSV_XS".
 
+           In order to use the specified class other than "Text::CSV_XS", it
+           needs to be loaded before use.  "DBD::CSV" does not "require"/"use"
+           the specified class itself.
+
    [1mText::CSV_XS specific attributes[0m
        csv_eol
        csv_sep_char
@@ -752,7 +756,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
        Zucker
 
 [1mCOPYRIGHT AND LICENSE[0m
-       Copyright (C) 2009-2021 by H.Merijn Brand Copyright (C) 2004-2009 by
+       Copyright (C) 2009-2022 by H.Merijn Brand Copyright (C) 2004-2009 by
        Jeff Zucker Copyright (C) 1998-2004 by Jochen Wiedmann
 
        All rights reserved.
@@ -763,4 +767,4 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
 
 
-perl v5.32.0                      2021-01-01                          STDIN(1)
+perl v5.34.0                      2022-01-01                          STDIN(1)

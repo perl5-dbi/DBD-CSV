@@ -497,6 +497,10 @@ But see ["KNOWN BUGS" in DBD::File](https://metacpan.org/pod/DBD%3A%3AFile#KNOWN
     `Text::CSV_XS` does and that `Text::CSV` is probably about 100 times
     slower than `Text::CSV_XS`.
 
+    In order to use the specified class other than `Text::CSV_XS`, it needs
+    to be loaded before use.  `DBD::CSV` does not `require`/`use` the
+    specified class itself.
+
 ## Text::CSV\_XS specific attributes
 
 - csv\_eol
@@ -853,7 +857,7 @@ Previous maintainer was Jeff Zucker
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by H.Merijn Brand
+Copyright (C) 2009-2022 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 

@@ -56,30 +56,30 @@
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>    use DBI;
-    # See &quot;Creating database handle&quot; below
-    $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
-        f_ext      =&gt; &quot;.csv/r&quot;,
-        RaiseError =&gt; 1,
-        }) or die &quot;Cannot connect: $DBI::errstr&quot;;
+<pre><code>use DBI;
+# See &quot;Creating database handle&quot; below
+$dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
+    f_ext      =&gt; &quot;.csv/r&quot;,
+    RaiseError =&gt; 1,
+    }) or die &quot;Cannot connect: $DBI::errstr&quot;;
 
-    # Simple statements
-    $dbh-&gt;do (&quot;CREATE TABLE foo (id INTEGER, name CHAR (10))&quot;);
+# Simple statements
+$dbh-&gt;do (&quot;CREATE TABLE foo (id INTEGER, name CHAR (10))&quot;);
 
-    # Selecting
-    my $sth = $dbh-&gt;prepare (&quot;select * from foo&quot;);
-    $sth-&gt;execute;
-    $sth-&gt;bind_columns (\my ($id, $name));
-    while ($sth-&gt;fetch) {
-        print &quot;id: $id, name: $name\n&quot;;
-        }
+# Selecting
+my $sth = $dbh-&gt;prepare (&quot;select * from foo&quot;);
+$sth-&gt;execute;
+$sth-&gt;bind_columns (\my ($id, $name));
+while ($sth-&gt;fetch) {
+    print &quot;id: $id, name: $name\n&quot;;
+    }
 
-    # Updates
-    my $sth = $dbh-&gt;prepare (&quot;UPDATE foo SET name = ? WHERE id = ?&quot;);
-    $sth-&gt;execute (&quot;DBI rocks!&quot;, 1);
-    $sth-&gt;finish;
+# Updates
+my $sth = $dbh-&gt;prepare (&quot;UPDATE foo SET name = ? WHERE id = ?&quot;);
+$sth-&gt;execute (&quot;DBI rocks!&quot;, 1);
+$sth-&gt;finish;
 
-    $dbh-&gt;disconnect;</code></pre>
+$dbh-&gt;disconnect;</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -93,7 +93,7 @@
 
 <p>Unlike other DBI drivers, you don&#39;t need an external SQL engine or a running server. All you need are the following Perl modules, available from any CPAN mirror, for example</p>
 
-<pre><code>  http://search.cpan.org/</code></pre>
+<pre><code>http://search.cpan.org/</code></pre>
 
 <dl>
 
@@ -129,29 +129,29 @@
 
 <p>Installing this module (and the prerequisites from above) is quite simple. The simplest way is to install the bundle:</p>
 
-<pre><code>    $ cpan Bundle::DBD::CSV</code></pre>
+<pre><code>$ cpan Bundle::DBD::CSV</code></pre>
 
 <p>Alternatively, you can name them all</p>
 
-<pre><code>    $ cpan Text::CSV_XS DBI DBD::CSV</code></pre>
+<pre><code>$ cpan Text::CSV_XS DBI DBD::CSV</code></pre>
 
 <p>or even trust <code>cpan</code> to resolve all dependencies for you:</p>
 
-<pre><code>    $ cpan DBD::CSV</code></pre>
+<pre><code>$ cpan DBD::CSV</code></pre>
 
 <p>If you cannot, for whatever reason, use cpan, fetch all modules from CPAN, and build with a sequence like:</p>
 
-<pre><code>    gzip -d &lt; DBD-CSV-0.40.tgz | tar xf -</code></pre>
+<pre><code>gzip -d &lt; DBD-CSV-0.40.tgz | tar xf -</code></pre>
 
 <p>(this is for Unix users, Windows users would prefer WinZip or something similar) and then enter the following:</p>
 
-<pre><code>    cd DBD-CSV-0.40
-    perl Makefile.PL
-    make test</code></pre>
+<pre><code>cd DBD-CSV-0.40
+perl Makefile.PL
+make test</code></pre>
 
 <p>If any tests fail, let us know. Otherwise go on with</p>
 
-<pre><code>    make install UNINST=1</code></pre>
+<pre><code>make install UNINST=1</code></pre>
 
 <p>Note that you almost definitely need root or administrator permissions. If you don&#39;t have them, read the ExtUtils::MakeMaker man page for details on installing in your own directories. <a>ExtUtils::MakeMaker</a>.</p>
 
@@ -169,63 +169,63 @@
 
 <p>Creating a database handle usually implies connecting to a database server. Thus this command reads</p>
 
-<pre><code>    use DBI;
-    my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, {
-        f_dir =&gt; &quot;/home/user/folder&quot;,
-        });</code></pre>
+<pre><code>use DBI;
+my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, {
+    f_dir =&gt; &quot;/home/user/folder&quot;,
+    });</code></pre>
 
 <p>The directory tells the driver where it should create or open tables (a.k.a. files). It defaults to the current directory, so the following are equivalent:</p>
 
-<pre><code>    $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;);
-    $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, { f_dir =&gt; &quot;.&quot; });
-    $dbh = DBI-&gt;connect (&quot;dbi:CSV:f_dir=.&quot;);</code></pre>
+<pre><code>$dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;);
+$dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, { f_dir =&gt; &quot;.&quot; });
+$dbh = DBI-&gt;connect (&quot;dbi:CSV:f_dir=.&quot;);</code></pre>
 
 <p>We were told, that VMS might - for whatever reason - require:</p>
 
-<pre><code>    $dbh = DBI-&gt;connect (&quot;dbi:CSV:f_dir=&quot;);</code></pre>
+<pre><code>$dbh = DBI-&gt;connect (&quot;dbi:CSV:f_dir=&quot;);</code></pre>
 
 <p>The preferred way of passing the arguments is by driver attributes:</p>
 
-<pre><code>    # specify most possible flags via driver flags
-    $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
-        f_schema         =&gt; undef,
-        f_dir            =&gt; &quot;data&quot;,
-        f_dir_search     =&gt; [],
-        f_ext            =&gt; &quot;.csv/r&quot;,
-        f_lock           =&gt; 2,
-        f_encoding       =&gt; &quot;utf8&quot;,
+<pre><code># specify most possible flags via driver flags
+$dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
+    f_schema         =&gt; undef,
+    f_dir            =&gt; &quot;data&quot;,
+    f_dir_search     =&gt; [],
+    f_ext            =&gt; &quot;.csv/r&quot;,
+    f_lock           =&gt; 2,
+    f_encoding       =&gt; &quot;utf8&quot;,
 
-        csv_eol          =&gt; &quot;\r\n&quot;,
-        csv_sep_char     =&gt; &quot;,&quot;,
-        csv_quote_char   =&gt; &#39;&quot;&#39;,
-        csv_escape_char  =&gt; &#39;&quot;&#39;,
-        csv_class        =&gt; &quot;Text::CSV_XS&quot;,
-        csv_null         =&gt; 1,
-        csv_bom          =&gt; 0,
-        csv_tables       =&gt; {
-            syspwd =&gt; {
-                sep_char    =&gt; &quot;:&quot;,
-                quote_char  =&gt; undef,
-                escape_char =&gt; undef,
-                file        =&gt; &quot;/etc/passwd&quot;,
-                col_names   =&gt; [qw( login password
-                                    uid gid realname
-                                    directory shell )],
-                },
+    csv_eol          =&gt; &quot;\r\n&quot;,
+    csv_sep_char     =&gt; &quot;,&quot;,
+    csv_quote_char   =&gt; &#39;&quot;&#39;,
+    csv_escape_char  =&gt; &#39;&quot;&#39;,
+    csv_class        =&gt; &quot;Text::CSV_XS&quot;,
+    csv_null         =&gt; 1,
+    csv_bom          =&gt; 0,
+    csv_tables       =&gt; {
+        syspwd =&gt; {
+            sep_char    =&gt; &quot;:&quot;,
+            quote_char  =&gt; undef,
+            escape_char =&gt; undef,
+            file        =&gt; &quot;/etc/passwd&quot;,
+            col_names   =&gt; [qw( login password
+                                uid gid realname
+                                directory shell )],
             },
+        },
 
-        RaiseError       =&gt; 1,
-        PrintError       =&gt; 1,
-        FetchHashKeyName =&gt; &quot;NAME_lc&quot;,
-        }) or die $DBI::errstr;</code></pre>
+    RaiseError       =&gt; 1,
+    PrintError       =&gt; 1,
+    FetchHashKeyName =&gt; &quot;NAME_lc&quot;,
+    }) or die $DBI::errstr;</code></pre>
 
 <p>but you may set these attributes in the DSN as well, separated by semicolons. Pay attention to the semi-colon for <code>csv_sep_char</code> (as seen in many CSV exports from MS Excel) is being escaped in below example, as is would otherwise be seen as attribute separator:</p>
 
-<pre><code>    $dbh = DBI-&gt;connect (
-        &quot;dbi:CSV:f_dir=$ENV{HOME}/csvdb;f_ext=.csv;f_lock=2;&quot; .
-        &quot;f_encoding=utf8;csv_eol=\n;csv_sep_char=\\;;&quot; .
-        &quot;csv_quote_char=\&quot;;csv_escape_char=\\;csv_class=Text::CSV_XS;&quot; .
-        &quot;csv_null=1&quot;) or die $DBI::errstr;</code></pre>
+<pre><code>$dbh = DBI-&gt;connect (
+    &quot;dbi:CSV:f_dir=$ENV{HOME}/csvdb;f_ext=.csv;f_lock=2;&quot; .
+    &quot;f_encoding=utf8;csv_eol=\n;csv_sep_char=\\;;&quot; .
+    &quot;csv_quote_char=\&quot;;csv_escape_char=\\;csv_class=Text::CSV_XS;&quot; .
+    &quot;csv_null=1&quot;) or die $DBI::errstr;</code></pre>
 
 <p>Using attributes in the DSN is easier to use when the DSN is derived from an outside source (environment variable, database entry, or configure file), whereas specifying entries in the attribute hash is easier to read and to maintain.</p>
 
@@ -237,8 +237,8 @@
 
 <p>You can create and drop tables with commands like the following:</p>
 
-<pre><code>    $dbh-&gt;do (&quot;CREATE TABLE $table (id INTEGER, name CHAR (64))&quot;);
-    $dbh-&gt;do (&quot;DROP TABLE $table&quot;);</code></pre>
+<pre><code>$dbh-&gt;do (&quot;CREATE TABLE $table (id INTEGER, name CHAR (64))&quot;);
+$dbh-&gt;do (&quot;DROP TABLE $table&quot;);</code></pre>
 
 <p>Note that currently only the column names will be stored and no other data. Thus all other information including column type (INTEGER or CHAR (x), for example), column attributes (NOT NULL, PRIMARY KEY, ...) will silently be discarded. This may change in a later release.</p>
 
@@ -252,15 +252,15 @@
 
 <p>The following examples insert some data in a table and fetch it back: First, an example where the column data is concatenated in the SQL string:</p>
 
-<pre><code>    $dbh-&gt;do (&quot;INSERT INTO $table VALUES (1, &quot;.
-               $dbh-&gt;quote (&quot;foobar&quot;) . &quot;)&quot;);</code></pre>
+<pre><code>$dbh-&gt;do (&quot;INSERT INTO $table VALUES (1, &quot;.
+           $dbh-&gt;quote (&quot;foobar&quot;) . &quot;)&quot;);</code></pre>
 
 <p>Note the use of the quote method for escaping the word &quot;foobar&quot;. Any string must be escaped, even if it does not contain binary data.</p>
 
 <p>Next, an example using parameters:</p>
 
-<pre><code>    $dbh-&gt;do (&quot;INSERT INTO $table VALUES (?, ?)&quot;, undef, 2,
-              &quot;It&#39;s a string!&quot;);</code></pre>
+<pre><code>$dbh-&gt;do (&quot;INSERT INTO $table VALUES (?, ?)&quot;, undef, 2,
+          &quot;It&#39;s a string!&quot;);</code></pre>
 
 <p>Note that you don&#39;t need to quote column data passed as parameters. This version is particularly well designed for loops. Whenever performance is an issue, I recommend using this method.</p>
 
@@ -268,81 +268,81 @@
 
 <p>To retrieve data, you can use the following:</p>
 
-<pre><code>    my $query = &quot;SELECT * FROM $table WHERE id &gt; 1 ORDER BY id&quot;;
-    my $sth   = $dbh-&gt;prepare ($query);
-    $sth-&gt;execute ();
-    while (my $row = $sth-&gt;fetchrow_hashref) {
-        print &quot;Found result row: id = &quot;, $row-&gt;{id},
-              &quot;, name = &quot;, $row-&gt;{name};
-        }
-    $sth-&gt;finish ();</code></pre>
+<pre><code>my $query = &quot;SELECT * FROM $table WHERE id &gt; 1 ORDER BY id&quot;;
+my $sth   = $dbh-&gt;prepare ($query);
+$sth-&gt;execute ();
+while (my $row = $sth-&gt;fetchrow_hashref) {
+    print &quot;Found result row: id = &quot;, $row-&gt;{id},
+          &quot;, name = &quot;, $row-&gt;{name};
+    }
+$sth-&gt;finish ();</code></pre>
 
 <p>Again, column binding works: The same example again.</p>
 
-<pre><code>    my $sth = $dbh-&gt;prepare (qq;
-        SELECT * FROM $table WHERE id &gt; 1 ORDER BY id;
-        ;);
-    $sth-&gt;execute;
-    my ($id, $name);
-    $sth-&gt;bind_columns (undef, \$id, \$name);
-    while ($sth-&gt;fetch) {
-        print &quot;Found result row: id = $id, name = $name\n&quot;;
-        }
-    $sth-&gt;finish;</code></pre>
+<pre><code>my $sth = $dbh-&gt;prepare (qq;
+    SELECT * FROM $table WHERE id &gt; 1 ORDER BY id;
+    ;);
+$sth-&gt;execute;
+my ($id, $name);
+$sth-&gt;bind_columns (undef, \$id, \$name);
+while ($sth-&gt;fetch) {
+    print &quot;Found result row: id = $id, name = $name\n&quot;;
+    }
+$sth-&gt;finish;</code></pre>
 
 <p>Of course you can even use input parameters. Here&#39;s the same example for the third time:</p>
 
-<pre><code>    my $sth = $dbh-&gt;prepare (&quot;SELECT * FROM $table WHERE id = ?&quot;);
-    $sth-&gt;bind_columns (undef, \$id, \$name);
-    for (my $i = 1; $i &lt;= 2; $i++) {
-        $sth-&gt;execute ($id);
-        if ($sth-&gt;fetch) {
-            print &quot;Found result row: id = $id, name = $name\n&quot;;
-            }
-        $sth-&gt;finish;
-        }</code></pre>
+<pre><code>my $sth = $dbh-&gt;prepare (&quot;SELECT * FROM $table WHERE id = ?&quot;);
+$sth-&gt;bind_columns (undef, \$id, \$name);
+for (my $i = 1; $i &lt;= 2; $i++) {
+    $sth-&gt;execute ($id);
+    if ($sth-&gt;fetch) {
+        print &quot;Found result row: id = $id, name = $name\n&quot;;
+        }
+    $sth-&gt;finish;
+    }</code></pre>
 
 <p>See <a>DBI</a> for details on these methods. See <a>SQL::Statement</a> for details on the WHERE clause.</p>
 
 <p>Data rows are modified with the UPDATE statement:</p>
 
-<pre><code>    $dbh-&gt;do (&quot;UPDATE $table SET id = 3 WHERE id = 1&quot;);</code></pre>
+<pre><code>$dbh-&gt;do (&quot;UPDATE $table SET id = 3 WHERE id = 1&quot;);</code></pre>
 
 <p>Likewise you use the DELETE statement for removing rows:</p>
 
-<pre><code>    $dbh-&gt;do (&quot;DELETE FROM $table WHERE id &gt; 1&quot;);</code></pre>
+<pre><code>$dbh-&gt;do (&quot;DELETE FROM $table WHERE id &gt; 1&quot;);</code></pre>
 
 <h2 id="Error-handling">Error handling</h2>
 
 <p>In the above examples we have never cared about return codes. Of course, this is not recommended. Instead we should have written (for example):</p>
 
-<pre><code>    my $sth = $dbh-&gt;prepare (&quot;SELECT * FROM $table WHERE id = ?&quot;) or
-        die &quot;prepare: &quot; . $dbh-&gt;errstr ();
-    $sth-&gt;bind_columns (undef, \$id, \$name) or
-        die &quot;bind_columns: &quot; . $dbh-&gt;errstr ();
-    for (my $i = 1; $i &lt;= 2; $i++) {
-        $sth-&gt;execute ($id) or
-            die &quot;execute: &quot; . $dbh-&gt;errstr ();
-        $sth-&gt;fetch and
-            print &quot;Found result row: id = $id, name = $name\n&quot;;
-        }
-    $sth-&gt;finish ($id) or die &quot;finish: &quot; . $dbh-&gt;errstr ();</code></pre>
+<pre><code>my $sth = $dbh-&gt;prepare (&quot;SELECT * FROM $table WHERE id = ?&quot;) or
+    die &quot;prepare: &quot; . $dbh-&gt;errstr ();
+$sth-&gt;bind_columns (undef, \$id, \$name) or
+    die &quot;bind_columns: &quot; . $dbh-&gt;errstr ();
+for (my $i = 1; $i &lt;= 2; $i++) {
+    $sth-&gt;execute ($id) or
+        die &quot;execute: &quot; . $dbh-&gt;errstr ();
+    $sth-&gt;fetch and
+        print &quot;Found result row: id = $id, name = $name\n&quot;;
+    }
+$sth-&gt;finish ($id) or die &quot;finish: &quot; . $dbh-&gt;errstr ();</code></pre>
 
 <p>Obviously this is tedious. Fortunately we have DBI&#39;s <i>RaiseError</i> attribute:</p>
 
-<pre><code>    $dbh-&gt;{RaiseError} = 1;
-    $@ = &quot;&quot;;
-    eval {
-        my $sth = $dbh-&gt;prepare (&quot;SELECT * FROM $table WHERE id = ?&quot;);
-        $sth-&gt;bind_columns (undef, \$id, \$name);
-        for (my $i = 1; $i &lt;= 2; $i++) {
-            $sth-&gt;execute ($id);
-            $sth-&gt;fetch and
-                print &quot;Found result row: id = $id, name = $name\n&quot;;
-            }
-        $sth-&gt;finish ($id);
-        };
-    $@ and die &quot;SQL database error: $@&quot;;</code></pre>
+<pre><code>$dbh-&gt;{RaiseError} = 1;
+$@ = &quot;&quot;;
+eval {
+    my $sth = $dbh-&gt;prepare (&quot;SELECT * FROM $table WHERE id = ?&quot;);
+    $sth-&gt;bind_columns (undef, \$id, \$name);
+    for (my $i = 1; $i &lt;= 2; $i++) {
+        $sth-&gt;execute ($id);
+        $sth-&gt;fetch and
+            print &quot;Found result row: id = $id, name = $name\n&quot;;
+        }
+    $sth-&gt;finish ($id);
+    };
+$@ and die &quot;SQL database error: $@&quot;;</code></pre>
 
 <p>This is not only shorter, it even works when using DBI methods within subroutines.</p>
 
@@ -352,15 +352,15 @@
 
 <p>The following attributes are handled by DBI itself and not by DBD::File, thus they all work as expected:</p>
 
-<pre><code>    Active
-    ActiveKids
-    CachedKids
-    CompatMode             (Not used)
-    InactiveDestroy
-    Kids
-    PrintError
-    RaiseError
-    Warn                   (Not used)</code></pre>
+<pre><code>Active
+ActiveKids
+CachedKids
+CompatMode             (Not used)
+InactiveDestroy
+Kids
+PrintError
+RaiseError
+Warn                   (Not used)</code></pre>
 
 <p>The following DBI attributes are handled by DBD::File:</p>
 
@@ -414,10 +414,10 @@
 
 <p>These attributes and methods are not supported:</p>
 
-<pre><code>    bind_param_inout
-    CursorName
-    LongReadLen
-    LongTruncOk</code></pre>
+<pre><code>bind_param_inout
+CursorName
+LongReadLen
+LongTruncOk</code></pre>
 
 <h1 id="DBD-CSV-specific-database-handle-attributes">DBD-CSV specific database handle attributes</h1>
 
@@ -438,11 +438,11 @@
 
 <p>This attribute optionally defines a list of extra directories to search when opening existing tables. It should be an anonymous list or an array reference listing all folders where tables could be found.</p>
 
-<pre><code>    my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, {
-        f_dir        =&gt; &quot;data&quot;,
-        f_dir_search =&gt; [ &quot;ref/data&quot;, &quot;ref/old&quot; ],
-        f_ext        =&gt; &quot;.csv/r&quot;,
-        }) or die $DBI::errstr;</code></pre>
+<pre><code>my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, {
+    f_dir        =&gt; &quot;data&quot;,
+    f_dir_search =&gt; [ &quot;ref/data&quot;, &quot;ref/old&quot; ],
+    f_ext        =&gt; &quot;.csv/r&quot;,
+    }) or die $DBI::errstr;</code></pre>
 
 </dd>
 <dt id="f_ext">f_ext </dt>
@@ -456,11 +456,11 @@
 
 <p>This attribute allows you to set the database schema name. The default is to use the owner of <code>f_dir</code>. <code>undef</code> is allowed, but not in the DSN part.</p>
 
-<pre><code>    my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, {
-        f_schema =&gt; undef,
-        f_dir    =&gt; &quot;data&quot;,
-        f_ext    =&gt; &quot;.csv/r&quot;,
-        }) or die $DBI::errstr;</code></pre>
+<pre><code>my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, {
+    f_schema =&gt; undef,
+    f_dir    =&gt; &quot;data&quot;,
+    f_ext    =&gt; &quot;.csv/r&quot;,
+    }) or die $DBI::errstr;</code></pre>
 
 </dd>
 <dt id="f_encoding">f_encoding </dt>
@@ -510,6 +510,8 @@
 
 <p>The attribute <i>csv_class</i> controls the CSV parsing engine. This defaults to <code>Text::CSV_XS</code>, but <code>Text::CSV</code> can be used in some cases, too. Please be aware that <code>Text::CSV</code> does not care about any edge case as <code>Text::CSV_XS</code> does and that <code>Text::CSV</code> is probably about 100 times slower than <code>Text::CSV_XS</code>.</p>
 
+<p>In order to use the specified class other than <code>Text::CSV_XS</code>, it needs to be loaded before use. <code>DBD::CSV</code> does not <code>require</code>/<code>use</code> the specified class itself.</p>
+
 </dd>
 </dl>
 
@@ -540,24 +542,24 @@
 
 <p>The <i>csv_eol</i> attribute defines the end-of-line pattern, which is better known as a record separator pattern since it separates records. The default is windows-style end-of-lines <code>\015\012</code> for output (writing) and unset for input (reading), so if on unix you may want to set this to newline (<code>\n</code>) like this:</p>
 
-<pre><code>  $dbh-&gt;{csv_eol} = &quot;\n&quot;;</code></pre>
+<pre><code>$dbh-&gt;{csv_eol} = &quot;\n&quot;;</code></pre>
 
 <p>It is also possible to use multi-character patterns as record separators. For example this file uses newlines as field separators (sep_char) and the pattern &quot;\n__ENDREC__\n&quot; as the record separators (eol):</p>
 
-<pre><code>  name
-  city
-  __ENDREC__
-  joe
-  seattle
-  __ENDREC__
-  sue
-  portland
-  __ENDREC__</code></pre>
+<pre><code>name
+city
+__ENDREC__
+joe
+seattle
+__ENDREC__
+sue
+portland
+__ENDREC__</code></pre>
 
 <p>To handle this file, you&#39;d do this:</p>
 
-<pre><code>  $dbh-&gt;{eol}      = &quot;\n__ENDREC__\n&quot; ,
-  $dbh-&gt;{sep_char} = &quot;\n&quot;</code></pre>
+<pre><code>$dbh-&gt;{eol}      = &quot;\n__ENDREC__\n&quot; ,
+$dbh-&gt;{sep_char} = &quot;\n&quot;</code></pre>
 
 <p>The attributes are used to create an instance of the class <i>csv_class</i>, by default Text::CSV_XS. Alternatively you may pass an instance as <i>csv_csv</i>, the latter takes precedence. Note that the <i>binary</i> attribute <i>must</i> be set to a true value in that case.</p>
 
@@ -569,9 +571,9 @@
 
 <p>With this option set, all new statement handles will set <code>always_quote</code> and <code>blank_is_undef</code> in the CSV parser and writer, so it knows how to distinguish between the empty string and <code>undef</code> or <code>NULL</code>. You cannot reset it with a false value. You can pass it to connect, or set it later:</p>
 
-<pre><code>  $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, { csv_null =&gt; 1 });
+<pre><code>$dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, { csv_null =&gt; 1 });
 
-  $dbh-&gt;{csv_null} = 1;</code></pre>
+$dbh-&gt;{csv_null} = 1;</code></pre>
 
 </dd>
 <dt id="csv_bom">csv_bom </dt>
@@ -579,9 +581,9 @@
 
 <p>With this option set, the CSV parser will try to detect BOM (Byte Order Mark) in the header line. This requires <a>Text::CSV_XS</a> version 1.22 or higher.</p>
 
-<pre><code>  $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, { csv_bom =&gt; 1 });
+<pre><code>$dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, &quot;&quot;, &quot;&quot;, { csv_bom =&gt; 1 });
 
-  $dbh-&gt;{csv_bom} = 1;</code></pre>
+$dbh-&gt;{csv_bom} = 1;</code></pre>
 
 </dd>
 <dt id="csv_tables">csv_tables </dt>
@@ -607,17 +609,17 @@
 
 <p>If you pass it <code>f_file</code> or its alias <code>file</code>, <code>f_ext</code> has no effect, but <code>f_dir</code> and <code>f_encoding</code> still have.</p>
 
-<pre><code>  csv_tables =&gt; {
-      syspwd =&gt; {                   # Table name
-          csv_sep_char =&gt; &quot;:&quot;,      # Text::CSV_XS
-          quote_char   =&gt; undef,    # Text::CSV_XS
-          escape_char  =&gt; undef,    # Text::CSV_XS
-          f_dir        =&gt; &quot;/etc&quot;,   # DBD::File
-          f_file       =&gt; &quot;passwd&quot;, # DBD::File
-          col_names    =&gt;           # DBD::File
-            [qw( login password uid gid realname directory shell )],
-          },
-      },</code></pre>
+<pre><code>csv_tables =&gt; {
+    syspwd =&gt; {                   # Table name
+        csv_sep_char =&gt; &quot;:&quot;,      # Text::CSV_XS
+        quote_char   =&gt; undef,    # Text::CSV_XS
+        escape_char  =&gt; undef,    # Text::CSV_XS
+        f_dir        =&gt; &quot;/etc&quot;,   # DBD::File
+        f_file       =&gt; &quot;passwd&quot;, # DBD::File
+        col_names    =&gt;           # DBD::File
+          [qw( login password uid gid realname directory shell )],
+        },
+    },</code></pre>
 
 </dd>
 <dt id="csv_">csv_* </dt>
@@ -625,9 +627,9 @@
 
 <p>All other attributes that start with <code>csv_</code> and are not described above will be passed to <code>Text::CSV_XS</code> (without the <code>csv_</code> prefix). These extra options are only likely to be useful for reading (select) handles. Examples:</p>
 
-<pre><code>  $dbh-&gt;{csv_allow_whitespace}    = 1;
-  $dbh-&gt;{csv_allow_loose_quotes}  = 1;
-  $dbh-&gt;{csv_allow_loose_escapes} = 1;</code></pre>
+<pre><code>$dbh-&gt;{csv_allow_whitespace}    = 1;
+$dbh-&gt;{csv_allow_loose_quotes}  = 1;
+$dbh-&gt;{csv_allow_loose_escapes} = 1;</code></pre>
 
 <p>See the <code>Text::CSV_XS</code> documentation for the full list and the documentation.</p>
 
@@ -643,7 +645,7 @@
 
 <p>The name of the file used for the table; defaults to</p>
 
-<pre><code>    &quot;$dbh-&gt;{f_dir}/$table&quot;</code></pre>
+<pre><code>&quot;$dbh-&gt;{f_dir}/$table&quot;</code></pre>
 
 </dd>
 <dt id="eol">eol </dt>
@@ -687,8 +689,8 @@
 
 <p>If <code>test.csv</code> looks like</p>
 
-<pre><code> select,from
- 1,2</code></pre>
+<pre><code>select,from
+1,2</code></pre>
 
 <p>the select query would result in <code>select select, from from test;</code>, which obviously is illegal SQL.</p>
 
@@ -700,20 +702,20 @@
 
 <p>Currently, the sanitizing of headers is as simple as</p>
 
-<pre><code>  s/\W/_/g;</code></pre>
+<pre><code>s/\W/_/g;</code></pre>
 
 <p>Note that headers (column names) might be folded in other parts of the code stack, specifically SQL::Statement, whose docs mention:</p>
 
-<pre><code> Wildcards are expanded to lower cased identifiers. This might
- confuse some people, but it was easier to implement.</code></pre>
+<pre><code>Wildcards are expanded to lower cased identifiers. This might
+confuse some people, but it was easier to implement.</code></pre>
 
 <p>That means that in</p>
 
-<pre><code> my $sth = $dbh-&gt;prepare (&quot;select * from foo&quot;);
- $sth-&gt;execute;
- while (my $row = $sth-&gt;fetchrow_hashref) {
-     say for keys %$row;
-     }</code></pre>
+<pre><code>my $sth = $dbh-&gt;prepare (&quot;select * from foo&quot;);
+$sth-&gt;execute;
+while (my $row = $sth-&gt;fetchrow_hashref) {
+    say for keys %$row;
+    }</code></pre>
 
 <p>all keys will show as all lower case, regardless of the original header.</p>
 
@@ -724,33 +726,33 @@
 
 <p>Example: Suppose you want to use <i>/etc/passwd</i> as a CSV file. :-) There simplest way is:</p>
 
-<pre><code>    use DBI;
-    my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
-        f_dir           =&gt; &quot;/etc&quot;,
-        csv_sep_char    =&gt; &quot;:&quot;,
-        csv_quote_char  =&gt; undef,
-        csv_escape_char =&gt; undef,
-        });
-    $dbh-&gt;{csv_tables}{passwd} = {
-        col_names =&gt; [qw( login password uid gid realname
-                          directory shell )];
-        };
-    $sth = $dbh-&gt;prepare (&quot;SELECT * FROM passwd&quot;);</code></pre>
+<pre><code>use DBI;
+my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
+    f_dir           =&gt; &quot;/etc&quot;,
+    csv_sep_char    =&gt; &quot;:&quot;,
+    csv_quote_char  =&gt; undef,
+    csv_escape_char =&gt; undef,
+    });
+$dbh-&gt;{csv_tables}{passwd} = {
+    col_names =&gt; [qw( login password uid gid realname
+                      directory shell )];
+    };
+$sth = $dbh-&gt;prepare (&quot;SELECT * FROM passwd&quot;);</code></pre>
 
 <p>Another possibility where you leave all the defaults as they are and override them on a per table basis:</p>
 
-<pre><code>    require DBI;
-    my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;);
-    $dbh-&gt;{csv_tables}{passwd} = {
-        eol         =&gt; &quot;\n&quot;,
-        sep_char    =&gt; &quot;:&quot;,
-        quote_char  =&gt; undef,
-        escape_char =&gt; undef,
-        f_file      =&gt; &quot;/etc/passwd&quot;,
-        col_names   =&gt; [qw( login password uid gid
-                            realname directory shell )],
-        };
-    $sth = $dbh-&gt;prepare (&quot;SELECT * FROM passwd&quot;);</code></pre>
+<pre><code>require DBI;
+my $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;);
+$dbh-&gt;{csv_tables}{passwd} = {
+    eol         =&gt; &quot;\n&quot;,
+    sep_char    =&gt; &quot;:&quot;,
+    quote_char  =&gt; undef,
+    escape_char =&gt; undef,
+    f_file      =&gt; &quot;/etc/passwd&quot;,
+    col_names   =&gt; [qw( login password uid gid
+                        realname directory shell )],
+    };
+$sth = $dbh-&gt;prepare (&quot;SELECT * FROM passwd&quot;);</code></pre>
 
 <h2 id="Driver-private-methods">Driver private methods</h2>
 
@@ -765,8 +767,8 @@
 
 <p>If you want to read the sub-directories of another directory, use</p>
 
-<pre><code>    my $drh  = DBI-&gt;install_driver (&quot;CSV&quot;);
-    my @list = $drh-&gt;data_sources (f_dir =&gt; &quot;/usr/local/csv_data&quot;);</code></pre>
+<pre><code>my $drh  = DBI-&gt;install_driver (&quot;CSV&quot;);
+my @list = $drh-&gt;data_sources (f_dir =&gt; &quot;/usr/local/csv_data&quot;);</code></pre>
 
 </dd>
 <dt id="list_tables">list_tables </dt>
@@ -774,8 +776,8 @@
 
 <p>This method returns a list of file-names inside $dbh-&gt;{directory}. Example:</p>
 
-<pre><code>    my $dbh  = DBI-&gt;connect (&quot;dbi:CSV:directory=/usr/local/csv_data&quot;);
-    my @list = $dbh-&gt;func (&quot;list_tables&quot;);</code></pre>
+<pre><code>my $dbh  = DBI-&gt;connect (&quot;dbi:CSV:directory=/usr/local/csv_data&quot;);
+my @list = $dbh-&gt;func (&quot;list_tables&quot;);</code></pre>
 
 <p>Note that the list includes all files contained in the directory, even those that have non-valid table names, from the view of SQL. See <a href="#Creating-and-dropping-tables">&quot;Creating and dropping tables&quot;</a> above.</p>
 
@@ -800,14 +802,14 @@
 
 <p>Aim for a full 100% code coverage</p>
 
-<pre><code> - eol      Make tests for different record separators.
- - csv_xs   Test with a variety of combinations for
-            sep_char, quote_char, and escape_char testing
- - quoting  $dbh-&gt;do (&quot;drop table $_&quot;) for DBI-tables ();
- - errors   Make sure that all documented exceptions are tested.
-            . write to write-protected file
-            . read from badly formatted csv
-            . pass bad arguments to csv parser while fetching</code></pre>
+<pre><code>- eol      Make tests for different record separators.
+- csv_xs   Test with a variety of combinations for
+           sep_char, quote_char, and escape_char testing
+- quoting  $dbh-&gt;do (&quot;drop table $_&quot;) for DBI-tables ();
+- errors   Make sure that all documented exceptions are tested.
+           . write to write-protected file
+           . read from badly formatted csv
+           . pass bad arguments to csv parser while fetching</code></pre>
 
 <p>Add tests that specifically test DBD::File functionality where that is useful.</p>
 
@@ -856,27 +858,27 @@
 
 <p>For help on the use of DBD::CSV, see the DBI users mailing list:</p>
 
-<pre><code>  http://lists.cpan.org/showlist.cgi?name=dbi-users</code></pre>
+<pre><code>http://lists.cpan.org/showlist.cgi?name=dbi-users</code></pre>
 
 <p>For general information on DBI see</p>
 
-<pre><code>  http://dbi.perl.org/ and http://faq.dbi-support.com/</code></pre>
+<pre><code>http://dbi.perl.org/ and http://faq.dbi-support.com/</code></pre>
 
 <h1 id="AUTHORS-and-MAINTAINERS">AUTHORS and MAINTAINERS</h1>
 
 <p>This module is currently maintained by</p>
 
-<pre><code>    H.Merijn Brand &lt;h.m.brand@xs4all.nl&gt;</code></pre>
+<pre><code>H.Merijn Brand &lt;h.m.brand@xs4all.nl&gt;</code></pre>
 
 <p>in close cooperation with and help from</p>
 
-<pre><code>    Jens Rehsack &lt;sno@NetBSD.org&gt;</code></pre>
+<pre><code>Jens Rehsack &lt;sno@NetBSD.org&gt;</code></pre>
 
 <p>The original author is Jochen Wiedmann. Previous maintainer was Jeff Zucker</p>
 
 <h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
 
-<p>Copyright (C) 2009-2021 by H.Merijn Brand Copyright (C) 2004-2009 by Jeff Zucker Copyright (C) 1998-2004 by Jochen Wiedmann</p>
+<p>Copyright (C) 2009-2022 by H.Merijn Brand Copyright (C) 2004-2009 by Jeff Zucker Copyright (C) 1998-2004 by Jochen Wiedmann</p>
 
 <p>All rights reserved.</p>
 
