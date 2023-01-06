@@ -9,7 +9,7 @@
 #   Statements that don't return rows of data, like DELETE and CREATE 
 #   set NUM_OF_FIELDS to 0 (though it may be undef in some drivers).
 
-use 5.18.2;
+use 5.018002;
 use DBI;
 
 use Data::Peek;

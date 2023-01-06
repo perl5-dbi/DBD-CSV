@@ -1,6 +1,6 @@
 #!/pro/bin/perl
 
-use 5.18.2;
+use 5.018002;
 use warnings;
 
 our $VERSION = "0.02 - 20200727";

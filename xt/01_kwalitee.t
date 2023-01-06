@@ -18,7 +18,7 @@ kwalitee_ok (qw(
 
     -use_strict
     ));
-# use_strict is still broken, as it does not include "use 5.16.2;" as
+# use_strict is still broken, as it does not include "use 5.016002;" as
 # equivalent to use strict
 
 my @experimental = qw(
