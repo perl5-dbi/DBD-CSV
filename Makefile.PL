@@ -51,8 +51,6 @@ MSG
     sleep 5;
     }
 
-use vars qw( $DBI_INC_DIR );
-
 {   my $tmp_dir = File::Spec->tmpdir ();
     if (!$ENV{AUTOMATED_TESTING} &&
          prompt ("Enable the use of $tmp_dir for tests?", "y") =~ m/[Yy]/) {
