@@ -27,17 +27,15 @@ package DBD::CSV;
 
 use strict;
 
-use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
+our @ISA         = qw( DBD::File );
 
-@ISA =   qw( DBD::File );
+our $VERSION     = "0.61";
+our $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
-$VERSION     = "0.60";
-$ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
-
-$err      = 0;		# holds error code   for DBI::err
-$errstr   = "";		# holds error string for DBI::errstr
-$sqlstate = "";         # holds error state  for DBI::state
-$drh      = undef;	# holds driver handle once initialized
+our $err      = 0;	# holds error code   for DBI::err
+our $errstr   = "";	# holds error string for DBI::errstr
+our $sqlstate = "";	# holds error state  for DBI::state
+our $drh      = undef;	# holds driver handle once initialized
 
 sub CLONE {		# empty method: prevent warnings when threads are cloned
     } # CLONE
@@ -49,9 +47,8 @@ package DBD::CSV::dr;
 use strict;
 
 use Text::CSV_XS ();
-use vars qw( @ISA @CSV_TYPES );
 
-@CSV_TYPES = (
+our @CSV_TYPES = (
     Text::CSV_XS::IV (), # SQL_TINYINT
     Text::CSV_XS::IV (), # SQL_BIGINT
     Text::CSV_XS::PV (), # SQL_LONGVARBINARY
