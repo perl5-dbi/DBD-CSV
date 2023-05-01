@@ -1,5 +1,6 @@
-0.61	- 2023-01-07, H.Merijn Brand
+0.61	- 2023-05-01, H.Merijn Brand
     * Replace "use vars" with "our" (James Raspass: PR #9)
+    * Specify recommended versions based on known CVE's
 
 0.60	- 2023-01-06, H.Merijn Brand
     * It's 2023
