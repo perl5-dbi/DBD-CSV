@@ -161,13 +161,13 @@ sub postamble {
 	'',
 	'doc docs:		doc/DBD-CSV.md doc/DBD-CSV.html doc/DBD-CSV.man',
 	'	-@rm -f pod2html.tmp',
-	'doc/DBD-CSV.md:		lib/DBD/CSV.pm',
+	'doc/DBD-CSV.md:	lib/DBD/CSV.pm',
 	'	pod2markdown  < $? > $@',
-	'doc/DBD-CSV.html:		lib/DBD/CSV.pm',
+	'doc/DBD-CSV.html:	lib/DBD/CSV.pm',
 	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
 	'doc/DBD-CSV.3:		lib/DBD/CSV.pm',
 	'	pod2man       < $? > $@',
 	'doc/DBD-CSV.man:	doc/DBD-CSV.3',
-	'	nroff -mandoc < $? > $@',
+	'	nroff2man     < $? > $@',
 	$min_vsn;
     } # postamble

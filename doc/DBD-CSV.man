@@ -1,11 +1,9 @@
 STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
-
-
-[1mNAME[0m
+NAME
        DBD::CSV - DBI driver for CSV files
 
-[1mSYNOPSIS[0m
+SYNOPSIS
            use DBI;
            # See "Creating database handle" below
            $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
@@ -31,7 +29,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
            $dbh->disconnect;
 
-[1mDESCRIPTION[0m
+DESCRIPTION
        The DBD::CSV module is yet another driver for the DBI (Database
        independent interface for Perl). This one is based on the SQL "engine"
        SQL::Statement and the abstract DBI driver DBD::File and implements
@@ -41,7 +39,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
        See DBI for details on DBI, SQL::Statement for details on
        SQL::Statement and DBD::File for details on the base class DBD::File.
 
-   [1mPrerequisites[0m
+   Prerequisites
        The only system dependent feature that DBD::File uses, is the "flock
        ()" function. Thus the module should run (in theory) on any system with
        a working "flock ()", in particular on all Unix machines and on Windows
@@ -54,31 +52,31 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
          http://search.cpan.org/
 
-       DBI A recent version of the DBI (Database independent interface for
+       DBI A  recent  version  of  the DBI (Database independent interface for
            Perl).  See below why.
 
        DBD::File
-           This is the base class for DBD::CSV, and it is part of the DBI
-           distribution. As DBD::CSV requires a matching version of DBD::File
-           which is (partly) developed by the same team that maintains
+           This is the base class for DBD::CSV, and it  is  part  of  the  DBI
+           distribution.  As DBD::CSV requires a matching version of DBD::File
+           which is  (partly)  developed  by  the  same  team  that  maintains
            DBD::CSV. See META.json or Makefile.PL for the minimum versions.
 
        SQL::Statement
-           A simple SQL engine. This module defines all of the SQL syntax for
-           DBD::CSV, new SQL support is added with each release so you should
+           A  simple SQL engine. This module defines all of the SQL syntax for
+           DBD::CSV, new SQL support is added with each release so you  should
            look for updates to SQL::Statement regularly.
 
-           It is possible to run "DBD::CSV" without this module if you define
-           the environment variable $DBI_SQL_NANO to 1. This will reduce the
+           It  is possible to run "DBD::CSV" without this module if you define
+           the environment variable $DBI_SQL_NANO to 1. This will  reduce  the
            SQL support a lot though. See DBI::SQL::Nano for more details. Note
-           that the test suite does only test in this mode in the development
+           that  the test suite does only test in this mode in the development
            environment.
 
        Text::CSV_XS
            This module is used to read and write rows in a CSV file.
 
-   [1mInstallation[0m
-       Installing this module (and the prerequisites from above) is quite
+   Installation
+       Installing this module (and the  prerequisites  from  above)  is  quite
        simple.  The simplest way is to install the bundle:
 
            $ cpan Bundle::DBD::CSV
@@ -91,7 +89,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
            $ cpan DBD::CSV
 
-       If you cannot, for whatever reason, use cpan, fetch all modules from
+       If  you  cannot,  for whatever reason, use cpan, fetch all modules from
        CPAN, and build with a sequence like:
 
            gzip -d < DBD-CSV-0.40.tgz | tar xf -
@@ -108,25 +106,25 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            make install UNINST=1
 
        Note that you almost definitely need root or administrator permissions.
-       If you don't have them, read the ExtUtils::MakeMaker man page for
+       If you don't have them,  read  the  ExtUtils::MakeMaker  man  page  for
        details on installing in your own directories. ExtUtils::MakeMaker.
 
-   [1mSupported SQL Syntax[0m
-       All SQL processing for DBD::CSV is done by SQL::Statement. See
-       SQL::Statement for more specific information about its feature set.
-       Features include joins, aliases, built-in and user-defined functions,
-       and more.  See SQL::Statement::Syntax for a description of the SQL
+   Supported SQL Syntax
+       All  SQL  processing  for  DBD::CSV  is  done  by  SQL::Statement.  See
+       SQL::Statement for more specific information  about  its  feature  set.
+       Features  include  joins, aliases, built-in and user-defined functions,
+       and more.  See SQL::Statement::Syntax for  a  description  of  the  SQL
        syntax supported in DBD::CSV.
 
-       Table- and column-names are case insensitive unless quoted. Column
+       Table-  and  column-names  are  case  insensitive unless quoted. Column
        names will be sanitized unless "raw_header" is true.
 
-[1mUsing DBD::CSV with DBI[0m
-       For most things, DBD-CSV operates the same as any DBI driver.  See DBI
+Using DBD::CSV with DBI
+       For most things, DBD-CSV operates the same as any DBI driver.  See  DBI
        for detailed usage.
 
-   [1mCreating a database handle (connect)[0m
-       Creating a database handle usually implies connecting to a database
+   Creating a database handle (connect)
+       Creating  a  database  handle  usually implies connecting to a database
        server.  Thus this command reads
 
            use DBI;
@@ -134,7 +132,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                f_dir => "/home/user/folder",
                });
 
-       The directory tells the driver where it should create or open tables
+       The directory tells the driver where it should create  or  open  tables
        (a.k.a.  files). It defaults to the current directory, so the following
        are equivalent:
 
@@ -181,9 +179,9 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                FetchHashKeyName => "NAME_lc",
                }) or die $DBI::errstr;
 
-       but you may set these attributes in the DSN as well, separated by
-       semicolons.  Pay attention to the semi-colon for "csv_sep_char" (as
-       seen in many CSV exports from MS Excel) is being escaped in below
+       but  you  may  set  these  attributes  in the DSN as well, separated by
+       semicolons.  Pay attention to the  semi-colon  for  "csv_sep_char"  (as
+       seen  in  many  CSV  exports  from  MS Excel) is being escaped in below
        example, as is would otherwise be seen as attribute separator:
 
            $dbh = DBI->connect (
@@ -192,27 +190,27 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                "csv_quote_char=\";csv_escape_char=\\;csv_class=Text::CSV_XS;" .
                "csv_null=1") or die $DBI::errstr;
 
-       Using attributes in the DSN is easier to use when the DSN is derived
-       from an outside source (environment variable, database entry, or
-       configure file), whereas specifying entries in the attribute hash is
+       Using attributes in the DSN is easier to use when the  DSN  is  derived
+       from  an  outside  source  (environment  variable,  database  entry, or
+       configure file), whereas specifying entries in the  attribute  hash  is
        easier to read and to maintain.
 
        The default value for "csv_binary" is 1 (True).
 
-       The default value for "csv_auto_diag" is <1>. Note that this might
+       The  default  value  for  "csv_auto_diag"  is <1>. Note that this might
        cause trouble on perl versions older than 5.8.9, so up to and including
-       perl version 5.8.8 it might be required to use ";csv_auto_diag=0"
+       perl version 5.8.8 it  might  be  required  to  use  ";csv_auto_diag=0"
        inside the "DSN" or "csv_auto_diag =" 0> inside the attributes.
 
-   [1mCreating and dropping tables[0m
+   Creating and dropping tables
        You can create and drop tables with commands like the following:
 
            $dbh->do ("CREATE TABLE $table (id INTEGER, name CHAR (64))");
            $dbh->do ("DROP TABLE $table");
 
-       Note that currently only the column names will be stored and no other
-       data.  Thus all other information including column type (INTEGER or
-       CHAR (x), for example), column attributes (NOT NULL, PRIMARY KEY, ...)
+       Note  that  currently only the column names will be stored and no other
+       data.  Thus all other information including  column  type  (INTEGER  or
+       CHAR  (x), for example), column attributes (NOT NULL, PRIMARY KEY, ...)
        will silently be discarded. This may change in a later release.
 
        A drop just removes the file without any warning.
@@ -220,21 +218,21 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
        See DBI for more details.
 
        Table names cannot be arbitrary, due to restrictions of the SQL syntax.
-       I recommend that table names are valid SQL identifiers: The first
-       character is alphabetic, followed by an arbitrary number of
+       I recommend that table names  are  valid  SQL  identifiers:  The  first
+       character   is   alphabetic,   followed   by  an  arbitrary  number  of
        alphanumeric characters. If you want to use other files, the file names
-       must start with "/", "./" or "../" and they must not contain white
+       must start with "/", "./" or "../" and  they  must  not  contain  white
        space.
 
-   [1mInserting, fetching and modifying data[0m
-       The following examples insert some data in a table and fetch it back:
-       First, an example where the column data is concatenated in the SQL
+   Inserting, fetching and modifying data
+       The  following  examples insert some data in a table and fetch it back:
+       First, an example where the column data  is  concatenated  in  the  SQL
        string:
 
            $dbh->do ("INSERT INTO $table VALUES (1, ".
                       $dbh->quote ("foobar") . ")");
 
-       Note the use of the quote method for escaping the word "foobar". Any
+       Note  the  use  of the quote method for escaping the word "foobar". Any
        string must be escaped, even if it does not contain binary data.
 
        Next, an example using parameters:
@@ -242,12 +240,12 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            $dbh->do ("INSERT INTO $table VALUES (?, ?)", undef, 2,
                      "It's a string!");
 
-       Note that you don't need to quote column data passed as parameters.
-       This version is particularly well designed for loops. Whenever
+       Note that you don't need to quote column  data  passed  as  parameters.
+       This   version  is  particularly  well  designed  for  loops.  Whenever
        performance is an issue, I recommend using this method.
 
-       You might wonder about the "undef". Don't wonder, just take it as it
-       is. :-) It's an attribute argument that I have never used and will be
+       You might wonder about the "undef". Don't wonder, just take  it  as  it
+       is.  :-)  It's an attribute argument that I have never used and will be
        passed to the prepare method as the second argument.
 
        To retrieve data, you can use the following:
@@ -274,7 +272,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                }
            $sth->finish;
 
-       Of course you can even use input parameters. Here's the same example
+       Of course you can even use input parameters. Here's  the  same  example
        for the third time:
 
            my $sth = $dbh->prepare ("SELECT * FROM $table WHERE id = ?");
@@ -298,9 +296,9 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
            $dbh->do ("DELETE FROM $table WHERE id > 1");
 
-   [1mError handling[0m
-       In the above examples we have never cared about return codes. Of
-       course, this is not recommended. Instead we should have written (for
+   Error handling
+       In  the  above  examples  we  have  never  cared about return codes. Of
+       course, this is not recommended. Instead we should  have  written  (for
        example):
 
            my $sth = $dbh->prepare ("SELECT * FROM $table WHERE id = ?") or
@@ -315,7 +313,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                }
            $sth->finish ($id) or die "finish: " . $dbh->errstr ();
 
-       Obviously this is tedious. Fortunately we have DBI's [4mRaiseError[0m
+       Obviously  this  is  tedious.  Fortunately  we  have  DBI's  RaiseError
        attribute:
 
            $dbh->{RaiseError} = 1;
@@ -332,12 +330,12 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                };
            $@ and die "SQL database error: $@";
 
-       This is not only shorter, it even works when using DBI methods within
+       This is not only shorter, it even works when using DBI  methods  within
        subroutines.
 
-[1mDBI database handle attributes[0m
-   [1mMetadata[0m
-       The following attributes are handled by DBI itself and not by
+DBI database handle attributes
+   Metadata
+       The  following  attributes  are  handled  by  DBI  itself  and  not  by
        DBD::File, thus they all work as expected:
 
            Active
@@ -370,8 +368,8 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            Valid after "$sth->execute"; undef for Non-Select statements.
 
        NULLABLE
-           Not really working. Always returns an array ref of one's, as
-           DBD::CSV does not verify input data. Valid after "$sth->execute";
+           Not really working. Always  returns  an  array  ref  of  one's,  as
+           DBD::CSV  does  not verify input data. Valid after "$sth->execute";
            undef for non-Select statements.
 
        These attributes and methods are not supported:
@@ -381,21 +379,21 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            LongReadLen
            LongTruncOk
 
-[1mDBD-CSV specific database handle attributes[0m
-       In addition to the DBI attributes, you can use the following dbh
+DBD-CSV specific database handle attributes
+       In addition to the DBI  attributes,  you  can  use  the  following  dbh
        attributes:
 
-   [1mDBD::File attributes[0m
+   DBD::File attributes
        f_dir
-           This attribute is used for setting the directory where CSV files
-           are opened. Usually you set it in the dbh and it defaults to the
+           This  attribute  is  used for setting the directory where CSV files
+           are opened. Usually you set it in the dbh and it  defaults  to  the
            current directory ("."). However, it may be overridden in statement
            handles.
 
        f_dir_search
-           This attribute optionally defines a list of extra directories to
+           This  attribute  optionally  defines a list of extra directories to
            search when opening existing tables. It should be an anonymous list
-           or an array reference listing all folders where tables could be
+           or an array reference listing all folders  where  tables  could  be
            found.
 
                my $dbh = DBI->connect ("dbi:CSV:", "", "", {
@@ -408,7 +406,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            This attribute is used for setting the file extension.
 
        f_schema
-           This attribute allows you to set the database schema name. The
+           This  attribute  allows  you  to  set the database schema name. The
            default is to use the owner of "f_dir". "undef" is allowed, but not
            in the DSN part.
 
@@ -419,16 +417,16 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                    }) or die $DBI::errstr;
 
        f_encoding
-           This attribute allows you to set the encoding of the data. With
-           CSV, it is not possible to set (and remember) the encoding on a
-           column basis, but DBD::File now allows the encoding to be set on
-           the underlying file. If this attribute is not set, or undef is
+           This attribute allows you to set the encoding  of  the  data.  With
+           CSV,  it  is  not  possible to set (and remember) the encoding on a
+           column basis, but DBD::File now allows the encoding to  be  set  on
+           the  underlying  file.  If  this  attribute is not set, or undef is
            passed, the file will be seen as binary.
 
        f_lock
-           With this attribute you can specify a locking mode to be used (if
+           With this attribute you can specify a locking mode to be  used  (if
            locking is supported at all) for opening tables. By default, tables
-           are opened with a shared lock for reading, and with an exclusive
+           are  opened  with  a shared lock for reading, and with an exclusive
            lock for writing. The supported modes are:
 
            0 Force no locking at all.
@@ -439,42 +437,42 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
        But see "KNOWN BUGS" in DBD::File.
 
-   [1mDBD::CSV specific attributes[0m
+   DBD::CSV specific attributes
        csv_class
-           The attribute [4mcsv_class[24m controls the CSV parsing engine. This
-           defaults to "Text::CSV_XS", but "Text::CSV" can be used in some
-           cases, too.  Please be aware that "Text::CSV" does not care about
-           any edge case as "Text::CSV_XS" does and that "Text::CSV" is
+           The attribute csv_class  controls  the  CSV  parsing  engine.  This
+           defaults  to  "Text::CSV_XS",  but  "Text::CSV" can be used in some
+           cases, too.  Please be aware that "Text::CSV" does not  care  about
+           any  edge  case  as  "Text::CSV_XS"  does  and  that "Text::CSV" is
            probably about 100 times slower than "Text::CSV_XS".
 
-           In order to use the specified class other than "Text::CSV_XS", it
+           In order to use the specified class other than  "Text::CSV_XS",  it
            needs to be loaded before use.  "DBD::CSV" does not "require"/"use"
            the specified class itself.
 
-   [1mText::CSV_XS specific attributes[0m
+   Text::CSV_XS specific attributes
        csv_eol
        csv_sep_char
        csv_quote_char
        csv_escape_char
        csv_csv
-           The attributes [4mcsv_eol[24m, [4mcsv_sep_char[24m, [4mcsv_quote_char[24m and
-           [4mcsv_escape_char[24m are corresponding to the respective attributes of
-           the [4mcsv_class[24m (usually Text::CSV_CS) object. You may want to set
-           these attributes if you have unusual CSV files like [4m/etc/passwd[24m or
-           MS Excel generated CSV files with a semicolon as separator.
+           The    attributes   csv_eol,   csv_sep_char,   csv_quote_char   and
+           csv_escape_char are corresponding to the respective  attributes  of
+           the  csv_class  (usually  Text::CSV_CS) object. You may want to set
+           these attributes if you have unusual CSV files like /etc/passwd  or
+           MS  Excel  generated  CSV  files  with  a  semicolon  as separator.
            Defaults are "\015\012"", ",", """ and """, respectively.
 
-           The [4mcsv_eol[24m attribute defines the end-of-line pattern, which is
-           better known as a record separator pattern since it separates
-           records.  The default is windows-style end-of-lines "\015\012" for
-           output (writing) and unset for input (reading), so if on unix you
+           The csv_eol attribute defines the  end-of-line  pattern,  which  is
+           better  known  as  a  record  separator  pattern since it separates
+           records.  The default is windows-style end-of-lines "\015\012"  for
+           output  (writing)  and unset for input (reading), so if on unix you
            may want to set this to newline ("\n") like this:
 
              $dbh->{csv_eol} = "\n";
 
-           It is also possible to use multi-character patterns as record
-           separators.  For example this file uses newlines as field
-           separators (sep_char) and the pattern "\n__ENDREC__\n" as the
+           It is also possible  to  use  multi-character  patterns  as  record
+           separators.    For   example  this  file  uses  newlines  as  field
+           separators (sep_char)  and  the  pattern  "\n__ENDREC__\n"  as  the
            record separators (eol):
 
              name
@@ -492,19 +490,19 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
              $dbh->{eol}      = "\n__ENDREC__\n" ,
              $dbh->{sep_char} = "\n"
 
-           The attributes are used to create an instance of the class
-           [4mcsv_class[24m, by default Text::CSV_XS. Alternatively you may pass an
-           instance as [4mcsv_csv[24m, the latter takes precedence. Note that the
-           [4mbinary[24m attribute [4mmust[24m be set to a true value in that case.
+           The  attributes  are  used  to  create  an  instance  of  the class
+           csv_class, by default Text::CSV_XS. Alternatively you may  pass  an
+           instance  as  csv_csv,  the  latter takes precedence. Note that the
+           binary attribute must be set to a true value in that case.
 
            Additionally you may overwrite these attributes on a per-table base
-           in the [4mcsv_tables[24m attribute.
+           in the csv_tables attribute.
 
        csv_null
-           With this option set, all new statement handles will set
-           "always_quote" and "blank_is_undef" in the CSV parser and writer,
+           With  this  option  set,  all  new  statement  handles   will   set
+           "always_quote"  and  "blank_is_undef" in the CSV parser and writer,
            so it knows how to distinguish between the empty string and "undef"
-           or "NULL". You cannot reset it with a false value. You can pass it
+           or "NULL". You cannot reset it with a false value. You can pass  it
            to connect, or set it later:
 
              $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_null => 1 });
@@ -512,8 +510,8 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
              $dbh->{csv_null} = 1;
 
        csv_bom
-           With this option set, the CSV parser will try to detect BOM (Byte
-           Order Mark) in the header line. This requires Text::CSV_XS version
+           With  this  option set, the CSV parser will try to detect BOM (Byte
+           Order Mark) in the header line. This requires Text::CSV_XS  version
            1.22 or higher.
 
              $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_bom => 1 });
@@ -546,19 +544,19 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                  },
 
        csv_*
-           All other attributes that start with "csv_" and are not described
+           All  other  attributes that start with "csv_" and are not described
            above will be passed to "Text::CSV_XS" (without the "csv_" prefix).
-           These extra options are only likely to be useful for reading
+           These extra options are  only  likely  to  be  useful  for  reading
            (select) handles. Examples:
 
              $dbh->{csv_allow_whitespace}    = 1;
              $dbh->{csv_allow_loose_quotes}  = 1;
              $dbh->{csv_allow_loose_escapes} = 1;
 
-           See the "Text::CSV_XS" documentation for the full list and the
+           See  the  "Text::CSV_XS"  documentation  for  the full list and the
            documentation.
 
-   [1mDriver specific attributes[0m
+   Driver specific attributes
        f_file
            The name of the file used for the table; defaults to
 
@@ -569,24 +567,24 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
        quote_char
        escape_char
        class
-       csv These correspond to the attributes [4mcsv_eol[24m, [4mcsv_sep_char[24m,
-           [4mcsv_quote_char[24m, [4mcsv_escape_char[24m, [4mcsv_class[24m and [4mcsv_csv[24m.  The
+       csv These  correspond  to   the   attributes   csv_eol,   csv_sep_char,
+           csv_quote_char,   csv_escape_char,   csv_class  and  csv_csv.   The
            difference is that they work on a per-table basis.
 
        col_names
        skip_first_row
-           By default DBD::CSV assumes that column names are stored in the
-           first row of the CSV file and sanitizes them (see "raw_header"
-           below). If this is not the case, you can supply an array ref of
-           table names with the [4mcol_names[24m attribute. In that case the
-           attribute [4mskip_first_row[24m will be set to FALSE.
+           By default DBD::CSV assumes that column names  are  stored  in  the
+           first  row  of  the  CSV  file and sanitizes them (see "raw_header"
+           below). If this is not the case, you can supply  an  array  ref  of
+           table  names  with  the  col_names  attribute.  In  that  case  the
+           attribute skip_first_row will be set to FALSE.
 
-           If you supply an empty array ref, the driver will read the first
-           row for you, count the number of columns and create column names
+           If you supply an empty array ref, the driver will  read  the  first
+           row  for  you,  count the number of columns and create column names
            like "col0", "col1", ...
 
-           Note that column names that match reserved SQL words will cause
-           unwanted and sometimes confusing errors. If your CSV has headers
+           Note that column names that match reserved  SQL  words  will  cause
+           unwanted  and  sometimes  confusing errors. If your CSV has headers
            that match reserved words, you will require these two attributes.
 
            If "test.csv" looks like
@@ -594,27 +592,27 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
             select,from
             1,2
 
-           the select query would result in "select select, from from test;",
+           the select query would result in "select select, from from  test;",
            which obviously is illegal SQL.
 
        raw_header
-           Due to the SQL standard, field names cannot contain special
-           characters like a dot (".") or a space (" ") unless the column
-           names are quoted.  Following the approach of mdb_tools, all these
+           Due  to  the  SQL  standard,  field  names  cannot  contain special
+           characters like a dot (".") or a space  ("  ")  unless  the  column
+           names  are  quoted.  Following the approach of mdb_tools, all these
            tokens are translated to an underscore ("_") when reading the first
            line of the CSV file, so all field names are 'sanitized'. If you do
-           not want this to happen, set "raw_header" to a true value and the
+           not want this to happen, set "raw_header" to a true value  and  the
            entries in the first line of the CSV data will be used verbatim for
            column headers and field names.  DBD::CSV cannot guarantee that any
-           part in the toolchain will work if field names have those
-           characters, and the chances are high that the SQL statements will
+           part  in  the  toolchain  will  work  if  field  names  have  those
+           characters, and the chances are high that the SQL  statements  will
            fail.
 
            Currently, the sanitizing of headers is as simple as
 
              s/\W/_/g;
 
-           Note that headers (column names) might be folded in other parts of
+           Note  that headers (column names) might be folded in other parts of
            the code stack, specifically SQL::Statement, whose docs mention:
 
             Wildcards are expanded to lower cased identifiers. This might
@@ -628,13 +626,13 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                 say for keys %$row;
                 }
 
-           all keys will show as all lower case, regardless of the original
+           all keys will show as all lower case, regardless  of  the  original
            header.
 
-       It's strongly recommended to check the attributes supported by
+       It's   strongly  recommended  to  check  the  attributes  supported  by
        "Metadata" in DBD::File.
 
-       Example: Suppose you want to use [4m/etc/passwd[24m as a CSV file. :-) There
+       Example: Suppose you want to use /etc/passwd as a CSV file.  :-)  There
        simplest way is:
 
            use DBI;
@@ -650,7 +648,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                };
            $sth = $dbh->prepare ("SELECT * FROM passwd");
 
-       Another possibility where you leave all the defaults as they are and
+       Another  possibility  where  you leave all the defaults as they are and
        override them on a per table basis:
 
            require DBI;
@@ -666,11 +664,11 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                };
            $sth = $dbh->prepare ("SELECT * FROM passwd");
 
-   [1mDriver private methods[0m
+   Driver private methods
        These methods are inherited from DBD::File:
 
        data_sources
-           The "data_sources" method returns a list of sub-directories of the
+           The "data_sources" method returns a list of sub-directories of  the
            current directory in the form "dbi:CSV:directory=$dirname".
 
            If you want to read the sub-directories of another directory, use
@@ -679,24 +677,24 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
                my @list = $drh->data_sources (f_dir => "/usr/local/csv_data");
 
        list_tables
-           This method returns a list of file-names inside $dbh->{directory}.
+           This  method returns a list of file-names inside $dbh->{directory}.
            Example:
 
                my $dbh  = DBI->connect ("dbi:CSV:directory=/usr/local/csv_data");
                my @list = $dbh->func ("list_tables");
 
-           Note that the list includes all files contained in the directory,
-           even those that have non-valid table names, from the view of SQL.
+           Note that the list includes all files contained in  the  directory,
+           even  those  that have non-valid table names, from the view of SQL.
            See "Creating and dropping tables" above.
 
-[1mKNOWN ISSUES[0m
-       •   The module is using flock () internally. However, this function is
-           not available on some platforms. Use of flock () is disabled on
-           MacOS and Windows 95: There's no locking at all (perhaps not so
-           important on these operating systems, as they are for single users
+KNOWN ISSUES
+       •   The module is using flock () internally. However, this function  is
+           not  available  on  some  platforms. Use of flock () is disabled on
+           MacOS and Windows 95: There's no locking at  all  (perhaps  not  so
+           important  on these operating systems, as they are for single users
            anyways).
 
-[1mTODO[0m
+TODO
        Tests
            Aim for a full 100% code coverage
 
@@ -718,21 +716,21 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
            Attack all items in http://www.cpanforum.com/dist/DBD-CSV
 
        Documentation
-           Expand on error-handling, and document all possible errors.  Use
+           Expand on error-handling, and document all  possible  errors.   Use
            Text::CSV_XS::error_diag () wherever possible.
 
        Debugging
            Implement and document dbd_verbose.
 
        Data dictionary
-           Investigate the possibility to store the data dictionary in a file
-           like .sys$columns that can store the field attributes (type, key,
+           Investigate  the possibility to store the data dictionary in a file
+           like .sys$columns that can store the field attributes  (type,  key,
            nullable).
 
        Examples
            Make more real-life examples from the docs in examples/
 
-[1mSEE ALSO[0m
+SEE ALSO
        DBI, Text::CSV_XS, SQL::Statement, DBI::SQL::Nano
 
        For help on the use of DBD::CSV, see the DBI users mailing list:
@@ -743,7 +741,7 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
          http://dbi.perl.org/ and http://faq.dbi-support.com/
 
-[1mAUTHORS and MAINTAINERS[0m
+AUTHORS and MAINTAINERS
        This module is currently maintained by
 
            H.Merijn Brand <h.m.brand@xs4all.nl>
@@ -752,19 +750,17 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
 
            Jens Rehsack <sno@NetBSD.org>
 
-       The original author is Jochen Wiedmann.  Previous maintainer was Jeff
+       The  original  author is Jochen Wiedmann.  Previous maintainer was Jeff
        Zucker
 
-[1mCOPYRIGHT AND LICENSE[0m
-       Copyright (C) 2009-2023 by H.Merijn Brand Copyright (C) 2004-2009 by
+COPYRIGHT AND LICENSE
+       Copyright (C) 2009-2023 by H.Merijn Brand Copyright  (C)  2004-2009  by
        Jeff Zucker Copyright (C) 1998-2004 by Jochen Wiedmann
 
        All rights reserved.
 
-       You may distribute this module under the terms of either the GNU
-       General Public License or the Artistic License, as specified in the
+       You  may  distribute  this  module  under  the  terms of either the GNU
+       General Public License or the Artistic License,  as  specified  in  the
        Perl README file.
 
-
-
-perl v5.36.0                      2023-01-06                          STDIN(1)
+perl v5.38.0                      2023-10-12                          STDIN(1)
