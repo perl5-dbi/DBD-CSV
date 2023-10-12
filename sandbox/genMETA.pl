@@ -58,7 +58,7 @@ license:                 perl
 author:
     - Jochen Wiedmann
     - Jeff Zucker
-    - H.Merijn Brand <h.m.brand@xs4all.nl>
+    - H.Merijn Brand <hmbrand@cpan.org>
     - Jens Rehsack <rehsack@cpan.org>
 generated_by:            Author
 distribution_type:       module
@@ -76,7 +76,7 @@ recommends:
     DBI:                 1.643
     DBD::File:           0.44
     SQL::Statement:      1.414
-    Text::CSV_XS:        1.50
+    Text::CSV_XS:        1.52
 suggests:
     DBI:                 1.643
 configure_requires:
