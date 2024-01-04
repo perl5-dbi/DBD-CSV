@@ -44,7 +44,7 @@ This module is currently maintained by
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2023 by H.Merijn Brand
+Copyright (C) 2009-2024 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 
