@@ -76,7 +76,7 @@ recommends:
     DBI:                 1.643
     DBD::File:           0.44
     SQL::Statement:      1.414
-    Text::CSV_XS:        1.52
+    Text::CSV_XS:        1.53
 suggests:
     DBI:                 1.643
 configure_requires:
@@ -95,10 +95,10 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302195
+    Test::More:          1.302198
     Encode:              3.12
 test_suggests:
-    Encode:              3.19
+    Encode:              3.20
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/
