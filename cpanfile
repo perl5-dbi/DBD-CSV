@@ -6,7 +6,7 @@ requires   "Text::CSV_XS"             => "1.01";
 recommends "DBD::File"                => "0.44";
 recommends "DBI"                      => "1.643";
 recommends "SQL::Statement"           => "1.414";
-recommends "Text::CSV_XS"             => "1.53";
+recommends "Text::CSV_XS"             => "1.55";
 
 suggests   "DBI"                      => "1.643";
 
@@ -31,7 +31,7 @@ on "test" => sub {
     requires   "charnames";
 
     recommends "Encode"                   => "3.12";
-    recommends "Test::More"               => "1.302198";
+    recommends "Test::More"               => "1.302199";
 
-    suggests   "Encode"                   => "3.20";
+    suggests   "Encode"                   => "3.21";
     };
