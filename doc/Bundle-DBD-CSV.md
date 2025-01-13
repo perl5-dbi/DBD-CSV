@@ -1,29 +1,16 @@
-#/usr/bin/perl
-
-package Bundle::DBD::CSV;
-
-use strict;
-use warnings;
-
-our $VERSION = "1.16";
-
-1;
-
-__END__
-
-=head1 NAME
+# NAME
 
 Bundle::DBD::CSV - A bundle to install the DBD::CSV driver
 
-=head1 SYNOPSIS
+# SYNOPSIS
 
-  perl -MCPAN -e 'install Bundle::DBD::CSV'
+    perl -MCPAN -e 'install Bundle::DBD::CSV'
 
-=head1 CONTENTS
+# CONTENTS
 
 DBI 1.645
 
-Text::CSV_XS 1.58
+Text::CSV\_XS 1.59
 
 SQL::Statement 1.414
 
@@ -31,18 +18,18 @@ DBD::File 0.44
 
 DBD::CSV 0.61
 
-=head1 DESCRIPTION
+# DESCRIPTION
 
 This bundle includes all that's needed to access so-called CSV (Comma
 Separated Values) files via a pseudo SQL engine (SQL::Statement) and DBI.
 
-=head1 AUTHOR
+# AUTHOR
 
 This module is currently maintained by
 
     H.Merijn Brand <h.m.brand@xs4all.nl>
 
-=head1 COPYRIGHT AND LICENSE
+# COPYRIGHT AND LICENSE
 
 Copyright (C) 2009-2025 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
@@ -53,5 +40,3 @@ All rights reserved.
 You may distribute this module under the terms of either the GNU
 General Public License or the Artistic License, as specified in
 the Perl README file.
-
-=cut

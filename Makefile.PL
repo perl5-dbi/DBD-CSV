@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# Copyright (c) 2009-2024 H.Merijn Brand
+# Copyright (c) 2009-2025 H.Merijn Brand
 
 require 5.008001;
 
@@ -162,12 +162,8 @@ sub postamble {
 	'doc docs:		doc/DBD-CSV.md doc/DBD-CSV.html doc/DBD-CSV.man',
 	'	-@rm -f pod2html.tmp',
 	'doc/DBD-CSV.md:	lib/DBD/CSV.pm',
-	'	pod2markdown  < $? > $@',
-	'doc/DBD-CSV.html:	lib/DBD/CSV.pm',
-	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
-	'doc/DBD-CSV.3:		lib/DBD/CSV.pm',
-	'	pod2man       < $? > $@',
-	'doc/DBD-CSV.man:	doc/DBD-CSV.3',
-	'	nroff2man     < $? > $@',
+	'	perl doc/make-doc.pl',
+	'test::',
+	'	perl doc/make-doc.pl',
 	$min_vsn;
     } # postamble
