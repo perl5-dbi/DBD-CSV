@@ -3,7 +3,7 @@
 use 5.014001;
 use warnings;
 
-our $VERSION = "1.20 - 20160520";
+our $VERSION = "1.21 - 20250113";
 
 sub usage {
     my $err = shift and select STDERR;
@@ -12,14 +12,14 @@ sub usage {
     } # usage
 
 use Getopt::Long qw(:config bundling nopermute);
-my $opt_v = 0;
 GetOptions (
     "help|?"		=> sub { usage (0); },
     "V|version"		=> sub { say $0 =~ s{.*/}{}r, " [$VERSION]"; exit 0; },
 
-    "c|check!"		=> \my $check,
-    "w|write:s"		=> \my $write,
-    "v|verbose:1"	=>    \$opt_v,
+    "c|check!"		=> \ my $check,
+    "w|write:s"		=> \ my $write,
+    "u|update!"		=> \ my $update,
+    "v|verbose:1"	=> \(my $opt_v = 0),
     ) or usage (1);
 
 use lib "sandbox";
@@ -31,6 +31,7 @@ my $meta = genMETA->new (
 
 $meta->quiet (defined $write);
 $meta->from_data (<DATA>);
+$meta->security_md ($update);
 $meta->gen_cpanfile ();
 
 if ($check) {
