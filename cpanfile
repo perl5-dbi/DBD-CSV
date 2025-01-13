@@ -6,9 +6,9 @@ requires   "Text::CSV_XS"             => "1.01";
 recommends "DBD::File"                => "0.44";
 recommends "DBI"                      => "1.643";
 recommends "SQL::Statement"           => "1.414";
-recommends "Text::CSV_XS"             => "1.58";
+recommends "Text::CSV_XS"             => "1.59";
 
-suggests   "DBI"                      => "1.645";
+suggests   "DBI"                      => "1.646";
 
 on "configure" => sub {
     requires   "DBI"                      => "1.628";
