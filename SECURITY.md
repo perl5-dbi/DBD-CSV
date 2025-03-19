@@ -3,7 +3,7 @@
 Report issues via email at: Jochen Wiedmann.
 
 
-This is the Security Policy for the Perl DBD::CSV distribution.
+This is the Security Policy for DBD::CSV.
 
 The latest version of the Security Policy can be found in the
 [git repository for DBD::CSV](https://github.com/perl5-dbi/DBD-CSV).

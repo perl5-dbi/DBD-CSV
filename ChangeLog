@@ -1,3 +1,9 @@
+0.63	- 2025-03-19, H.Merijn Brand
+    * 
+
+0.62	- 2025-01-13, H.Merijn Brand
+    * doc should not be part of test
+
 0.61	- 2025-01-13, H.Merijn Brand
     * Replace "use vars" with "our" (James Raspass: PR #9)
     * Specify recommended versions based on known CVE's

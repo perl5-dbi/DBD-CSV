@@ -763,4 +763,4 @@ COPYRIGHT AND LICENSE
        General Public License or the Artistic License, as specified in the
        Perl README file.
 
-perl v5.40.0                      2025-01-13                       DBD::CSV(3)
+perl v5.40.1                      2025-03-19                       DBD::CSV(3)

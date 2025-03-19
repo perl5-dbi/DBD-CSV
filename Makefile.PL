@@ -163,7 +163,5 @@ sub postamble {
 	'	-@rm -f pod2html.tmp',
 	'doc/DBD-CSV.md:	lib/DBD/CSV.pm',
 	'	perl doc/make-doc.pl',
-	'test::',
-	'	perl doc/make-doc.pl',
 	$min_vsn;
     } # postamble

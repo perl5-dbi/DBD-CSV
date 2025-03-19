@@ -74,10 +74,10 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.643
+    DBI:                 1.647
     DBD::File:           0.44
     SQL::Statement:      1.414
-    Text::CSV_XS:        1.59
+    Text::CSV_XS:        1.60
 suggests:
     DBI:                 1.646
 configure_requires:
@@ -86,7 +86,7 @@ configure_requires:
 configure_recommends:
     ExtUtils::MakeMaker: 7.22
 configure_suggests:
-    ExtUtils::MakeMaker: 7.70
+    ExtUtils::MakeMaker: 7.72
 build_requires:
     Config:              0
 test_requires:
@@ -96,7 +96,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302207
+    Test::More:          1.302209
     Encode:              3.12
 test_suggests:
     Encode:              3.21
