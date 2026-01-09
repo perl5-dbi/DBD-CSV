@@ -7,6 +7,7 @@
 \.tgz$
 \.tmp$
 \.travis.yml
+^\.test_info\.
 \.whitesource
 ~$
 \bCVS\b

@@ -31,7 +31,7 @@ This module is currently maintained by
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2025 by H.Merijn Brand
+Copyright (C) 2009-2026 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 

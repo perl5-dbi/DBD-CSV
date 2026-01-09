@@ -754,7 +754,7 @@ AUTHORS and MAINTAINERS
        Zucker
 
 COPYRIGHT AND LICENSE
-       Copyright (C) 2009-2025 by H.Merijn Brand Copyright (C) 2004-2009 by
+       Copyright (C) 2009-2026 by H.Merijn Brand Copyright (C) 2004-2009 by
        Jeff Zucker Copyright (C) 1998-2004 by Jochen Wiedmann
 
        All rights reserved.
@@ -763,4 +763,4 @@ COPYRIGHT AND LICENSE
        General Public License or the Artistic License, as specified in the
        Perl README file.
 
-perl v5.40.1                      2025-03-19                       DBD::CSV(3)
+perl v5.42.0                      2026-01-09                       DBD::CSV(3)
