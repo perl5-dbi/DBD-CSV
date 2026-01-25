@@ -23,7 +23,7 @@ Bundle::DBD::CSV - A bundle to install the DBD::CSV driver
 
 DBI 1.647
 
-Text::CSV_XS 1.60
+Text::CSV_XS 1.61
 
 SQL::Statement 1.414
 
