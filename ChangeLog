@@ -1,5 +1,6 @@
-0.63	- 2026-01-25, H.Merijn Brand
+0.63	- 2026-05-28, H.Merijn Brand
     * It's 2026
+    * New test for DBI-1.648 CVE fix
 
 0.62	- 2025-01-13, H.Merijn Brand
     * doc should not be part of test
