@@ -3,12 +3,10 @@ requires   "DBI"                      => "1.628";
 requires   "SQL::Statement"           => "1.405";
 requires   "Text::CSV_XS"             => "1.01";
 
-recommends "DBD::File"                => "0.44";
-recommends "DBI"                      => "1.646";
+recommends "DBD::File"                => "0.45";
+recommends "DBI"                      => "1.648";
 recommends "SQL::Statement"           => "1.414";
-recommends "Text::CSV_XS"             => "1.61";
-
-suggests   "DBI"                      => "1.647";
+recommends "Text::CSV_XS"             => "1.62";
 
 on "configure" => sub {
     requires   "DBI"                      => "1.628";
@@ -16,7 +14,7 @@ on "configure" => sub {
 
     recommends "ExtUtils::MakeMaker"      => "7.22";
 
-    suggests   "ExtUtils::MakeMaker"      => "7.76";
+    suggests   "ExtUtils::MakeMaker"      => "7.78";
     };
 
 on "build" => sub {
@@ -31,7 +29,7 @@ on "test" => sub {
     requires   "charnames";
 
     recommends "Encode"                   => "3.12";
-    recommends "Test::More"               => "1.302219";
+    recommends "Test::More"               => "1.302220";
 
-    suggests   "Encode"                   => "3.21";
+    suggests   "Encode"                   => "3.24";
     };

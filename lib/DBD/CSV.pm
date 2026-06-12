@@ -1252,7 +1252,7 @@ L<Creating and dropping tables> above.
 The module is using flock () internally. However, this function is not
 available on some platforms. Use of flock () is disabled on MacOS and
 Windows 95: There's no locking at all (perhaps not so important on
-these operating systems, as they are for single users anyways).
+these operating systems, as they are for single users anyway).
 
 =back
 

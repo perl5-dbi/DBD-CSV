@@ -692,7 +692,7 @@ KNOWN ISSUES
            not available on some platforms. Use of flock () is disabled on
            MacOS and Windows 95: There's no locking at all (perhaps not so
            important on these operating systems, as they are for single users
-           anyways).
+           anyway).
 
 TODO
        Tests
@@ -763,4 +763,4 @@ COPYRIGHT AND LICENSE
        General Public License or the Artistic License, as specified in the
        Perl README file.
 
-perl v5.42.0                      2026-01-09                       DBD::CSV(3)
+perl v5.42.2                      2026-06-12                       DBD::CSV(3)

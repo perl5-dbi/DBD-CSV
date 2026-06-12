@@ -74,19 +74,17 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.646
-    DBD::File:           0.44
+    DBI:                 1.648
+    DBD::File:           0.45
     SQL::Statement:      1.414
-    Text::CSV_XS:        1.61
-suggests:
-    DBI:                 1.647
+    Text::CSV_XS:        1.62
 configure_requires:
     ExtUtils::MakeMaker: 0
     DBI:                 1.628
 configure_recommends:
     ExtUtils::MakeMaker: 7.22
 configure_suggests:
-    ExtUtils::MakeMaker: 7.76
+    ExtUtils::MakeMaker: 7.78
 build_requires:
     Config:              0
 test_requires:
@@ -96,10 +94,10 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302219
+    Test::More:          1.302220
     Encode:              3.12
 test_suggests:
-    Encode:              3.21
+    Encode:              3.24
 installdirs:             site
 resources:
     license:             http://dev.perl.org/licenses/

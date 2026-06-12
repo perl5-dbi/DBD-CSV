@@ -7,13 +7,13 @@ SYNOPSIS
          perl -MCPAN -e 'install Bundle::DBD::CSV'
 
 CONTENTS
-       DBI 1.647
+       DBI 1.648
 
-       Text::CSV_XS 1.60
+       Text::CSV_XS 1.62
 
        SQL::Statement 1.414
 
-       DBD::File 0.44
+       DBD::File 0.45
 
        DBD::CSV 0.63
 
@@ -37,4 +37,4 @@ COPYRIGHT AND LICENSE
        General Public License or the Artistic License, as specified in the
        Perl README file.
 
-perl v5.42.0                      2026-01-09               Bundle::DBD::CSV(3)
+perl v5.42.2                      2026-06-12               Bundle::DBD::CSV(3)
