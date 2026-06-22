@@ -74,7 +74,7 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.648
+    DBI:                 1.649
     DBD::File:           0.45
     SQL::Statement:      1.414
     Text::CSV_XS:        1.62
@@ -94,7 +94,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302220
+    Test::More:          1.302222
     Encode:              3.12
 test_suggests:
     Encode:              3.24
