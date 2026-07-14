@@ -7,7 +7,7 @@ skip_dist 1
 allow_glob_in_perls 1
 required DBI,Text::CSV_XS,SQL::Statement
 perls /pro/bin/perl:/usr/bin/perl\
-:/media/Tux/perls/bin/perl5.8\
-:/media/Tux/perls/bin/perl5.[1234][02468]\
-:/media/Tux/perls/bin/tperl5.8\
-:/media/Tux/perls/bin/perl5.[1234][02468]
+:/media/Tux/perls/bin/perl5.1[234][02468]\
+:/media/Tux/perls/bin/perl5.[2345][02468]\
+:/media/Tux/perls/bin/tperl5.1[234][02468]\
+:/media/Tux/perls/bin/tperl5.[2345][02468]
