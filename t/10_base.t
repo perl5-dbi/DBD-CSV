@@ -15,8 +15,7 @@ ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION"
 
 do "./t/lib.pl";
 
-my $nano = $ENV{DBI_SQL_NANO};
-defined $nano or $nano = "not set";
+my $nano = $ENV{DBI_SQL_NANO} // "not set";
 diag ("Showing relevant versions (DBI_SQL_NANO = $nano)");
 diag ("Using DBI            version $DBI::VERSION");
 diag ("Using DBD::File      version $DBD::File::VERSION");

@@ -2,7 +2,7 @@
 
 # Copyright (c) 2009-2026 H.Merijn Brand
 
-require 5.008001;
+require 5.012000;
 
 use strict;
 
@@ -132,7 +132,7 @@ if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
 package MY;
 
 sub postamble {
-    my $min_vsn = ($] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
+    my $min_vsn = (-d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
 	    'test ::',
 	    '	-@env DBI_SQL_NANO=1 make -e test_dynamic TEST_FILES=t/[1-9]*.t',

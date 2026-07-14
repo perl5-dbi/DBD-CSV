@@ -29,7 +29,7 @@ use strict;
 
 our @ISA         = qw( DBD::File );
 
-our $VERSION     = "0.64";
+our $VERSION     = "0.65";
 our $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 our $err      = 0;	# holds error code   for DBI::err
@@ -321,8 +321,7 @@ sub open_data {
 		: defined $meta->{csv_skip_first_row}
 		    ? 1
 		    : exists $meta->{col_names} ? 0 : 1;
-	    defined $meta->{skip_rows} or
-		$meta->{skip_rows} = $skipRows;
+	    $meta->{skip_rows} //= $skipRows;
 	    if ($meta->{csv_bom}) {
 		my @hdr = $attrs->{csv_csv_in}->header ($meta->{fh}) or
 		    croak "Failed using the header row: ".$attrs->{csv_csv_in}->error_diag;
@@ -335,8 +334,7 @@ sub open_data {
 		unless ($meta->{raw_header}) {
 		    s/\W/_/g for @$array;
 		    }
-		defined $meta->{col_names} or
-		    $meta->{col_names} = $array;
+		$meta->{col_names} //= $array;
 		while ($skipRows--) {
 		    $attrs->{csv_csv_in}->getline ($meta->{fh});
 		    }
@@ -366,9 +364,7 @@ use warnings;
 
 sub _csv_diag {
     my @diag = $_[0]->error_diag;
-    for (2, 3) {
-	defined $diag[$_] or $diag[$_] = "?";
-	}
+    $diag[$_] //= "?" for 2, 3;
     return @diag;
     } # _csv_diag
 
@@ -638,10 +634,7 @@ maintain.
 
 The default value for C<csv_binary> is C<1> (True).
 
-The default value for C<csv_auto_diag> is <1>. Note that this might cause
-trouble on perl versions older than 5.8.9, so up to and including perl
-version 5.8.8 it might be required to use C<;csv_auto_diag=0> inside the
-C<DSN> or C<csv_auto_diag => 0> inside the attributes.
+The default value for C<csv_auto_diag> is <1>.
 
 =head2 Creating and dropping tables
 

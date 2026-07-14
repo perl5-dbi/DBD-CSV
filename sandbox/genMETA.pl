@@ -68,7 +68,7 @@ provides:
         file:            lib/DBD/CSV.pm
         version:         VERSION
 requires:
-    perl:                5.008001
+    perl:                5.012000
     DBI:                 1.628
     DBD::File:           0.42
     SQL::Statement:      1.405
