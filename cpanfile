@@ -4,7 +4,7 @@ requires   "SQL::Statement"           => "1.405";
 requires   "Text::CSV_XS"             => "1.01";
 
 recommends "DBD::File"                => "0.45";
-recommends "DBI"                      => "1.650";
+recommends "DBI"                      => "1.651";
 recommends "SQL::Statement"           => "1.414";
 recommends "Text::CSV_XS"             => "1.64";
 

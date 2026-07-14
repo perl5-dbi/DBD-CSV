@@ -74,7 +74,7 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.650
+    DBI:                 1.651
     DBD::File:           0.45
     SQL::Statement:      1.414
     Text::CSV_XS:        1.64
