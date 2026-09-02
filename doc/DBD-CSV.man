@@ -197,10 +197,7 @@ Using DBD::CSV with DBI
 
        The default value for "csv_binary" is 1 (True).
 
-       The default value for "csv_auto_diag" is <1>. Note that this might
-       cause trouble on perl versions older than 5.8.9, so up to and including
-       perl version 5.8.8 it might be required to use ";csv_auto_diag=0"
-       inside the "DSN" or "csv_auto_diag =" 0> inside the attributes.
+       The default value for "csv_auto_diag" is <1>.
 
    Creating and dropping tables
        You can create and drop tables with commands like the following:
@@ -744,7 +741,7 @@ SEE ALSO
 AUTHORS and MAINTAINERS
        This module is currently maintained by
 
-           H.Merijn Brand <h.m.brand@xs4all.nl>
+           H.Merijn Brand <perl5@tux.freedom.nl>
 
        in close cooperation with and help from
 
@@ -763,4 +760,4 @@ COPYRIGHT AND LICENSE
        General Public License or the Artistic License, as specified in the
        Perl README file.
 
-perl v5.42.2                      2026-06-12                       DBD::CSV(3)
+perl v5.44.0                      2026-09-02                       DBD::CSV(3)

@@ -231,7 +231,7 @@ $dbh = DBI-&gt;connect (&quot;dbi:CSV:&quot;, undef, undef, {
 
 <p>The default value for <code>csv_binary</code> is <code>1</code> (True).</p>
 
-<p>The default value for <code>csv_auto_diag</code> is &lt;1&gt;. Note that this might cause trouble on perl versions older than 5.8.9, so up to and including perl version 5.8.8 it might be required to use <code>;csv_auto_diag=0</code> inside the <code>DSN</code> or <code>csv_auto_diag =</code> 0&gt; inside the attributes.</p>
+<p>The default value for <code>csv_auto_diag</code> is &lt;1&gt;.</p>
 
 <h2 id="Creating-and-dropping-tables">Creating and dropping tables</h2>
 
@@ -868,7 +868,7 @@ my @list = $dbh-&gt;func (&quot;list_tables&quot;);</code></pre>
 
 <p>This module is currently maintained by</p>
 
-<pre><code>H.Merijn Brand &lt;h.m.brand@xs4all.nl&gt;</code></pre>
+<pre><code>H.Merijn Brand &lt;perl5@tux.freedom.nl&gt;</code></pre>
 
 <p>in close cooperation with and help from</p>
 

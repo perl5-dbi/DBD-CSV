@@ -211,10 +211,7 @@ maintain.
 
 The default value for `csv_binary` is `1` (True).
 
-The default value for `csv_auto_diag` is <1>. Note that this might cause
-trouble on perl versions older than 5.8.9, so up to and including perl
-version 5.8.8 it might be required to use `;csv_auto_diag=0` inside the
-`DSN` or `csv_auto_diag =` 0> inside the attributes.
+The default value for `csv_auto_diag` is <1>.
 
 ## Creating and dropping tables
 
@@ -846,7 +843,7 @@ For general information on DBI see
 
 This module is currently maintained by
 
-    H.Merijn Brand <h.m.brand@xs4all.nl>
+    H.Merijn Brand <perl5@tux.freedom.nl>
 
 in close cooperation with and help from
 

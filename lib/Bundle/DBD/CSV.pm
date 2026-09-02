@@ -21,7 +21,7 @@ Bundle::DBD::CSV - A bundle to install the DBD::CSV driver
 
 =head1 CONTENTS
 
-DBI 1.651
+DBI 1.652
 
 Text::CSV_XS 1.64
 
@@ -40,7 +40,7 @@ Separated Values) files via a pseudo SQL engine (SQL::Statement) and DBI.
 
 This module is currently maintained by
 
-    H.Merijn Brand <h.m.brand@xs4all.nl>
+    H.Merijn Brand <perl5@tux.freedom.nl>
 
 =head1 COPYRIGHT AND LICENSE
 

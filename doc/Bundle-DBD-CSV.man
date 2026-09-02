@@ -7,15 +7,15 @@ SYNOPSIS
          perl -MCPAN -e 'install Bundle::DBD::CSV'
 
 CONTENTS
-       DBI 1.648
+       DBI 1.652
 
-       Text::CSV_XS 1.62
+       Text::CSV_XS 1.64
 
        SQL::Statement 1.414
 
        DBD::File 0.45
 
-       DBD::CSV 0.63
+       DBD::CSV 0.65
 
 DESCRIPTION
        This bundle includes all that's needed to access so-called CSV (Comma
@@ -25,7 +25,7 @@ DESCRIPTION
 AUTHOR
        This module is currently maintained by
 
-           H.Merijn Brand <h.m.brand@xs4all.nl>
+           H.Merijn Brand <perl5@tux.freedom.nl>
 
 COPYRIGHT AND LICENSE
        Copyright (C) 2009-2026 by H.Merijn Brand Copyright (C) 2004-2009 by
@@ -37,4 +37,4 @@ COPYRIGHT AND LICENSE
        General Public License or the Artistic License, as specified in the
        Perl README file.
 
-perl v5.42.2                      2026-06-12               Bundle::DBD::CSV(3)
+perl v5.44.0                      2026-09-02               Bundle::DBD::CSV(3)

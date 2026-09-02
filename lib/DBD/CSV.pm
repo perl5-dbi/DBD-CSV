@@ -4,7 +4,7 @@
 #
 #   This module is currently maintained by
 #
-#	H.Merijn Brand <h.m.brand@xs4all.nl>
+#	H.Merijn Brand <perl5@tux.freedom.nl>
 #
 #   See for full acknowledgements the last two pod sections in this file
 
@@ -1320,7 +1320,7 @@ For general information on DBI see
 
 This module is currently maintained by
 
-    H.Merijn Brand <h.m.brand@xs4all.nl>
+    H.Merijn Brand <perl5@tux.freedom.nl>
 
 in close cooperation with and help from
 

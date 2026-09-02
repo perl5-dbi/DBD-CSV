@@ -59,7 +59,7 @@ license:                 perl
 author:
     - Jochen Wiedmann
     - Jeff Zucker
-    - H.Merijn Brand <hmbrand@cpan.org>
+    - H.Merijn Brand <perl5@tux.freedom.nl>
     - Jens Rehsack <rehsack@cpan.org>
 generated_by:            Author
 distribution_type:       module
@@ -74,7 +74,7 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.651
+    DBI:                 1.652
     DBD::File:           0.45
     SQL::Statement:      1.414
     Text::CSV_XS:        1.64
@@ -94,7 +94,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302222
+    Test::More:          1.302224
     Encode:              3.12
 test_suggests:
     Encode:              3.24
