@@ -67,6 +67,9 @@ provides:
     DBD::CSV:
         file:            lib/DBD/CSV.pm
         version:         VERSION
+    Bundle::CSV:
+        file:            lib/Bundle/DBD/CSV.pm
+        version:         1.19
 requires:
     perl:                5.012000
     DBI:                 1.628
@@ -74,7 +77,7 @@ requires:
     SQL::Statement:      1.405
     Text::CSV_XS:        1.01
 recommends:
-    DBI:                 1.652
+    DBI:                 1.655
     DBD::File:           0.45
     SQL::Statement:      1.414
     Text::CSV_XS:        1.64
@@ -94,7 +97,7 @@ test_requires:
     Cwd:                 0
     charnames:           0
 test_recommends:
-    Test::More:          1.302224
+    Test::More:          1.302225
     Encode:              3.12
 test_suggests:
     Encode:              3.24
