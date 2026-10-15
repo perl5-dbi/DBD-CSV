@@ -2,7 +2,7 @@
 
 package genMETA;
 
-our $VERSION = "1.19-20260909";
+our $VERSION = "1.20-20261005";
 
 use 5.026001;
 use warnings;
@@ -171,14 +171,17 @@ sub check_required {
     my %req = map { %{$yml->{$_}} } grep m/requires/   => keys %{$yml};
     my %rec = map { %{$yml->{$_}} } grep m/recommends/ => keys %{$yml};
     my %sug = map { %{$yml->{$_}} } grep m/suggests/   => keys %{$yml};
+    my %cfl = map { %{$yml->{$_}} } grep m/conflicts/  => keys %{$yml};
     if (my $of = $yml->{optional_features}) {
 	foreach my $f (values %{$of}) {
 	    my %q = map { %{$f->{$_}} } grep m/requires/   => keys %{$f};
 	    my %c = map { %{$f->{$_}} } grep m/recommends/ => keys %{$f};
 	    my %s = map { %{$f->{$_}} } grep m/suggests/   => keys %{$f};
+	    my %C = map { %{$f->{$_}} } grep m/conflicts/  => keys %{$f};
 	    @req{keys %q} = values %q;
 	    @rec{keys %c} = values %c;
 	    @sug{keys %s} = values %s;
+	    @cfl{keys %C} = values %C;
 	    }
 	}
     if (my $of = $yml->{prereqs}) {
@@ -186,9 +189,11 @@ sub check_required {
 	    my %q = map { %{$f->{$_}} } grep m/requires/   => keys %{$f};
 	    my %c = map { %{$f->{$_}} } grep m/recommends/ => keys %{$f};
 	    my %s = map { %{$f->{$_}} } grep m/suggests/   => keys %{$f};
+	    my %C = map { %{$f->{$_}} } grep m/conflicts/  => keys %{$f};
 	    @req{keys %q} = values %q;
 	    @rec{keys %c} = values %c;
 	    @sug{keys %s} = values %s;
+	    @cfl{keys %C} = values %C;
 	    }
 	}
     my %vsn = ( %req, %rec, %sug );
@@ -205,6 +210,8 @@ sub check_required {
 	}
     if (my @mfpr = grep { $_ ne "version" } sort keys %{$self->{mfpr}}) {
 	croak RED, "Makefile.PL requires @mfpr, YAML does not", RESET, "\n";
+	}
+    if (%cfl) {	# Check conflicts!
 	}
 
     find (sub {
@@ -439,7 +446,7 @@ sub add_json {
 	}
     foreach my $sct ("", "configure_", "build_", "test_") {
 	(my $x = $sct || "runtime") =~ s/_$//;
-	for (qw( requires recommends suggests )) {
+	for (qw( requires recommends suggests conflicts )) {
 	    exists $jsn->{"$sct$_"} and
 		$jsn->{prereqs}{$x}{$_} = delete $jsn->{"$sct$_"};
 	    }
@@ -460,6 +467,10 @@ sub add_json {
 		#$jsn->{prereqs}{runtime}{suggests}{$_} //= $r->{$_} for keys %$r;
 		$of->{$f}{prereqs}{runtime}{suggests} = $r;
 		}
+	    if (my $r = delete $of->{$f}{conflicts}) {
+		#$jsn->{prereqs}{runtime}{conflicts}{$_} //= $r->{$_} for keys %$r;
+		$of->{$f}{prereqs}{runtime}{conflicts} = $r;
+		}
 	    }
 	}
 
@@ -478,8 +489,8 @@ sub fix_meta {
 	croak join "\n" => RED, "META Validator found fail:\n", $cmv->errors, RESET, "";
 
     unless ($yf) {
-	my @my = grep { -s } glob ("*/META.yml"), "META.yml" or croak "No META files";
-	$yf = $my[0];
+	my @my = grep { -s } glob ("*/META.yml"), "META.yml" or warn "No META files (yet)\n";
+	$yf = $my[0] || "META.yml";
 	}
     my $jf = $yf =~ s/yml$/json/r;
     open my $jh, ">", $jf or croak "Cannot update $jf: $!\n";
@@ -507,6 +518,9 @@ sub fix_meta {
 		}
 	    if (my $r = delete $of->{$f}{prereqs}{runtime}{suggests}) {
 		$of->{$f}{suggests} = $r;
+		}
+	    if (my $r = delete $of->{$f}{prereqs}{runtime}{conflicts}) {
+		$of->{$f}{conflicts} = $r;
 		}
 	    }
 	}
@@ -543,7 +557,7 @@ sub _cpfd {
 
     open my $sh, ">", \my $b;
     my $sep = "";
-    for (qw( requires recommends suggests )) {
+    for (qw( requires recommends suggests conflicts )) {
 	my $x = "$sct$_";
 	my $s = $jsn->{$x} or next;
 	print $sh $sep;
